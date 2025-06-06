@@ -1,8 +1,8 @@
 import axios from "axios";
 
-// Configura la URL base del backend (usa esto temporalmente para depuración)
+// Configura la URL base del backend usando la variable de entorno o un valor por defecto para desarrollo local
 const api = axios.create({
-  baseURL: "http://localhost:5000/api", // URL fija para pruebas
+  baseURL: process.env.REACT_APP_API_URL || "http://localhost:5000/api",
   headers: {
     "Content-Type": "application/json",
   },
@@ -53,7 +53,7 @@ api.interceptors.response.use(
     if (!error.response) {
       return Promise.reject(
         new Error(
-          "Error de conexión. Por favor, verifica tu conexión a internet."
+          "Error de conexión. Por favor, verifica tu conexión a internet o la URL del backend."
         )
       );
     }
