@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Button, Alert } from "react-bootstrap";
-import axios from "axios";
+import { crearCliente } from "../api/axios"; // Usa la función exportada
 import { AuthContext } from "../context/AuthContext";
 
 const CrearCliente = () => {
@@ -64,11 +64,7 @@ const CrearCliente = () => {
         headers: { Authorization: `Bearer ${user.token}` },
       };
       console.log("Datos enviados:", formData); // Depuración
-      const response = await axios.post(
-        "http://localhost:5000/api/clientes",
-        formData,
-        config
-      );
+      const response = await crearCliente(formData, config); // Usa la función de axios
       console.log("Respuesta del backend:", response.data);
       setSuccess("Cliente creado con éxito!");
       setFormData({
