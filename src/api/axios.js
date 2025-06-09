@@ -18,7 +18,7 @@ api.interceptors.request.use(
     } else {
       console.log("No se encontró token en localStorage.");
     }
-    console.log("Solicitud enviada a:", config.url);
+    console.log("Solicitud enviada a:", `${config.baseURL}${config.url}`);
     return config;
   },
   (error) => {
