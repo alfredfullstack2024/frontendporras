@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Configura la URL base del backend usando la variable de entorno o un valor por defecto para desarrollo local
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "http://localhost:5000/api",
+  baseURL: process.env.REACT_APP_API_URL || "http://localhost:5000/api", // Mantén localhost para desarrollo
   headers: {
     "Content-Type": "application/json",
   },
