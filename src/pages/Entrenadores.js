@@ -18,9 +18,8 @@ const Entrenadores = () => {
         setEntrenadores(response.data);
       } catch (err) {
         if (err.response && err.response.status === 403) {
-          // Redirigir al dashboard o mostrar mensaje genérico
+          // Redirigir al panel si no hay permisos
           navigate("/dashboard");
-          setError("No tienes permisos para ver esta sección. Redirigiendo al Dashboard.");
         } else {
           setError("Error al cargar los entrenadores: " + (err.response?.data?.mensaje || err.message));
         }
@@ -32,12 +31,20 @@ const Entrenadores = () => {
     fetchEntrenadores();
   }, [navigate]);
 
+  if (!isLoading && error) {
+    return (
+      <div className="container mt-4">
+        <h2>Lista de Entrenadores</h2>
+        <Alert variant="danger">{error}</Alert>
+      </div>
+    );
+  }
+
   return (
     <div className="container mt-4">
       <h2>Lista de Entrenadores</h2>
-      {error && <Alert variant="danger">{error}</Alert>}
       {isLoading && <Alert variant="info">Cargando entrenadores...</Alert>}
-      {!isLoading && !error && entrenadores.length === 0 && (
+      {!isLoading && entrenadores.length === 0 && !error && (
         <Alert variant="info">No hay entrenadores para mostrar.</Alert>
       )}
       {!isLoading && !error && entrenadores.length > 0 && (
