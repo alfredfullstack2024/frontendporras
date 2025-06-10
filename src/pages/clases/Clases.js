@@ -19,9 +19,8 @@ const Clases = () => {
         setClases(response.data);
       } catch (err) {
         if (err.response && err.response.status === 403) {
-          // Redirigir al dashboard o mostrar mensaje genérico
+          // Redirigir al panel si no hay permisos
           navigate("/dashboard");
-          setError("No tienes permisos para ver esta sección. Redirigiendo al Dashboard.");
         } else {
           setError("No se pudieron cargar las clases: " + (err.response?.data?.mensaje || err.message));
         }
@@ -33,10 +32,18 @@ const Clases = () => {
     fetchClases();
   }, [navigate]);
 
+  if (!isLoading && error) {
+    return (
+      <div className="container mt-4">
+        <h2>Lista de Clases Disponibles</h2>
+        <Alert variant="danger">{error}</Alert>
+      </div>
+    );
+  }
+
   return (
     <div className="container mt-4">
       <h2>Lista de Clases Disponibles</h2>
-      {error && <Alert variant="danger">{error}</Alert>}
       {isLoading && <Alert variant="info">Cargando clases...</Alert>}
       {!isLoading && !error && clases.length === 0 && (
         <Alert variant="info">No hay clases disponibles.</Alert>
