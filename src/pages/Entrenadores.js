@@ -18,7 +18,6 @@ const Entrenadores = () => {
         setEntrenadores(response.data);
       } catch (err) {
         if (err.response && err.response.status === 403) {
-          // Redirigir al panel si no hay permisos
           navigate("/dashboard");
         } else {
           setError("Error al cargar los entrenadores: " + (err.response?.data?.mensaje || err.message));
@@ -44,7 +43,7 @@ const Entrenadores = () => {
     <div className="container mt-4">
       <h2>Lista de Entrenadores</h2>
       {isLoading && <Alert variant="info">Cargando entrenadores...</Alert>}
-      {!isLoading && entrenadores.length === 0 && !error && (
+      {!isLoading && !error && entrenadores.length === 0 && (
         <Alert variant="info">No hay entrenadores para mostrar.</Alert>
       )}
       {!isLoading && !error && entrenadores.length > 0 && (
