@@ -17,11 +17,7 @@ const Entrenadores = () => {
         const response = await api.get("/entrenadores");
         setEntrenadores(response.data);
       } catch (err) {
-        if (err.response && err.response.status === 403) {
-          navigate("/dashboard");
-        } else {
-          setError("Error al cargar los entrenadores: " + (err.response?.data?.mensaje || err.message));
-        }
+        setError("Error al cargar los entrenadores: " + (err.response?.data?.mensaje || err.message));
       } finally {
         setIsLoading(false);
       }
@@ -30,18 +26,10 @@ const Entrenadores = () => {
     fetchEntrenadores();
   }, [navigate]);
 
-  if (!isLoading && error) {
-    return (
-      <div className="container mt-4">
-        <h2>Lista de Entrenadores</h2>
-        <Alert variant="danger">{error}</Alert>
-      </div>
-    );
-  }
-
   return (
     <div className="container mt-4">
       <h2>Lista de Entrenadores</h2>
+      {error && <Alert variant="danger">{error}</Alert>}
       {isLoading && <Alert variant="info">Cargando entrenadores...</Alert>}
       {!isLoading && !error && entrenadores.length === 0 && (
         <Alert variant="info">No hay entrenadores para mostrar.</Alert>
@@ -65,10 +53,23 @@ const Entrenadores = () => {
                 <td>{entrenador.correo}</td>
                 <td>{entrenador.especialidad}</td>
                 <td>
-                  <Button variant="warning" size="sm" className="me-2">
+                  <Button
+                    variant="warning"
+                    size="sm"
+                    className="me-2"
+                    onClick={() => navigate(`/entrenadores/editar/${entrenador._id}`)}
+                  >
                     Editar
                   </Button>
-                  <Button variant="danger" size="sm">
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    onClick={() => {
+                      if (window.confirm("¿Estás seguro de eliminar este entrenador?")) {
+                        // Lógica de eliminación aquí si la tienes
+                      }
+                    }}
+                  >
                     Eliminar
                   </Button>
                 </td>
