@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
-import axios from "axios";
+import { crearEntrenador } from "../api/axios"; // Usa la función exportada
 
 const CrearEntrenador = () => {
   const navigate = useNavigate();
@@ -49,9 +49,8 @@ const CrearEntrenador = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await axios.post("http://localhost:5000/api/entrenadores", entrenador, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      await crearEntrenador(entrenador, config); // Usa la función de axios
       alert("Entrenador creado con éxito");
       navigate("/entrenadores");
     } catch (err) {
