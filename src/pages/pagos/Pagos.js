@@ -42,17 +42,14 @@ const Pagos = () => {
 
       console.log("Parámetros enviados a /pagos:", params);
       const response = await api.get("/pagos", { params });
-      console.log("Respuesta del backend (/pagos):", response.data);
+      console.log("Respuesta completa del backend (/pagos):", response.data);
       const fetchedPagos = response.data.pagos || [];
       setPagos(fetchedPagos);
 
-      // Aplicar filtrado por nombre si existe
       const pagosFiltrados = busquedaNombre
         ? fetchedPagos.filter((pago) => {
             const nombreCliente = pago.cliente
-              ? `${pago.cliente.nombre} ${
-                  pago.cliente.apellido || ""
-                }`.toLowerCase()
+              ? `${pago.cliente.nombre} ${pago.cliente.apellido || ""}`.toLowerCase()
               : "";
             return nombreCliente.includes(busquedaNombre.toLowerCase());
           })
@@ -60,10 +57,10 @@ const Pagos = () => {
       setPagosFiltrados(pagosFiltrados);
     } catch (err) {
       const errorMessage = err.response?.data?.message || err.message;
+      console.error("Error detallado en fetchPagos:", err.response?.data);
       setError("Error al cargar los pagos: " + errorMessage);
       setPagos([]);
       setPagosFiltrados([]);
-      console.error("Detalles del error:", err.response?.data);
     } finally {
       setIsLoading(false);
     }
@@ -71,7 +68,7 @@ const Pagos = () => {
 
   useEffect(() => {
     fetchPagos();
-  }, [filtroTipo, mes, semana, fetchPagos]);
+  }, [fetchPagos]);
 
   const manejarFiltrar = async (e) => {
     e.preventDefault();
@@ -91,8 +88,7 @@ const Pagos = () => {
   };
 
   const eliminarPago = async (id) => {
-    if (!window.confirm("¿Estás seguro de que deseas eliminar este pago?"))
-      return;
+    if (!window.confirm("¿Estás seguro de que deseas eliminar este pago?")) return;
     try {
       setIsLoading(true);
       await api.delete(`/pagos/${id}`);
@@ -102,9 +98,7 @@ const Pagos = () => {
           busquedaNombre
             ? nuevosPagos.filter((pago) => {
                 const nombreCliente = pago.cliente
-                  ? `${pago.cliente.nombre} ${
-                      pago.cliente.apellido || ""
-                    }`.toLowerCase()
+                  ? `${pago.cliente.nombre} ${pago.cliente.apellido || ""}`.toLowerCase()
                   : "";
                 return nombreCliente.includes(busquedaNombre.toLowerCase());
               })
@@ -115,8 +109,7 @@ const Pagos = () => {
       setError("");
     } catch (err) {
       setError(
-        "Error al eliminar el pago: " +
-          (err.response?.data?.message || err.message)
+        "Error al eliminar el pago: " + (err.response?.data?.message || err.message)
       );
       await fetchPagos();
     } finally {
@@ -137,13 +130,10 @@ const Pagos = () => {
     const valor = e.target.value;
     setBusquedaNombre(valor);
 
-    // Filtrar los pagos en el frontend
     const pagosFiltrados = valor
       ? pagos.filter((pago) => {
           const nombreCliente = pago.cliente
-            ? `${pago.cliente.nombre} ${
-                pago.cliente.apellido || ""
-              }`.toLowerCase()
+            ? `${pago.cliente.nombre} ${pago.cliente.apellido || ""}`.toLowerCase()
             : "";
           return nombreCliente.includes(valor.toLowerCase());
         })
@@ -152,22 +142,16 @@ const Pagos = () => {
   };
 
   const esProximoVencimiento = (fecha, productoNombre) => {
-    // Solo aplicar la lógica a productos de tipo "Mensualidad"
-    if (
-      !productoNombre ||
-      !productoNombre.toLowerCase().includes("mensualidad")
-    ) {
+    if (!productoNombre || !productoNombre.toLowerCase().includes("mensualidad")) {
       return false;
     }
 
     const fechaPago = new Date(fecha);
     const vencimiento = new Date(fechaPago);
-    vencimiento.setDate(vencimiento.getDate() + 30); // Suma 30 días para mensualidad
-    const hoy = new Date(); // Fecha actual: 20/5/2025
-    const diferenciaDias = Math.ceil(
-      (vencimiento - hoy) / (1000 * 60 * 60 * 24)
-    );
-    return diferenciaDias <= 5 && diferenciaDias > 0; // Menos de 5 días y no vencido
+    vencimiento.setDate(vencimiento.getDate() + 30);
+    const hoy = new Date();
+    const diferenciaDias = Math.ceil((vencimiento - hoy) / (1000 * 60 * 60 * 24));
+    return diferenciaDias <= 5 && diferenciaDias > 0;
   };
 
   return (
