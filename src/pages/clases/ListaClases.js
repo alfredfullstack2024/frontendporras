@@ -15,15 +15,15 @@ const ListaClases = () => {
       setError("");
       try {
         const response = await obtenerClases();
-        console.log("Clases cargadas (estructura):", response.data);
+        console.log("Clases cargadas:", response.data);
         if (response.data && Array.isArray(response.data)) {
           setClases(response.data);
         } else {
           setClases([]);
-          setError("Formato de datos inesperado del servidor");
+          setError("Formato de datos inválido del servidor");
         }
       } catch (err) {
-        setError("Error al cargar clases: " + (err.response?.data?.mensaje || err.message || err.toString()));
+        setError("Error al cargar clases: " + (err.message || "Sin detalles"));
         console.error("Error detallado:", err);
       } finally {
         setIsLoading(false);
@@ -33,13 +33,13 @@ const ListaClases = () => {
   }, []);
 
   const handleDelete = async (id) => {
-    if (window.confirm("¿Estás seguro de que deseas eliminar esta clase?")) {
+    if (window.confirm("¿Estás seguro de eliminar esta clase?")) {
       setIsLoading(true);
       try {
         await eliminarClase(id);
         setClases(clases.filter((clase) => clase._id !== id));
       } catch (err) {
-        setError("Error al eliminar la clase: " + (err.response?.data?.mensaje || err.message));
+        setError("Error al eliminar clase: " + (err.message || "Sin detalles"));
         console.error("Error al eliminar:", err);
       } finally {
         setIsLoading(false);
@@ -50,21 +50,12 @@ const ListaClases = () => {
   return (
     <div className="container mt-4">
       <h2>Lista de Clases</h2>
-
       {isLoading && <Alert variant="info">Cargando...</Alert>}
       {error && <Alert variant="danger">{error}</Alert>}
-      {!isLoading && clases.length === 0 && !error && (
-        <Alert variant="info">No hay clases para mostrar.</Alert>
-      )}
-
+      {!isLoading && clases.length === 0 && !error && <Alert variant="info">No hay clases para mostrar.</Alert>}
       <Card>
         <Card.Body>
-          <Button
-            variant="primary"
-            className="mb-3"
-            onClick={() => navigate("/clases/crear")}
-            disabled={isLoading}
-          >
+          <Button variant="primary" className="mb-3" onClick={() => navigate("/clases/crear")} disabled={isLoading}>
             Crear Nueva Clase
           </Button>
           <Table striped bordered hover responsive>
