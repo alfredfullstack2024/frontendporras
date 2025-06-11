@@ -12,12 +12,19 @@ const ListaClases = () => {
   useEffect(() => {
     const fetchClases = async () => {
       setIsLoading(true);
+      setError("");
       try {
         const response = await obtenerClases();
         console.log("Clases cargadas (estructura):", response.data);
-        setClases(response.data);
+        if (response.data && Array.isArray(response.data)) {
+          setClases(response.data);
+        } else {
+          setClases([]);
+          setError("Formato de datos inesperado del servidor");
+        }
       } catch (err) {
-        setError("Error al cargar clases: " + err.message);
+        setError("Error al cargar clases: " + (err.response?.data?.mensaje || err.message || err.toString()));
+        console.error("Error detallado:", err);
       } finally {
         setIsLoading(false);
       }
@@ -32,7 +39,8 @@ const ListaClases = () => {
         await eliminarClase(id);
         setClases(clases.filter((clase) => clase._id !== id));
       } catch (err) {
-        setError("Error al eliminar la clase: " + err.message);
+        setError("Error al eliminar la clase: " + (err.response?.data?.mensaje || err.message));
+        console.error("Error al eliminar:", err);
       } finally {
         setIsLoading(false);
       }
@@ -73,26 +81,24 @@ const ListaClases = () => {
             <tbody>
               {clases.map((clase) => (
                 <tr key={clase._id}>
-                  <td>{clase.nombreClase}</td>
+                  <td>{clase.nombreClase || "Sin nombre"}</td>
                   <td>
-                    {clase.dias &&
-                    Array.isArray(clase.dias) &&
-                    clase.dias.length > 0
+                    {clase.dias && Array.isArray(clase.dias) && clase.dias.length > 0
                       ? clase.dias.map((dia, index) => (
                           <div key={index}>
-                            {dia.dia.charAt(0).toUpperCase() + dia.dia.slice(1)}
-                            : {dia.horarioInicio} - {dia.horarioFin}
+                            {dia.dia.charAt(0).toUpperCase() + dia.dia.slice(1) || "Sin día"}
+                            : {dia.horarioInicio || "N/A"} - {dia.horarioFin || "N/A"}
                           </div>
                         ))
                       : "Sin horario"}
                   </td>
-                  <td>{clase.capacidadMaxima}</td>
+                  <td>{clase.capacidadMaxima || "N/A"}</td>
                   <td>
                     {clase.entrenador
-                      ? `${clase.entrenador.nombre} ${clase.entrenador.apellido}`
+                      ? `${clase.entrenador.nombre || ""} ${clase.entrenador.apellido || ""}`
                       : "Sin entrenador"}
                   </td>
-                  <td>{clase.estado}</td>
+                  <td>{clase.estado || "Sin estado"}</td>
                   <td>
                     <Button
                       variant="warning"
