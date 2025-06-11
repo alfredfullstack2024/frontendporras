@@ -1,8 +1,8 @@
 import axios from "axios";
 
-// Configura la URL base del backend usando la variable de entorno o un valor por defecto para desarrollo local
+// Configura la URL base del backend usando la variable de entorno o un valor por defecto para producción
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || "https://admin-gimnasios-backend.onrender.com/api/", // Cambia localhost por la URL del backend desplegado
+  baseURL: process.env.REACT_APP_API_URL || "https://admin-gimnasios-backend.onrender.com/api/", // URL de producción como fallback
   headers: {
     "Content-Type": "application/json",
   },
