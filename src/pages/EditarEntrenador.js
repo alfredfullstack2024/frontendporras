@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
+import { Form, Button, Container } from "react-bootstrap";
 import { useParams, useNavigate } from "react-router-dom";
-import { Form, Button, Container, Row, Col } from "react-bootstrap";
-import api from "../../api/axios";
+import { obtenerEntrenadorPorId, editarEntrenador } from "../../api/axios";
 
 const EditarEntrenador = () => {
   const { id } = useParams();
@@ -12,87 +12,43 @@ const EditarEntrenador = () => {
     correo: "",
     telefono: "",
     especialidad: "",
-    clases: [
-      { nombreClase: "Entrenamiento General", dias: [], capacidadMaxima: 10 },
-    ],
+    clases: [{ nombreClase: "", dias: [], capacidadMaxima: 10 }],
   });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const [error, setError] = useState("");
 
   useEffect(() => {
     const fetchEntrenador = async () => {
+      setLoading(true);
       try {
-        const token = localStorage.getItem("token");
-        const response = await api.get(`/entrenadores/${id}`, {
-          headers: { Authorization: `Bearer ${token}` },
+        const response = await obtenerEntrenadorPorId(id);
+        setEntrenador(response.data || {
+          nombre: "",
+          apellido: "",
+          correo: "",
+          telefono: "",
+          especialidad: "",
+          clases: [{ nombreClase: "", dias: [], capacidadMaxima: 10 }],
         });
-        const data = response.data;
-        setEntrenador({
-          nombre: data.nombre,
-          apellido: data.apellido,
-          correo: data.correo,
-          telefono: data.telefono,
-          especialidad: data.especialidad,
-          clases: data.clases || [
-            {
-              nombreClase: "Entrenamiento General",
-              dias: [],
-              capacidadMaxima: 10,
-            },
-          ],
-        });
-        setLoading(false);
       } catch (err) {
-        setError(
-          err.response?.data?.mensaje || "Error al cargar el entrenador"
-        );
+        setError("Error al cargar el entrenador: " + (err.message || "Sin detalles"));
+      } finally {
         setLoading(false);
       }
     };
     fetchEntrenador();
   }, [id]);
 
-  const handleClaseChange = (index, field, value) => {
-    const nuevasClases = [...entrenador.clases];
-    nuevasClases[index][field] = value;
-    setEntrenador({ ...entrenador, clases: nuevasClases });
-  };
-
-  const handleDiaChange = (claseIndex, diaIndex, field, value) => {
-    const nuevasClases = [...entrenador.clases];
-    nuevasClases[claseIndex].dias[diaIndex][field] = value;
-    setEntrenador({ ...entrenador, clases: nuevasClases });
-  };
-
-  const agregarDia = (claseIndex) => {
-    const nuevasClases = [...entrenador.clases];
-    nuevasClases[claseIndex].dias.push({
-      dia: "",
-      horarioInicio: "",
-      horarioFin: "",
-    });
-    setEntrenador({ ...entrenador, clases: nuevasClases });
-  };
-
-  const eliminarDia = (claseIndex, diaIndex) => {
-    const nuevasClases = [...entrenador.clases];
-    nuevasClases[claseIndex].dias.splice(diaIndex, 1);
-    setEntrenador({ ...entrenador, clases: nuevasClases });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
     try {
-      const token = localStorage.getItem("token");
-      await api.put(`/entrenadores/${id}`, entrenador, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      alert("Entrenador actualizado con éxito");
+      await editarEntrenador(id, entrenador);
       navigate("/entrenadores");
     } catch (err) {
-      setError(
-        err.response?.data?.mensaje || "Error al actualizar el entrenador"
-      );
+      setError("Error al actualizar el entrenador: " + (err.message || "Sin detalles"));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -108,9 +64,7 @@ const EditarEntrenador = () => {
           <Form.Control
             type="text"
             value={entrenador.nombre}
-            onChange={(e) =>
-              setEntrenador({ ...entrenador, nombre: e.target.value })
-            }
+            onChange={(e) => setEntrenador({ ...entrenador, nombre: e.target.value })}
             required
           />
         </Form.Group>
@@ -119,9 +73,7 @@ const EditarEntrenador = () => {
           <Form.Control
             type="text"
             value={entrenador.apellido}
-            onChange={(e) =>
-              setEntrenador({ ...entrenador, apellido: e.target.value })
-            }
+            onChange={(e) => setEntrenador({ ...entrenador, apellido: e.target.value })}
             required
           />
         </Form.Group>
@@ -130,9 +82,7 @@ const EditarEntrenador = () => {
           <Form.Control
             type="email"
             value={entrenador.correo}
-            onChange={(e) =>
-              setEntrenador({ ...entrenador, correo: e.target.value })
-            }
+            onChange={(e) => setEntrenador({ ...entrenador, correo: e.target.value })}
             required
           />
         </Form.Group>
@@ -141,9 +91,7 @@ const EditarEntrenador = () => {
           <Form.Control
             type="text"
             value={entrenador.telefono}
-            onChange={(e) =>
-              setEntrenador({ ...entrenador, telefono: e.target.value })
-            }
+            onChange={(e) => setEntrenador({ ...entrenador, telefono: e.target.value })}
             required
           />
         </Form.Group>
@@ -152,103 +100,11 @@ const EditarEntrenador = () => {
           <Form.Control
             type="text"
             value={entrenador.especialidad}
-            onChange={(e) =>
-              setEntrenador({ ...entrenador, especialidad: e.target.value })
-            }
+            onChange={(e) => setEntrenador({ ...entrenador, especialidad: e.target.value })}
             required
           />
         </Form.Group>
-
-        {entrenador.clases.map((clase, claseIndex) => (
-          <div key={claseIndex} className="mb-4">
-            <h5>Clase {claseIndex + 1}</h5>
-            <Form.Group className="mb-3">
-              <Form.Label>Nombre de la Clase</Form.Label>
-              <Form.Control
-                type="text"
-                value={clase.nombreClase}
-                onChange={(e) =>
-                  handleClaseChange(claseIndex, "nombreClase", e.target.value)
-                }
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Capacidad Máxima</Form.Label>
-              <Form.Control
-                type="number"
-                value={clase.capacidadMaxima}
-                onChange={(e) =>
-                  handleClaseChange(
-                    claseIndex,
-                    "capacidadMaxima",
-                    Number(e.target.value)
-                  )
-                }
-              />
-            </Form.Group>
-            <h6>Días y Horarios</h6>
-            {clase.dias.map((dia, diaIndex) => (
-              <Row key={diaIndex} className="mb-2">
-                <Col>
-                  <Form.Control
-                    type="text"
-                    placeholder="Día"
-                    value={dia.dia}
-                    onChange={(e) =>
-                      handleDiaChange(
-                        claseIndex,
-                        diaIndex,
-                        "dia",
-                        e.target.value
-                      )
-                    }
-                  />
-                </Col>
-                <Col>
-                  <Form.Control
-                    type="time"
-                    value={dia.horarioInicio}
-                    onChange={(e) =>
-                      handleDiaChange(
-                        claseIndex,
-                        diaIndex,
-                        "horarioInicio",
-                        e.target.value
-                      )
-                    }
-                  />
-                </Col>
-                <Col>
-                  <Form.Control
-                    type="time"
-                    value={dia.horarioFin}
-                    onChange={(e) =>
-                      handleDiaChange(
-                        claseIndex,
-                        diaIndex,
-                        "horarioFin",
-                        e.target.value
-                      )
-                    }
-                  />
-                </Col>
-                <Col>
-                  <Button
-                    variant="danger"
-                    onClick={() => eliminarDia(claseIndex, diaIndex)}
-                  >
-                    Eliminar
-                  </Button>
-                </Col>
-              </Row>
-            ))}
-            <Button variant="secondary" onClick={() => agregarDia(claseIndex)}>
-              Agregar Día
-            </Button>
-          </div>
-        ))}
-
-        <Button variant="primary" type="submit">
+        <Button variant="primary" type="submit" disabled={loading}>
           Actualizar Entrenador
         </Button>
       </Form>
