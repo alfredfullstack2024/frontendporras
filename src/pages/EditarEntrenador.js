@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
-import axios from "axios";
+import api from "../../api/axios";
 
 const EditarEntrenador = () => {
   const { id } = useParams();
@@ -23,12 +23,9 @@ const EditarEntrenador = () => {
     const fetchEntrenador = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get(
-          `http://localhost:5000/api/entrenadores/${id}`,
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
-        );
+        const response = await api.get(`/entrenadores/${id}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = response.data;
         setEntrenador({
           nombre: data.nombre,
@@ -87,11 +84,9 @@ const EditarEntrenador = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      await axios.put(
-        `http://localhost:5000/api/entrenadores/${id}`,
-        entrenador,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
+      await api.put(`/entrenadores/${id}`, entrenador, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       alert("Entrenador actualizado con éxito");
       navigate("/entrenadores");
     } catch (err) {
