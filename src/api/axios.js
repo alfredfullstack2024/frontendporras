@@ -63,4 +63,26 @@ export const crearEntrenador = (data, config) => api.post("/entrenadores", data,
 export const obtenerEntrenadores = (config) => api.get("/entrenadores", config);
 export const eliminarEntrenador = (id, config) => api.delete(`/entrenadores/${id}`, config);
 
+// Nueva función para obtener todas las clases de los entrenadores
+export const obtenerClases = async (config) => {
+  const response = await api.get("/entrenadores", config);
+  const clases = response.data.flatMap((entrenador) => 
+    (entrenador.clases || []).map(clase => ({
+      ...clase,
+      _id: `${entrenador._id}-${clase.nombreClase}`, // Generar un ID único para la clase
+      entrenador: { nombre: entrenador.nombre, apellido: entrenador.apellido }
+    }))
+  );
+  return { data: clases };
+};
+
+// Nueva función para eliminar una clase (actualiza el entrenador correspondiente)
+export const eliminarClase = async (id, config) => {
+  const [entrenadorId, nombreClase] = id.split('-');
+  const response = await api.get(`/entrenadores/${entrenadorId}`, config);
+  const entrenador = response.data;
+  const nuevasClases = (entrenador.clases || []).filter(clase => clase.nombreClase !== nombreClase);
+  await api.put(`/entrenadores/${entrenadorId}`, { ...entrenador, clases: nuevasClases }, config);
+};
+
 export default api;
