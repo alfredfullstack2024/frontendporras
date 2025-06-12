@@ -22,7 +22,8 @@ const EditarEntrenador = () => {
       const fetchEntrenador = async () => {
         setLoading(true);
         try {
-          const response = await obtenerEntrenadorPorId(id, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } });
+          const config = { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } };
+          const response = await obtenerEntrenadorPorId(id, config);
           setEntrenador(response.data || {
             nombre: "",
             apellido: "",
