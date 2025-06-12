@@ -61,7 +61,12 @@ const ListaClases = () => {
       {!isLoading && clases.length === 0 && !error && <Alert variant="info">No hay clases para mostrar.</Alert>}
       <Card>
         <Card.Body>
-          <Button variant="primary" className="mb-3" onClick={() => navigate("/clases/crear")} disabled={isLoading}>
+          <Button
+            variant="primary"
+            className="mb-3"
+            onClick={() => navigate("/entrenadores/crear")} // Cambiado a crear entrenador
+            disabled={isLoading}
+          >
             Crear Nueva Clase
           </Button>
           <Table striped bordered hover responsive>
@@ -100,7 +105,7 @@ const ListaClases = () => {
                     <Button
                       variant="warning"
                       className="me-2"
-                      onClick={() => navigate(`/clases/editar/${clase._id}`)}
+                      onClick={() => navigate(`/entrenadores/editar/${clase._id.split('-')[0]}`)} // Editar entrenador
                       disabled={isLoading}
                     >
                       Editar
