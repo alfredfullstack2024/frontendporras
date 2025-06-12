@@ -22,7 +22,7 @@ const EditarEntrenador = () => {
       const fetchEntrenador = async () => {
         setLoading(true);
         try {
-          const response = await obtenerEntrenadorPorId(id);
+          const response = await obtenerEntrenadorPorId(id, { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } });
           setEntrenador(response.data || {
             nombre: "",
             apellido: "",
@@ -47,10 +47,11 @@ const EditarEntrenador = () => {
     e.preventDefault();
     setLoading(true);
     try {
+      const config = { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } };
       if (id) {
-        await editarEntrenador(id, entrenador);
+        await editarEntrenador(id, entrenador, config);
       } else {
-        await crearEntrenador(entrenador);
+        await crearEntrenador(entrenador, config);
       }
       navigate("/entrenadores");
     } catch (err) {
