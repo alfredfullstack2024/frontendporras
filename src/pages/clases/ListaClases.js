@@ -14,7 +14,10 @@ const ListaClases = () => {
       setIsLoading(true);
       setError("");
       try {
-        const response = await obtenerClases();
+        const config = {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        };
+        const response = await obtenerClases(config);
         console.log("Clases cargadas:", response.data);
         if (response.data && Array.isArray(response.data)) {
           setClases(response.data);
@@ -36,7 +39,10 @@ const ListaClases = () => {
     if (window.confirm("¿Estás seguro de eliminar esta clase?")) {
       setIsLoading(true);
       try {
-        await eliminarClase(id);
+        const config = {
+          headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        };
+        await eliminarClase(id, config);
         setClases(clases.filter((clase) => clase._id !== id));
       } catch (err) {
         setError("Error al eliminar clase: " + (err.message || "Sin detalles"));
@@ -77,7 +83,7 @@ const ListaClases = () => {
                     {clase.dias && Array.isArray(clase.dias) && clase.dias.length > 0
                       ? clase.dias.map((dia, index) => (
                           <div key={index}>
-                            {dia.dia.charAt(0).toUpperCase() + dia.dia.slice(1) || "Sin día"}
+                            {(dia.dia?.charAt(0).toUpperCase() + dia.dia?.slice(1)) || "Sin día"}
                             : {dia.horarioInicio || "N/A"} - {dia.horarioFin || "N/A"}
                           </div>
                         ))
