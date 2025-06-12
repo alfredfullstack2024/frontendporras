@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, Container } from "react-bootstrap";
 import { useParams, useNavigate } from "react-router-dom";
-import { obtenerEntrenadorPorId, editarEntrenador } from "../../api/axios";
+import { obtenerEntrenadorPorId, editarEntrenador, crearEntrenador } from "../../api/axios";
 
 const EditarEntrenador = () => {
   const { id } = useParams();
@@ -18,35 +18,43 @@ const EditarEntrenador = () => {
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const fetchEntrenador = async () => {
-      setLoading(true);
-      try {
-        const response = await obtenerEntrenadorPorId(id);
-        setEntrenador(response.data || {
-          nombre: "",
-          apellido: "",
-          correo: "",
-          telefono: "",
-          especialidad: "",
-          clases: [{ nombreClase: "", dias: [], capacidadMaxima: 10 }],
-        });
-      } catch (err) {
-        setError("Error al cargar el entrenador: " + (err.message || "Sin detalles"));
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchEntrenador();
+    if (id) {
+      const fetchEntrenador = async () => {
+        setLoading(true);
+        try {
+          const response = await obtenerEntrenadorPorId(id);
+          setEntrenador(response.data || {
+            nombre: "",
+            apellido: "",
+            correo: "",
+            telefono: "",
+            especialidad: "",
+            clases: [{ nombreClase: "", dias: [], capacidadMaxima: 10 }],
+          });
+        } catch (err) {
+          setError("Error al cargar el entrenador: " + (err.message || "Sin detalles"));
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchEntrenador();
+    } else {
+      setLoading(false);
+    }
   }, [id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      await editarEntrenador(id, entrenador);
+      if (id) {
+        await editarEntrenador(id, entrenador);
+      } else {
+        await crearEntrenador(entrenador);
+      }
       navigate("/entrenadores");
     } catch (err) {
-      setError("Error al actualizar el entrenador: " + (err.message || "Sin detalles"));
+      setError("Error al guardar el entrenador: " + (err.message || "Sin detalles"));
     } finally {
       setLoading(false);
     }
@@ -57,7 +65,7 @@ const EditarEntrenador = () => {
 
   return (
     <Container>
-      <h2>Editar Entrenador</h2>
+      <h2>{id ? "Editar" : "Crear"} Entrenador</h2>
       <Form onSubmit={handleSubmit}>
         <Form.Group className="mb-3">
           <Form.Label>Nombre</Form.Label>
@@ -105,7 +113,7 @@ const EditarEntrenador = () => {
           />
         </Form.Group>
         <Button variant="primary" type="submit" disabled={loading}>
-          Actualizar Entrenador
+          {id ? "Actualizar" : "Crear"} Entrenador
         </Button>
       </Form>
     </Container>
