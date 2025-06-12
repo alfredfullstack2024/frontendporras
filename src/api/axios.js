@@ -47,6 +47,7 @@ export const obtenerEntrenadores = (config) => api.get("/entrenadores", config);
 export const obtenerEntrenadorPorId = (id, config) => api.get(`/entrenadores/${id}`, config);
 export const editarEntrenador = (id, data, config) => api.put(`/entrenadores/${id}`, data, config);
 export const crearEntrenador = (data, config) => api.post("/entrenadores", data, config);
+export const eliminarEntrenador = (id, config) => api.delete(`/entrenadores/${id}`, config); // Añadido para eliminar
 export const obtenerClientes = (config) => api.get("/clientes", config);
 export const consultarClientePorCedula = (numeroIdentificacion, config) => api.get(`/clientes/consultar/${numeroIdentificacion}`, config);
 export const obtenerClientePorId = (id, config) => api.get(`/clientes/${id}`, config);
@@ -82,7 +83,6 @@ export const obtenerTransaccionPorId = (id, config) => api.get(`/contabilidad/${
 export const crearTransaccion = (data, config) => api.post("/contabilidad", data, config);
 export const editarTransaccion = (id, data, config) => api.put(`/contabilidad/${id}`, data, config);
 export const eliminarTransaccion = (id, config) => api.delete(`/contabilidad/${id}`, config);
-export const eliminarEntrenador = (id, config) => api.delete(`/entrenadores/${id}`, config);
 export const obtenerRutinas = (config) => api.get("/rutinas", config);
 export const crearRutina = (data, config) => api.post("/rutinas", data, config);
 export const editarRutina = (id, data, config) => api.put(`/rutinas/${id}`, data, config);
