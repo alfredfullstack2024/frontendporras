@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, Container } from "react-bootstrap";
 import { useParams, useNavigate } from "react-router-dom";
-import { obtenerEntrenadorPorId, editarEntrenador, crearEntrenador } from "../../api/axios";
+import { obtenerEntrenadorPorId, editarEntrenador, crearEntrenador } from "../api/axios"; // Ajuste de la ruta de importación
 
 const EditarEntrenador = () => {
   const { id } = useParams();
@@ -24,13 +24,15 @@ const EditarEntrenador = () => {
         try {
           const config = { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } };
           const response = await obtenerEntrenadorPorId(id, config);
-          setEntrenador(response.data || {
-            nombre: "",
-            apellido: "",
-            correo: "",
-            telefono: "",
-            especialidad: "",
-            clases: [{ nombreClase: "", dias: [], capacidadMaxima: 10 }],
+          // Asegurarse de que response.data tenga la estructura esperada
+          const data = response.data || {};
+          setEntrenador({
+            nombre: data.nombre || "",
+            apellido: data.apellido || "",
+            correo: data.correo || "",
+            telefono: data.telefono || "",
+            especialidad: data.especialidad || "",
+            clases: data.clases || [{ nombreClase: "", dias: [], capacidadMaxima: 10 }],
           });
         } catch (err) {
           setError("Error al cargar el entrenador: " + (err.message || "Sin detalles"));
@@ -49,10 +51,18 @@ const EditarEntrenador = () => {
     setLoading(true);
     try {
       const config = { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } };
+      const payload = {
+        nombre: entrenador.nombre,
+        apellido: entrenador.apellido,
+        correo: entrenador.correo,
+        telefono: entrenador.telefono,
+        especialidad: entrenador.especialidad,
+        clases: entrenador.clases,
+      };
       if (id) {
-        await editarEntrenador(id, entrenador, config);
+        await editarEntrenador(id, payload, config);
       } else {
-        await crearEntrenador(entrenador, config);
+        await crearEntrenador(payload, config);
       }
       navigate("/entrenadores");
     } catch (err) {
