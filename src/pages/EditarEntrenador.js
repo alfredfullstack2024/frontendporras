@@ -1,7 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import { useParams, useNavigate } from "react-router-dom";
-import { obtenerEntrenadorPorId, editarEntrenador, crearEntrenador } from "../api/axios";
+import {
+  obtenerEntrenadorPorId,
+  editarEntrenador,
+  crearEntrenador,
+} from "../api/axios";
 
 const EditarEntrenador = () => {
   const { id } = useParams();
@@ -22,7 +26,11 @@ const EditarEntrenador = () => {
       const fetchEntrenador = async () => {
         setLoading(true);
         try {
-          const config = { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } };
+          const config = {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          };
           const response = await obtenerEntrenadorPorId(id, config);
           const data = response.data || {};
           setEntrenador({
@@ -31,10 +39,15 @@ const EditarEntrenador = () => {
             correo: data.correo || "",
             telefono: data.telefono || "",
             especialidad: data.especialidad || "",
-            clases: Array.isArray(data.clases) && data.clases.length > 0 ? data.clases : [{ nombreClase: "", dias: [], capacidadMaxima: 10 }],
+            clases:
+              Array.isArray(data.clases) && data.clases.length > 0
+                ? data.clases
+                : [{ nombreClase: "", dias: [], capacidadMaxima: 10 }],
           });
         } catch (err) {
-          setError("Error al cargar el entrenador: " + (err.message || "Sin detalles"));
+          setError(
+            "Error al cargar el entrenador: " + (err.message || "Sin detalles")
+          );
         } finally {
           setLoading(false);
         }
@@ -53,13 +66,20 @@ const EditarEntrenador = () => {
 
   const handleDiaChange = (claseIndex, diaIndex, field, value) => {
     const nuevasClases = [...entrenador.clases];
-    nuevasClases[claseIndex].dias[diaIndex] = { ...nuevasClases[claseIndex].dias[diaIndex], [field]: value };
+    nuevasClases[claseIndex].dias[diaIndex] = {
+      ...nuevasClases[claseIndex].dias[diaIndex],
+      [field]: value,
+    };
     setEntrenador({ ...entrenador, clases: nuevasClases });
   };
 
   const agregarDia = (claseIndex) => {
     const nuevasClases = [...entrenador.clases];
-    nuevasClases[claseIndex].dias.push({ dia: "", horarioInicio: "", horarioFin: "" });
+    nuevasClases[claseIndex].dias.push({
+      dia: "",
+      horarioInicio: "",
+      horarioFin: "",
+    });
     setEntrenador({ ...entrenador, clases: nuevasClases });
   };
 
@@ -73,7 +93,9 @@ const EditarEntrenador = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const config = { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } };
+      const config = {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      };
       const payload = {
         nombre: entrenador.nombre,
         apellido: entrenador.apellido,
@@ -89,7 +111,9 @@ const EditarEntrenador = () => {
       }
       navigate("/entrenadores");
     } catch (err) {
-      setError("Error al guardar el entrenador: " + (err.message || "Sin detalles"));
+      setError(
+        "Error al guardar el entrenador: " + (err.message || "Sin detalles")
+      );
     } finally {
       setLoading(false);
     }
@@ -107,7 +131,9 @@ const EditarEntrenador = () => {
           <Form.Control
             type="text"
             value={entrenador.nombre}
-            onChange={(e) => setEntrenador({ ...entrenador, nombre: e.target.value })}
+            onChange={(e) =>
+              setEntrenador({ ...entrenador, nombre: e.target.value })
+            }
             required
           />
         </Form.Group>
@@ -116,7 +142,9 @@ const EditarEntrenador = () => {
           <Form.Control
             type="text"
             value={entrenador.apellido}
-            onChange={(e) => setEntrenador({ ...entrenador, apellido: e.target.value })}
+            onChange={(e) =>
+              setEntrenador({ ...entrenador, apellido: e.target.value })
+            }
             required
           />
         </Form.Group>
@@ -125,7 +153,9 @@ const EditarEntrenador = () => {
           <Form.Control
             type="email"
             value={entrenador.correo}
-            onChange={(e) => setEntrenador({ ...entrenador, correo: e.target.value })}
+            onChange={(e) =>
+              setEntrenador({ ...entrenador, correo: e.target.value })
+            }
             required
           />
         </Form.Group>
@@ -134,7 +164,9 @@ const EditarEntrenador = () => {
           <Form.Control
             type="text"
             value={entrenador.telefono}
-            onChange={(e) => setEntrenador({ ...entrenador, telefono: e.target.value })}
+            onChange={(e) =>
+              setEntrenador({ ...entrenador, telefono: e.target.value })
+            }
             required
           />
         </Form.Group>
@@ -143,7 +175,9 @@ const EditarEntrenador = () => {
           <Form.Control
             type="text"
             value={entrenador.especialidad}
-            onChange={(e) => setEntrenador({ ...entrenador, especialidad: e.target.value })}
+            onChange={(e) =>
+              setEntrenador({ ...entrenador, especialidad: e.target.value })
+            }
             required
           />
         </Form.Group>
@@ -156,7 +190,9 @@ const EditarEntrenador = () => {
               <Form.Control
                 type="text"
                 value={clase.nombreClase}
-                onChange={(e) => handleClaseChange(claseIndex, "nombreClase", e.target.value)}
+                onChange={(e) =>
+                  handleClaseChange(claseIndex, "nombreClase", e.target.value)
+                }
               />
             </Form.Group>
             <Form.Group className="mb-3">
@@ -164,7 +200,13 @@ const EditarEntrenador = () => {
               <Form.Control
                 type="number"
                 value={clase.capacidadMaxima}
-                onChange={(e) => handleClaseChange(claseIndex, "capacidadMaxima", Number(e.target.value))}
+                onChange={(e) =>
+                  handleClaseChange(
+                    claseIndex,
+                    "capacidadMaxima",
+                    Number(e.target.value)
+                  )
+                }
               />
             </Form.Group>
             <h6>Días y Horarios</h6>
@@ -175,25 +217,49 @@ const EditarEntrenador = () => {
                     type="text"
                     placeholder="Día"
                     value={dia.dia || ""}
-                    onChange={(e) => handleDiaChange(claseIndex, diaIndex, "dia", e.target.value)}
+                    onChange={(e) =>
+                      handleDiaChange(
+                        claseIndex,
+                        diaIndex,
+                        "dia",
+                        e.target.value
+                      )
+                    }
                   />
                 </Col>
                 <Col>
                   <Form.Control
                     type="time"
                     value={dia.horarioInicio || ""}
-                    onChange={(e) => handleDiaChange(claseIndex, diaIndex, "horarioInicio", e.target.value)}
+                    onChange={(e) =>
+                      handleDiaChange(
+                        claseIndex,
+                        diaIndex,
+                        "horarioInicio",
+                        e.target.value
+                      )
+                    }
                   />
                 </Col>
                 <Col>
                   <Form.Control
                     type="time"
                     value={dia.horarioFin || ""}
-                    onChange={(e) => handleDiaChange(claseIndex, diaIndex, "horarioFin", e.target.value)}
+                    onChange={(e) =>
+                      handleDiaChange(
+                        claseIndex,
+                        diaIndex,
+                        "horarioFin",
+                        e.target.value
+                      )
+                    }
                   />
                 </Col>
                 <Col>
-                  <Button variant="danger" onClick={() => eliminarDia(claseIndex, diaIndex)}>
+                  <Button
+                    variant="danger"
+                    onClick={() => eliminarDia(claseIndex, diaIndex)}
+                  >
                     Eliminar
                   </Button>
                 </Col>
