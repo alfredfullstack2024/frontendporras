@@ -1,10 +1,35 @@
 import axios from "axios";
 
-// Configura la URL base del backend dinámicamente
+// Función para obtener y validar la URL base del backend
 const getBaseUrl = () => {
-  return process.env.REACT_APP_API_URL || (process.env.NODE_ENV === "development"
-    ? "http://localhost:5000/api"
-    : "https://admin-gimnasios-backend.onrender.com/api");
+  const envUrl = process.env.REACT_APP_API_URL;
+  const defaultDevUrl = "http://localhost:5000/api";
+  const defaultProdUrl = "https://admin-gimnasios-backend.onrender.com/api";
+  const baseUrl = envUrl || (process.env.NODE_ENV === "development" ? defaultDevUrl : defaultProdUrl);
+
+  console.log("Depuración de URL - Variables de entorno:", {
+    REACT_APP_API_URL: envUrl,
+    NODE_ENV: process.env.NODE_ENV,
+    BaseUrlSeleccionada: baseUrl,
+  });
+
+  // Validar que la URL sea accesible (prueba simple)
+  const testUrl = `${baseUrl}/status`; // Asumiendo un endpoint de estado (ajústalo si no existe)
+  axios
+    .get(testUrl, { timeout: 5000 })
+    .then(() => console.log("URL base válida y accesible:", baseUrl))
+    .catch((error) => {
+      console.error("Error al validar la URL base:", {
+        url: baseUrl,
+        error: error.message,
+        code: error.code,
+      });
+      if (!envUrl) {
+        console.warn("REACT_APP_API_URL no está definida. Usando URL por defecto:", defaultProdUrl);
+      }
+    });
+
+  return baseUrl;
 };
 
 const api = axios.create({
@@ -14,7 +39,7 @@ const api = axios.create({
     "Content-Type": "application/json",
   },
 });
-console.log("Base URL del API configurada:", api.defaults.baseURL);
+console.log("Base URL del API configurada finalmente:", api.defaults.baseURL);
 
 // Interceptor de solicitudes
 api.interceptors.request.use(
@@ -22,15 +47,26 @@ api.interceptors.request.use(
     const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
-      console.log("Token añadido a la solicitud:", token);
+      console.log("Token añadido a la solicitud:", {
+        token: token.substring(0, 10) + "...", // Mostrar solo parte del token por seguridad
+        url: `${config.baseURL}${config.url}`,
+      });
     } else {
-      console.log("No se encontró token en localStorage. Solicitud sin autenticación.");
+      console.log("No se encontró token en localStorage. Solicitud sin autenticación a:", `${config.baseURL}${config.url}`);
     }
-    console.log("Solicitud enviada a:", `${config.baseURL}${config.url}`, "con datos:", config.data);
+    console.log("Solicitud enviada a:", {
+      url: `${config.baseURL}${config.url}`,
+      method: config.method,
+      data: config.data,
+    });
     return config;
   },
   (error) => {
-    console.error("Error en el interceptor de solicitud:", error.message, error);
+    console.error("Error en el interceptor de solicitud:", {
+      message: error.message,
+      code: error.code,
+      config: error.config,
+    });
     return Promise.reject(error);
   }
 );
@@ -38,22 +74,31 @@ api.interceptors.request.use(
 // Interceptor de respuestas
 api.interceptors.response.use(
   (response) => {
-    console.log("Respuesta recibida:", response.status, response.data);
+    console.log("Respuesta recibida:", {
+      status: response.status,
+      url: response.config.url,
+      data: response.data,
+    });
     return response;
   },
   (error) => {
     if (error.code === "ECONNABORTED") {
-      console.error("Timeout en la solicitud:", error.message);
+      console.error("Timeout en la solicitud:", {
+        message: error.message,
+        url: error.config?.url,
+        timeout: error.config?.timeout,
+      });
       return Promise.reject(new Error("La solicitud tardó demasiado. Verifica tu conexión."));
     }
     if (error.response) {
       console.error("Error en la respuesta:", {
         status: error.response.status,
+        url: error.response.config.url,
         data: error.response.data,
         headers: error.response.headers,
       });
       if (error.response.status === 401) {
-        console.error("Sesión expirada, redirigiendo a login...");
+        console.error("Sesión expirada, redirigiendo a login... URL:", error.response.config.url);
         localStorage.removeItem("token");
         window.location.href = "/login";
         return Promise.reject(new Error("Sesión expirada. Por favor, inicia sesión nuevamente."));
@@ -65,7 +110,10 @@ api.interceptors.response.use(
         return Promise.reject(new Error("Recurso no encontrado. Verifica la ruta o los datos enviados."));
       }
     } else if (!error.response) {
-      console.error("Error de conexión:", error.message);
+      console.error("Error de conexión:", {
+        message: error.message,
+        url: error.config?.url,
+      });
       return Promise.reject(new Error("Error de conexión. Verifica tu conexión a internet."));
     }
     const errorMessage =
@@ -76,6 +124,7 @@ api.interceptors.response.use(
     console.error("Error en la respuesta del servidor:", {
       statusCode,
       errorMessage,
+      url: error.response?.config?.url,
       data: error.response?.data,
     });
     return Promise.reject(new Error(`Error ${statusCode}: ${errorMessage}`));
@@ -89,7 +138,7 @@ export const crearEntrenador = (data) => api.post("/entrenadores", data);
 export const obtenerEntrenadores = () => api.get("/entrenadores");
 export const eliminarEntrenador = (id) => api.delete(`/entrenadores/${id}`);
 
-// Funciones para clases (puedes mantenerlas o ajustarlas según necesidad)
+// Funciones para clases
 export const obtenerClasesDisponibles = () => api.get("/clases/disponibles");
 export const registrarClienteEnClase = (data) => api.post("/clases/registrar", data);
 export const consultarClasesPorNumeroIdentificacion = (numeroIdentificacion) =>
@@ -104,6 +153,7 @@ export const obtenerClases = async () => {
       entrenador: { nombre: entrenador.nombre, apellido: entrenador.apellido },
     }))
   );
+  console.log("Clases extraídas:", clases);
   return { data: clases };
 };
 
@@ -114,6 +164,7 @@ export const eliminarClase = async (id) => {
   const nuevasClases = (entrenador.clases || []).filter(
     (clase) => clase.nombreClase !== nombreClase
   );
+  console.log("Eliminando clase - Nuevas clases:", nuevasClases);
   await api.put(`/entrenadores/${entrenadorId}`, { ...entrenador, clases: nuevasClases });
 };
 
