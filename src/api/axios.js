@@ -14,21 +14,20 @@ const getBaseUrl = () => {
   });
 
   // Validar que la URL sea accesible (opcional, ajusta si no tienes /status)
-  // Nota: Desactivado temporalmente si no tienes un endpoint /status
-  // const testUrl = `${baseUrl}/status`;
-  // axios
-  //   .get(testUrl, { timeout: 5000 })
-  //   .then(() => console.log("URL base válida y accesible:", baseUrl))
-  //   .catch((error) => {
-  //     console.error("Error al validar la URL base:", {
-  //       url: baseUrl,
-  //       error: error.message,
-  //       code: error.code,
-  //     });
-  //     if (!envUrl) {
-  //       console.warn("REACT_APP_API_URL no está definida. Usando URL por defecto:", defaultProdUrl);
-  //     }
-  //   });
+  const testUrl = `${baseUrl}/status`; // Ajusta si no existe este endpoint
+  axios
+    .get(testUrl, { timeout: 5000 })
+    .then(() => console.log("URL base válida y accesible:", baseUrl))
+    .catch((error) => {
+      console.error("Error al validar la URL base:", {
+        url: baseUrl,
+        error: error.message,
+        code: error.code,
+      });
+      if (!envUrl) {
+        console.warn("REACT_APP_API_URL no está definida. Usando URL por defecto:", defaultProdUrl);
+      }
+    });
 
   return baseUrl;
 };
