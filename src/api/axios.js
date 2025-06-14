@@ -9,7 +9,7 @@ const getBaseUrl = () => {
 
 const api = axios.create({
   baseURL: getBaseUrl(),
-  timeout: 10000, // Añadimos un timeout de 10 segundos para evitar que se cuelgue
+  timeout: 10000, // Timeout de 10 segundos
   headers: {
     "Content-Type": "application/json",
   },
@@ -24,7 +24,7 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${token}`;
       console.log("Token añadido a la solicitud:", token);
     } else {
-      console.log("No se encontró token en localStorage.");
+      console.log("No se encontró token en localStorage. Solicitud sin autenticación.");
     }
     console.log("Solicitud enviada a:", `${config.baseURL}${config.url}`, "con datos:", config.data);
     return config;
@@ -83,29 +83,20 @@ api.interceptors.response.use(
 );
 
 // Funciones exportadas para entrenadores
-export const obtenerEntrenadorPorId = (id, config) =>
-  api.get(`/entrenadores/${id}`, config);
-export const editarEntrenador = (id, data, config) =>
-  api.put(`/entrenadores/${id}`, data, config);
-export const crearEntrenador = (data, config) =>
-  api.post("/entrenadores", data, config);
-export const obtenerEntrenadores = (config) => api.get("/entrenadores", config);
-export const eliminarEntrenador = (id, config) =>
-  api.delete(`/entrenadores/${id}`, config);
+export const obtenerEntrenadorPorId = (id) => api.get(`/entrenadores/${id}`);
+export const editarEntrenador = (id, data) => api.put(`/entrenadores/${id}`, data);
+export const crearEntrenador = (data) => api.post("/entrenadores", data);
+export const obtenerEntrenadores = () => api.get("/entrenadores");
+export const eliminarEntrenador = (id) => api.delete(`/entrenadores/${id}`);
 
-// Funciones para clases
-export const obtenerClasesDisponibles = (config) =>
-  api.get("/clases/disponibles", config);
-export const registrarClienteEnClase = (data, config) =>
-  api.post("/clases/registrar", data, config);
-export const consultarClasesPorNumeroIdentificacion = (
-  numeroIdentificacion,
-  config
-) => api.get(`/clases/consultar/${numeroIdentificacion}`, config);
+// Funciones para clases (puedes mantenerlas o ajustarlas según necesidad)
+export const obtenerClasesDisponibles = () => api.get("/clases/disponibles");
+export const registrarClienteEnClase = (data) => api.post("/clases/registrar", data);
+export const consultarClasesPorNumeroIdentificacion = (numeroIdentificacion) =>
+  api.get(`/clases/consultar/${numeroIdentificacion}`);
 
-// Función personalizada para obtener todas las clases
-export const obtenerClases = async (config) => {
-  const response = await api.get("/entrenadores", config);
+export const obtenerClases = async () => {
+  const response = await api.get("/entrenadores");
   const clases = response.data.flatMap((entrenador) =>
     (entrenador.clases || []).map((clase) => ({
       ...clase,
@@ -116,15 +107,14 @@ export const obtenerClases = async (config) => {
   return { data: clases };
 };
 
-// Función para eliminar una clase
-export const eliminarClase = async (id, config) => {
+export const eliminarClase = async (id) => {
   const [entrenadorId, nombreClase] = id.split("-");
-  const response = await api.get(`/entrenadores/${entrenadorId}`, config);
+  const response = await api.get(`/entrenadores/${entrenadorId}`);
   const entrenador = response.data;
   const nuevasClases = (entrenador.clases || []).filter(
     (clase) => clase.nombreClase !== nombreClase
   );
-  await api.put(`/entrenadores/${entrenadorId}`, { ...entrenador, clases: nuevasClases }, config);
+  await api.put(`/entrenadores/${entrenadorId}`, { ...entrenador, clases: nuevasClases });
 };
 
 export default api;
