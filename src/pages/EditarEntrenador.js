@@ -34,9 +34,6 @@ const EditarEntrenador = () => {
           });
         } catch (err) {
           setError("Error al cargar el entrenador: " + (err.message || "Sin detalles"));
-          if (err.message.includes("Sesión expirada")) {
-            navigate("/login");
-          }
         } finally {
           setLoading(false);
         }
@@ -45,7 +42,7 @@ const EditarEntrenador = () => {
     } else {
       setLoading(false);
     }
-  }, [id, navigate]);
+  }, [id]);
 
   const handleClaseChange = (index, field, value) => {
     const nuevasClases = [...entrenador.clases];
@@ -91,9 +88,6 @@ const EditarEntrenador = () => {
       navigate("/entrenadores");
     } catch (err) {
       setError("Error al guardar el entrenador: " + (err.message || "Sin detalles"));
-      if (err.message.includes("Sesión expirada")) {
-        navigate("/login");
-      }
     } finally {
       setLoading(false);
     }
