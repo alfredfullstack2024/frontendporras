@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { obtenerEntrenadorPorId, editarEntrenador } from "../../api/axios";
+import { obtenerEntrenadorPorId, editarEntrenador } from "../api/axios";
 
 const EditarEntrenador = () => {
   const { id } = useParams();
@@ -19,7 +19,8 @@ const EditarEntrenador = () => {
     const cargarEntrenador = async () => {
       try {
         const response = await obtenerEntrenadorPorId(id);
-        setEntrenador(response.data); // Asegura que las clases se carguen desde el backend
+        setEntrenador(response.data); // Carga las clases desde el backend
+        console.log("Datos del entrenador cargados:", response.data); // Depuración
       } catch (err) {
         console.error("Error al cargar el entrenador: ", err.message || "Sin detalles");
         if (err.message.includes("Sesión expirada")) {
@@ -85,12 +86,12 @@ const EditarEntrenador = () => {
         {entrenador.clases.map((clase, index) => (
           <div key={index}>
             <input
-              value={clase.nombreClase}
+              value={clase.nombreClase || ""}
               onChange={(e) => handleClaseChange(index, "nombreClase", e.target.value)}
               placeholder="Nombre de la clase"
             />
             <input
-              value={clase.capacidadMaxima}
+              value={clase.capacidadMaxima || ""}
               onChange={(e) => handleClaseChange(index, "capacidadMaxima", e.target.value)}
               placeholder="Capacidad Máxima"
               type="number"
