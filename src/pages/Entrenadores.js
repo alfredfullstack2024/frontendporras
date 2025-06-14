@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Alert } from "react-bootstrap"; // Eliminamos Button
+import { Table, Alert } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import { obtenerEntrenadores } from "../api/axios";
 
@@ -13,7 +13,7 @@ const Entrenadores = () => {
         const response = await obtenerEntrenadores();
         setEntrenadores(response.data);
       } catch (err) {
-        setError("Error al cargar los entrenadores");
+        setError("Error al cargar los entrenadores: " + (err.message || "Sin detalles"));
         console.error(err);
       }
     };
@@ -42,7 +42,7 @@ const Entrenadores = () => {
             <tr key={entrenador._id}>
               <td>{entrenador.nombre}</td>
               <td>{entrenador.apellido}</td>
-              <td>{entrenador.email}</td>
+              <td>{entrenador.correo}</td>
               <td>{entrenador.especialidad}</td>
               <td>
                 <Link
