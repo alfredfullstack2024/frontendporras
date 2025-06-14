@@ -1,11 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { Table, Alert } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { obtenerEntrenadores } from "../api/axios";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 const Entrenadores = () => {
   const [entrenadores, setEntrenadores] = useState([]);
   const [error, setError] = useState("");
+  const context = useContext(AuthContext);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchEntrenadores = async () => {
@@ -19,6 +23,9 @@ const Entrenadores = () => {
     };
     fetchEntrenadores();
   }, []);
+
+  // Verificar si el usuario tiene rol permitido (admin o entrenador)
+  const isAllowedRole = context?.user?.rol && ["admin", "entrenador"].includes(context.user.rol.toLowerCase());
 
   return (
     <div className="container mt-4">
@@ -47,10 +54,18 @@ const Entrenadores = () => {
               <td>
                 <Link
                   to={`/entrenadores/editar/${entrenador._id}`}
-                  className="btn btn-warning btn-sm"
+                  className="btn btn-warning btn-sm me-2"
                 >
                   Editar
                 </Link>
+                {isAllowedRole && (
+                  <Link
+                    to={`/entrenadores/${entrenador._id}/editar-clases`}
+                    className="btn btn-info btn-sm"
+                  >
+                    Editar Clases
+                  </Link>
+                )}
               </td>
             </tr>
           ))}
