@@ -34,6 +34,9 @@ const EditarEntrenador = () => {
           });
         } catch (err) {
           setError("Error al cargar el entrenador: " + (err.message || "Sin detalles"));
+          if (err.message.includes("Sesión expirada")) {
+            navigate("/login");
+          }
         } finally {
           setLoading(false);
         }
@@ -42,7 +45,7 @@ const EditarEntrenador = () => {
     } else {
       setLoading(false);
     }
-  }, [id]);
+  }, [id, navigate]);
 
   const handleClaseChange = (index, field, value) => {
     const nuevasClases = [...entrenador.clases];
@@ -54,6 +57,13 @@ const EditarEntrenador = () => {
     const nuevasClases = [...entrenador.clases];
     nuevasClases[claseIndex].dias[diaIndex] = { ...nuevasClases[claseIndex].dias[diaIndex], [field]: value };
     setEntrenador({ ...entrenador, clases: nuevasClases });
+  };
+
+  const agregarClase = () => {
+    setEntrenador({
+      ...entrenador,
+      clases: [...entrenador.clases, { nombreClase: "", dias: [], capacidadMaxima: 10 }],
+    });
   };
 
   const agregarDia = (claseIndex) => {
@@ -88,6 +98,9 @@ const EditarEntrenador = () => {
       navigate("/entrenadores");
     } catch (err) {
       setError("Error al guardar el entrenador: " + (err.message || "Sin detalles"));
+      if (err.message.includes("Sesión expirada")) {
+        navigate("/login");
+      }
     } finally {
       setLoading(false);
     }
@@ -202,7 +215,9 @@ const EditarEntrenador = () => {
             </Button>
           </div>
         ))}
-
+        <Button variant="secondary" onClick={agregarClase} className="mb-3">
+          Agregar Clase
+        </Button>
         <Button variant="primary" type="submit" disabled={loading}>
           {id ? "Actualizar" : "Crear"} Entrenador
         </Button>
