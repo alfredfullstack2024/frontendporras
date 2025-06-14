@@ -22,8 +22,7 @@ const EditarEntrenador = () => {
       const fetchEntrenador = async () => {
         setLoading(true);
         try {
-          const config = { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } };
-          const response = await obtenerEntrenadorPorId(id, config);
+          const response = await obtenerEntrenadorPorId(id); // Interceptor maneja el token
           const data = response.data || {};
           setEntrenador({
             nombre: data.nombre || "",
@@ -35,6 +34,9 @@ const EditarEntrenador = () => {
           });
         } catch (err) {
           setError("Error al cargar el entrenador: " + (err.message || "Sin detalles"));
+          if (err.message.includes("Sesión expirada")) {
+            navigate("/login");
+          }
         } finally {
           setLoading(false);
         }
@@ -43,7 +45,7 @@ const EditarEntrenador = () => {
     } else {
       setLoading(false);
     }
-  }, [id]);
+  }, [id, navigate]);
 
   const handleClaseChange = (index, field, value) => {
     const nuevasClases = [...entrenador.clases];
@@ -73,7 +75,6 @@ const EditarEntrenador = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const config = { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } };
       const payload = {
         nombre: entrenador.nombre,
         apellido: entrenador.apellido,
@@ -83,13 +84,16 @@ const EditarEntrenador = () => {
         clases: entrenador.clases,
       };
       if (id) {
-        await editarEntrenador(id, payload, config);
+        await editarEntrenador(id, payload);
       } else {
-        await crearEntrenador(payload, config);
+        await crearEntrenador(payload);
       }
       navigate("/entrenadores");
     } catch (err) {
       setError("Error al guardar el entrenador: " + (err.message || "Sin detalles"));
+      if (err.message.includes("Sesión expirada")) {
+        navigate("/login");
+      }
     } finally {
       setLoading(false);
     }
