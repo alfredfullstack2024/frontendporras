@@ -13,8 +13,8 @@ const getBaseUrl = () => {
     BaseUrlSeleccionada: baseUrl,
   });
 
-  // Validar que la URL sea accesible (prueba simple)
-  const testUrl = `${baseUrl}/status`; // Asumiendo un endpoint de estado (ajústalo si no existe)
+  // Validar que la URL sea accesible (opcional, ajusta si no tienes /status)
+  const testUrl = `${baseUrl}/status`; // Ajusta si no existe este endpoint
   axios
     .get(testUrl, { timeout: 5000 })
     .then(() => console.log("URL base válida y accesible:", baseUrl))
@@ -48,7 +48,7 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
       console.log("Token añadido a la solicitud:", {
-        token: token.substring(0, 10) + "...", // Mostrar solo parte del token por seguridad
+        token: token.substring(0, 10) + "...", // Mostrar solo parte por seguridad
         url: `${config.baseURL}${config.url}`,
       });
     } else {
