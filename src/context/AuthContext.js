@@ -13,9 +13,8 @@ const useAuthNavigation = () => {
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { navigate } = useAuthNavigation(); // Usamos el custom hook aquí
+  const { navigate } = useAuthNavigation();
 
-  // Configurar axios para incluir el token en todas las solicitudes
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -27,7 +26,6 @@ const AuthProvider = ({ children }) => {
     }
   }, [user]);
 
-  // Cargar usuario al iniciar
   useEffect(() => {
     const token = localStorage.getItem("token");
     console.log("Token en localStorage al iniciar:", token);
@@ -36,7 +34,13 @@ const AuthProvider = ({ children }) => {
         .get("/auth/me")
         .then((response) => {
           console.log("Datos de /auth/me:", response.data);
-          setUser(response.data.user ? { ...response.data.user, token } : { token }); // Manejo seguro
+          const usuario = response.data.user;
+          if (usuario) {
+            setUser({ ...usuario, token });
+          } else {
+            console.warn("No se recibió un usuario válido.");
+            setUser(null);
+          }
           setLoading(false);
         })
         .catch((error) => {
@@ -51,19 +55,19 @@ const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // Login
   const login = async (email, password) => {
     try {
       const response = await api.post("/auth/login", { email, password });
       console.log("Respuesta de /auth/login:", response.data);
       const token = response.data.token;
-      if (!token) {
-        throw new Error("No se recibió un token en la respuesta.");
+      const usuario = response.data.user;
+      if (!token || !usuario) {
+        throw new Error("No se recibió un token o usuario válido.");
       }
       localStorage.setItem("token", token);
-      setUser(response.data.user ? { ...response.data.user, token } : { token });
+      setUser({ ...usuario, token });
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      navigate("/dashboard"); // Navegación directa
+      navigate("/dashboard");
     } catch (error) {
       console.error("Error al iniciar sesión:", error.message);
       throw new Error(
@@ -72,7 +76,6 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  // Registro
   const register = async (nombre, email, password, rol) => {
     try {
       const response = await api.post("/auth/register", {
@@ -83,13 +86,14 @@ const AuthProvider = ({ children }) => {
       });
       console.log("Respuesta de /auth/register:", response.data);
       const token = response.data.token;
-      if (!token) {
-        throw new Error("No se recibió un token en la respuesta.");
+      const usuario = response.data.user;
+      if (!token || !usuario) {
+        throw new Error("No se recibió un token o usuario válido.");
       }
       localStorage.setItem("token", token);
-      setUser(response.data.user ? { ...response.data.user, token } : { token });
+      setUser({ ...usuario, token });
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      navigate("/dashboard"); // Navegación directa
+      navigate("/dashboard");
     } catch (error) {
       console.error("Error al registrar usuario:", error.message);
       throw new Error(
@@ -98,7 +102,6 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  // Logout
   const logout = () => {
     localStorage.removeItem("token");
     setUser(null);
@@ -106,11 +109,10 @@ const AuthProvider = ({ children }) => {
     navigate("/login");
   };
 
-  // Verificar permisos
   const hasPermission = (requiredRole) => {
     if (!user) return false;
     console.log("Rol del usuario:", user.role, "Rol requerido:", requiredRole);
-    if (user.role === "admin") return true; // Admin tiene acceso a todo
+    if (user.role === "admin") return true;
     return user.role === requiredRole;
   };
 
