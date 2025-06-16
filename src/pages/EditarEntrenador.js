@@ -3,6 +3,9 @@ import { useParams, useNavigate } from "react-router-dom";
 import { Form, Button, Container, Row, Col } from "react-bootstrap";
 import axios from "axios";
 
+// URL base de la API (ajustada para Vercel o entorno)
+const API_URL = process.env.REACT_APP_API_URL || "http://localhost:5000/api";
+
 const EditarEntrenador = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -24,19 +27,19 @@ const EditarEntrenador = () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          `http://localhost:5000/api/entrenadores/${id}`,
+          `${API_URL}/entrenadores/${id}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
         );
         const data = response.data;
         setEntrenador({
-          nombre: data.nombre,
-          apellido: data.apellido,
-          correo: data.correo,
-          telefono: data.telefono,
-          especialidad: data.especialidad,
-          clases: data.clases.length > 0 ? data.clases : [
+          nombre: data.nombre || "",
+          apellido: data.apellido || "",
+          correo: data.correo || "",
+          telefono: data.telefono || "",
+          especialidad: data.especialidad || "",
+          clases: Array.isArray(data.clases) && data.clases.length > 0 ? data.clases : [
             { nombreClase: "Entrenamiento General", dias: [], capacidadMaxima: 10 },
           ],
         });
@@ -48,7 +51,11 @@ const EditarEntrenador = () => {
         setLoading(false);
       }
     };
-    fetchEntrenador();
+    if (id) fetchEntrenador();
+    else {
+      setError("ID de entrenador no proporcionado");
+      setLoading(false);
+    }
   }, [id]);
 
   const handleClaseChange = (index, field, value) => {
@@ -87,7 +94,7 @@ const EditarEntrenador = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.put(
-        `http://localhost:5000/api/entrenadores/${id}`,
+        `${API_URL}/entrenadores/${id}`,
         entrenador,
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -163,14 +170,14 @@ const EditarEntrenador = () => {
           />
         </Form.Group>
 
-        {entrenador.clases.map((clase, claseIndex) => (
+        {Array.isArray(entrenador.clases) && entrenador.clases.map((clase, claseIndex) => (
           <div key={claseIndex} className="mb-4">
             <h5>Clase {claseIndex + 1}</h5>
             <Form.Group className="mb-3">
               <Form.Label>Nombre de la Clase</Form.Label>
               <Form.Control
                 type="text"
-                value={clase.nombreClase}
+                value={clase.nombreClase || ""}
                 onChange={(e) =>
                   handleClaseChange(claseIndex, "nombreClase", e.target.value)
                 }
@@ -181,7 +188,7 @@ const EditarEntrenador = () => {
               <Form.Label>Capacidad Máxima</Form.Label>
               <Form.Control
                 type="number"
-                value={clase.capacidadMaxima}
+                value={clase.capacidadMaxima || 10}
                 onChange={(e) =>
                   handleClaseChange(
                     claseIndex,
@@ -193,13 +200,13 @@ const EditarEntrenador = () => {
               />
             </Form.Group>
             <h6>Días y Horarios</h6>
-            {clase.dias.map((dia, diaIndex) => (
+            {Array.isArray(clase.dias) && clase.dias.map((dia, diaIndex) => (
               <Row key={diaIndex} className="mb-2">
                 <Col>
                   <Form.Control
                     type="text"
                     placeholder="Día"
-                    value={dia.dia}
+                    value={dia.dia || ""}
                     onChange={(e) =>
                       handleDiaChange(
                         claseIndex,
@@ -214,7 +221,7 @@ const EditarEntrenador = () => {
                 <Col>
                   <Form.Control
                     type="time"
-                    value={dia.horarioInicio}
+                    value={dia.horarioInicio || ""}
                     onChange={(e) =>
                       handleDiaChange(
                         claseIndex,
@@ -229,7 +236,7 @@ const EditarEntrenador = () => {
                 <Col>
                   <Form.Control
                     type="time"
-                    value={dia.horarioFin}
+                    value={dia.horarioFin || ""}
                     onChange={(e) =>
                       handleDiaChange(
                         claseIndex,
