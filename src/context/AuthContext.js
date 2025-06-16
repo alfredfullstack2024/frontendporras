@@ -8,9 +8,8 @@ const AuthContext = createContext();
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate(); // Usamos directamente por compatibilidad
+  const navigate = useNavigate();
 
-  // Configurar axios para incluir el token en todas las solicitudes
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -22,7 +21,6 @@ const AuthProvider = ({ children }) => {
     }
   }, [user]);
 
-  // Cargar usuario al iniciar
   useEffect(() => {
     const token = localStorage.getItem("token");
     console.log("Token en localStorage al iniciar:", token);
@@ -31,74 +29,55 @@ const AuthProvider = ({ children }) => {
         .get("/auth/me")
         .then((response) => {
           console.log("Datos de /auth/me:", response.data);
-          const userData = response.data.user || response.data || { token }; // Manejo flexible
+          const userData = response.data.user || response.data || { token };
           setUser({ ...userData, token });
         })
         .catch((error) => {
           console.error("Error en /auth/me:", error.message, error.response?.data);
-          if (error.response?.status === 401) {
-            console.log("Sin autorización, ignorando token.");
-          }
           localStorage.removeItem("token");
           setUser(null);
         })
-        .finally(() => setLoading(false)); // Aseguramos que loading se desactive
+        .finally(() => setLoading(false));
     } else {
       console.log("No hay token, usuario no autenticado.");
       setLoading(false);
     }
   }, []);
 
-  // Login
   const login = async (email, password) => {
     try {
       const response = await api.post("/auth/login", { email, password });
       console.log("Respuesta de /auth/login:", response.data);
       const token = response.data.token;
-      if (!token) {
-        throw new Error("No se recibió un token en la respuesta.");
-      }
+      if (!token) throw new Error("No se recibió un token.");
       localStorage.setItem("token", token);
       const userData = response.data.user || {};
       setUser({ ...userData, token });
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      setTimeout(() => navigate("/dashboard"), 0); // Restauramos setTimeout
+      setTimeout(() => navigate("/dashboard"), 0);
     } catch (error) {
       console.error("Error al iniciar sesión:", error.message);
-      throw new Error(
-        error.response?.data?.message || "Error al iniciar sesión"
-      );
+      throw new Error(error.response?.data?.message || "Error al iniciar sesión");
     }
   };
 
-  // Registro
   const register = async (nombre, email, password, rol) => {
     try {
-      const response = await api.post("/auth/register", {
-        nombre,
-        email,
-        password,
-        role: rol,
-      });
+      const response = await api.post("/auth/register", { nombre, email, password, role: rol });
       console.log("Respuesta de /auth/register:", response.data);
       const token = response.data.token;
-      if (!token) {
-        throw new Error("No se recibió un token en la respuesta.");
-      }
+      if (!token) throw new Error("No se recibió un token.");
       localStorage.setItem("token", token);
       const userData = response.data.user || {};
       setUser({ ...userData, token });
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      setTimeout(() => navigate("/dashboard"), 0); // Restauramos setTimeout
+      setTimeout(() => navigate("/dashboard"), 0);
     } catch (error) {
       console.error("Error al registrar usuario:", error.message);
-      throw new Error(
-        error.response?.data?.message || "Error al registrar usuario"
-      );
+      throw new Error(error.response?.data?.message || "Error al registrar usuario");
     }
   };
 
-  // Logout
   const logout = () => {
     localStorage.removeItem("token");
     setUser(null);
@@ -106,7 +85,6 @@ const AuthProvider = ({ children }) => {
     navigate("/login");
   };
 
-  // Verificar permisos
   const hasPermission = (requiredRole) => {
     if (!user) return false;
     console.log("Rol del usuario:", user.role, "Rol requerido:", requiredRole);
@@ -115,19 +93,15 @@ const AuthProvider = ({ children }) => {
   };
 
   return (
-    <AuthContext.Provider
-      value={{ user, setUser, loading, login, register, logout, hasPermission }}
-    >
-      {loading ? null : children} {/* Evita renderizar hasta que loading sea false */}
+    <AuthContext.Provider value={{ user, setUser, loading, login, register, logout, hasPermission }}>
+      {loading ? null : children}
     </AuthContext.Provider>
   );
 };
 
 const useAuth = () => {
   const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error("useAuth debe ser usado dentro de un AuthProvider");
-  }
+  if (!context) throw new Error("useAuth debe ser usado dentro de un AuthProvider");
   return context;
 };
 
