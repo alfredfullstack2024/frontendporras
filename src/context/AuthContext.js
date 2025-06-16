@@ -8,7 +8,7 @@ const AuthContext = createContext();
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-  const navigate = useNavigate(); // Usamos directamente por ahora, pero podemos ajustar si falla
+  const navigate = useNavigate(); // Usamos directamente por compatibilidad
 
   // Configurar axios para incluir el token en todas las solicitudes
   useEffect(() => {
@@ -31,8 +31,7 @@ const AuthProvider = ({ children }) => {
         .get("/auth/me")
         .then((response) => {
           console.log("Datos de /auth/me:", response.data);
-          // Manejo seguro: asume que response.data puede contener user o solo token
-          const userData = response.data.user || response.data || { token };
+          const userData = response.data.user || response.data || { token }; // Manejo flexible
           setUser({ ...userData, token });
           setLoading(false);
         })
@@ -61,7 +60,7 @@ const AuthProvider = ({ children }) => {
       const userData = response.data.user || {};
       setUser({ ...userData, token });
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      setTimeout(() => navigate("/dashboard"), 0); // Restauramos setTimeout por compatibilidad
+      setTimeout(() => navigate("/dashboard"), 0); // Restauramos setTimeout
     } catch (error) {
       console.error("Error al iniciar sesión:", error.message);
       throw new Error(
@@ -109,7 +108,7 @@ const AuthProvider = ({ children }) => {
   const hasPermission = (requiredRole) => {
     if (!user) return false;
     console.log("Rol del usuario:", user.role, "Rol requerido:", requiredRole);
-    if (user.role === "admin") return true; // Admin tiene acceso a todo
+    if (user.role === "admin") return true;
     return user.role === requiredRole;
   };
 
@@ -117,7 +116,7 @@ const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{ user, setUser, loading, login, register, logout, hasPermission }}
     >
-      {children} {/* Restauramos renderizado sin condicional por ahora */}
+      {children} {/* Renderizamos siempre por ahora */}
     </AuthContext.Provider>
   );
 };
