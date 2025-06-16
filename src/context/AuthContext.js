@@ -33,14 +33,16 @@ const AuthProvider = ({ children }) => {
           console.log("Datos de /auth/me:", response.data);
           const userData = response.data.user || response.data || { token }; // Manejo flexible
           setUser({ ...userData, token });
-          setLoading(false);
         })
         .catch((error) => {
           console.error("Error en /auth/me:", error.message, error.response?.data);
+          if (error.response?.status === 401) {
+            console.log("Sin autorización, ignorando token.");
+          }
           localStorage.removeItem("token");
           setUser(null);
-          setLoading(false);
-        });
+        })
+        .finally(() => setLoading(false)); // Aseguramos que loading se desactive
     } else {
       console.log("No hay token, usuario no autenticado.");
       setLoading(false);
@@ -116,7 +118,7 @@ const AuthProvider = ({ children }) => {
     <AuthContext.Provider
       value={{ user, setUser, loading, login, register, logout, hasPermission }}
     >
-      {children} {/* Renderizamos siempre por ahora */}
+      {loading ? null : children} {/* Evita renderizar hasta que loading sea false */}
     </AuthContext.Provider>
   );
 };
