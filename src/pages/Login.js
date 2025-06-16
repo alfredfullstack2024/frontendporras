@@ -1,3 +1,4 @@
+// src/pages/Login.js
 import React, { useState } from "react";
 import { Form, Button, Alert, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -24,6 +25,7 @@ const Login = () => {
     try {
       await login(formData.email, formData.password);
     } catch (err) {
+      console.error("Error desde Login.js:", err.message);
       setError(err.message);
     }
   };
