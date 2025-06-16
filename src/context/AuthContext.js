@@ -7,7 +7,7 @@ const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false); // Iniciamos sin loading
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -21,28 +21,21 @@ const AuthProvider = ({ children }) => {
     }
   }, [user]);
 
+  // Desactivamos temporalmente la llamada a /auth/me
   // useEffect(() => {
-    //const token = localStorage.getItem("token");
-    //console.log("Token en localStorage al iniciar:", token);
-    //if (token) {
-      //api
-        //.get("/auth/me")
-        //.then((response) => {
-          //console.log("Datos de /auth/me:", response.data);
-          //const userData = response.data.user || response.data || { token };
-          //setUser({ ...userData, token });
-        //})
-        //.catch((error) => {
-          //console.error("Error en /auth/me:", error.message, error.response?.data);
-          //localStorage.removeItem("token");
-         // setUser(null);
-       // })
-      //  .finally(() => setLoading(false));
-    //} else {
-      //console.log("No hay token, usuario no autenticado.");
-    //  setLoading(false);
-  //  }
- // }, []);
+  //   const token = localStorage.getItem("token");
+  //   console.log("Token en localStorage al iniciar:", token);
+  //   if (token) {
+  //     api.get("/auth/me").then((response) => {
+  //       console.log("Datos de /auth/me:", response.data);
+  //       setUser({ ...response.data, token });
+  //     }).catch((error) => {
+  //       console.error("Error en /auth/me:", error.message);
+  //       localStorage.removeItem("token");
+  //       setUser(null);
+  //     });
+  //   }
+  // }, []);
 
   const login = async (email, password) => {
     try {
@@ -94,7 +87,7 @@ const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{ user, setUser, loading, login, register, logout, hasPermission }}>
-      {loading ? null : children}
+      {children} {/* Renderizamos siempre por ahora */}
     </AuthContext.Provider>
   );
 };
