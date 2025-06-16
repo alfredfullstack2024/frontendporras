@@ -21,28 +21,28 @@ const AuthProvider = ({ children }) => {
     }
   }, [user]);
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    console.log("Token en localStorage al iniciar:", token);
-    if (token) {
-      api
-        .get("/auth/me")
-        .then((response) => {
-          console.log("Datos de /auth/me:", response.data);
-          const userData = response.data.user || response.data || { token };
-          setUser({ ...userData, token });
-        })
-        .catch((error) => {
-          console.error("Error en /auth/me:", error.message, error.response?.data);
-          localStorage.removeItem("token");
-          setUser(null);
-        })
-        .finally(() => setLoading(false));
-    } else {
-      console.log("No hay token, usuario no autenticado.");
-      setLoading(false);
-    }
-  }, []);
+  // useEffect(() => {
+    //const token = localStorage.getItem("token");
+    //console.log("Token en localStorage al iniciar:", token);
+    //if (token) {
+      //api
+        //.get("/auth/me")
+        //.then((response) => {
+          //console.log("Datos de /auth/me:", response.data);
+          //const userData = response.data.user || response.data || { token };
+          //setUser({ ...userData, token });
+        //})
+        //.catch((error) => {
+          //console.error("Error en /auth/me:", error.message, error.response?.data);
+          //localStorage.removeItem("token");
+         // setUser(null);
+       // })
+      //  .finally(() => setLoading(false));
+    //} else {
+      //console.log("No hay token, usuario no autenticado.");
+    //  setLoading(false);
+  //  }
+ // }, []);
 
   const login = async (email, password) => {
     try {
