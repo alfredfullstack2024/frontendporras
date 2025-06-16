@@ -58,14 +58,6 @@ const Entrenadores = () => {
                 >
                   Editar
                 </Link>
-                {isAllowedRole && (
-                  <Link
-                    to={`/entrenadores/${entrenador._id}/editar-clases`}
-                    className="btn btn-info btn-sm"
-                  >
-                    Editar Clases
-                  </Link>
-                )}
               </td>
             </tr>
           ))}
