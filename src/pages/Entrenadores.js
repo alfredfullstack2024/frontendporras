@@ -24,9 +24,6 @@ const Entrenadores = () => {
     fetchEntrenadores();
   }, []);
 
-  // No necesitamos isAllowedRole si solo queremos el botón Editar
-  // const isAllowedRole = context?.user?.rol && ["admin", "entrenador"].includes(context.user.rol.toLowerCase());
-
   return (
     <div className="container mt-4">
       <h2>Lista de Entrenadores</h2>
