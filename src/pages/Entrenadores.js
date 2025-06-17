@@ -24,8 +24,8 @@ const Entrenadores = () => {
     fetchEntrenadores();
   }, []);
 
-  // Verificar si el usuario tiene rol permitido (admin o entrenador)
-  const isAllowedRole = context?.user?.rol && ["admin", "entrenador"].includes(context.user.rol.toLowerCase());
+  // No necesitamos isAllowedRole si solo queremos el botón Editar
+  // const isAllowedRole = context?.user?.rol && ["admin", "entrenador"].includes(context.user.rol.toLowerCase());
 
   return (
     <div className="container mt-4">
