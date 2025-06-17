@@ -49,6 +49,9 @@ const Entrenadores = () => {
               <td>{entrenador.correo}</td>
               <td>{entrenador.especialidad}</td>
               <td>
+                <style>
+                  .btn-info { display: none !important; }
+                </style>
                 <Link
                   to={`/entrenadores/editar/${entrenador._id}`}
                   className="btn btn-warning btn-sm me-2"
