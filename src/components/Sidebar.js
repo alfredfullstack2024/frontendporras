@@ -25,18 +25,15 @@ const Sidebar = () => {
       { label: "💵 Pagos", path: "/pagos" },
       { label: "📊 Contabilidad", path: "/contabilidad" },
       { label: "👥 Usuarios", path: "/usuarios" },
-      { label: "🏋️‍♂️ Entrenadores", path: "/entrenadores" },
+      { label: "🏋️♂️ Entrenadores", path: "/entrenadores" },
       { label: "🕒 Clases", path: "/clases" },
-      { label: "📋 Registrar Asistencia", path: "/registrar-asistencia" },
+      { label: "📋 Registrar Asistencia", path: "/asistencias/registrar" },
       { label: "📝 Suscripción", path: "/suscripcion" },
       { label: "📈 Indicadores", path: "/indicadores" },
       { label: "🏋️ Rutinas", path: "/rutinas/crear" },
       { label: "📋 Asignar Rutina", path: "/rutinas/asignar" },
       { label: "📏 Composición Corporal", path: "/composicion-corporal" },
-      {
-        label: "🔍 Consultar Composición",
-        path: "/consultar-composicion-corporal",
-      },
+      { label: "🔍 Consultar Composición", path: "/consultar-composicion-corporal" },
       { label: "🎥 Videos Entrenamiento", path: "/videos-entrenamiento" },
       { label: "✏️ Editar Clases", path: "/entrenadores/editar-clases" }, // Ruta intermedia
     ],
@@ -48,10 +45,18 @@ const Sidebar = () => {
       { label: "🎥 Videos Entrenamiento", path: "/videos-entrenamiento" },
       { label: "✏️ Editar Clases", path: "/entrenadores/editar-clases" }, // Ruta intermedia
     ],
+    // Ítems públicos para usuarios no autenticados o sin rol específico
+    public: [
+      { label: "🔍 Consultar Rutinas", path: "/rutinas/consultar" },
+      { label: "📏 Consultar Composición Corporal", path: "/consultar-composicion-corporal" },
+      { label: "🎥 Asesoramiento de Ejercicios", path: "/videos-entrenamiento" },
+    ],
   };
 
-  // Seleccionar los ítems según el rol del usuario
-  const itemsToShow = user ? menuItems[user.rol] || menuItems.entrenador : [];
+  // Seleccionar ítems según el rol, o mostrar ítems públicos si no hay usuario
+  const itemsToShow = user
+    ? [...menuItems[user.rol] || menuItems.entrenador, ...menuItems.public]
+    : menuItems.public;
 
   console.log(
     "Renderizando Sidebar... Items:",
@@ -60,9 +65,6 @@ const Sidebar = () => {
 
   const handleEditarClasesClick = () => {
     navigate("/entrenadores"); // Redirige a la lista de entrenadores para seleccionar ID
-    // Alternativa: prompt para ID
-    // const id = prompt("Ingresa el ID del entrenador:");
-    // if (id) navigate(`/entrenadores/${id}/editar-clases`);
   };
 
   return (
