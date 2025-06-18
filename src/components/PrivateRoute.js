@@ -1,24 +1,21 @@
 import { useEffect } from "react";
-import { Navigate, Outlet, useLocation } from "react-router-dom";
+import { Navigate, Outlet, useLocation, useSearchParams } from "react-router-dom";
 
 const PrivateRoute = () => {
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+  const isPublic = searchParams.get("public") === "true";
 
-  // Rutas públicas que no requieren autenticación
+  console.log("PrivateRoute - Ruta actual:", location.pathname, "isPublic:", isPublic);
+
+  // Si es una ruta pública forzada o definida, permite el acceso
   const publicRoutes = [
     "/login",
     "/register",
     "/consulta-usuario",
-    "/rutinas/consultar",
-    "/consultar-composicion-corporal",
-    "/videos-entrenamiento",
   ];
-
-  console.log("PrivateRoute - Ruta actual:", location.pathname); // Depuración
-
-  // Si la ruta es pública, permite el acceso
-  if (publicRoutes.includes(location.pathname)) {
-    console.log(`Ruta pública detectada: ${location.pathname}, permitiendo acceso`);
+  if (isPublic || publicRoutes.includes(location.pathname)) {
+    console.log(`Acceso público permitido para: ${location.pathname}`);
     return <Outlet />;
   }
 
@@ -29,7 +26,7 @@ const PrivateRoute = () => {
     return <Navigate to="/login" replace />;
   }
 
-  return <Outlet />; // Renderiza las rutas hijas para rutas protegidas
+  return <Outlet />;
 };
 
 export default PrivateRoute;
