@@ -11,7 +11,6 @@ const Login = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     if (login(email, password)) {
-      // Redirige a uno de los módulos públicos tras login exitoso
       navigate("/rutinas/consultar");
     } else {
       alert("Credenciales incorrectas. Usa usuario: 123, contraseña: 123");
@@ -24,7 +23,7 @@ const Login = () => {
         <h2 className="text-center mb-4">Iniciar sesión</h2>
         <div className="mb-3">
           <input
-            type="text" // Cambiado de email a text para evitar validación de correo
+            type="text"
             className="form-control"
             placeholder="Usuario"
             value={email}
