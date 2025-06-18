@@ -92,7 +92,7 @@ const RoleBasedRoute = ({ element, allowedRoles }) => {
 const App = () => {
   return (
     <Routes>
-      {/* Rutas Públicas */}
+      {/* Rutas Públicas (fuera de PrivateRoute) */}
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/consulta-usuario" element={<ConsultaUsuario />} />
@@ -329,9 +329,6 @@ const App = () => {
             }
           />
 
-          {/* Rutas para Recepcionistas, Entrenadores y Admins (eliminadas como públicas) */}
-          {/* /consultar-composicion-corporal y /videos-entrenamiento ya están fuera */}
-
           {/* Rutas Solo para Admins */}
           <Route
             path="/contabilidad"
@@ -405,4 +402,3 @@ const App = () => {
 };
 
 export default App;
-
