@@ -24,7 +24,7 @@ const Login = () => {
         <h2 className="text-center mb-4">Iniciar sesión</h2>
         <div className="mb-3">
           <input
-            type="text"
+            type="text" // Cambiado de email a text para evitar validación de correo
             className="form-control"
             placeholder="Usuario"
             value={email}
@@ -46,7 +46,7 @@ const Login = () => {
         <p className="text-center mt-3">
           ¿No tienes una cuenta? <a href="/register">Registrarse</a>
         </p>
-      </p>
+      </form>
     </div>
   );
 };
