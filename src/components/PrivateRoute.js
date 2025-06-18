@@ -1,9 +1,10 @@
 import { useContext, useEffect } from "react";
-import { Navigate, Outlet } from "react-router-dom";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
 const PrivateRoute = () => {
   const { user, loading, setUser } = useContext(AuthContext);
+  const location = useLocation();
 
   // Validar token al cargar el componente
   useEffect(() => {
@@ -16,7 +17,7 @@ const PrivateRoute = () => {
     }
   }, [user, setUser]);
 
-  console.log("PrivateRoute - Estado:", { user, loading }); // Depuración
+  console.log("PrivateRoute - Estado:", { user, loading, currentPath: location.pathname }); // Depuración
 
   if (loading) {
     return (
@@ -26,12 +27,27 @@ const PrivateRoute = () => {
     );
   }
 
+  // Rutas públicas que no requieren autenticación
+  const publicRoutes = [
+    "/login",
+    "/register",
+    "/consulta-usuario",
+    "/rutinas/consultar",
+    "/consultar-composicion-corporal",
+    "/videos-entrenamiento",
+  ];
+
+  if (publicRoutes.includes(location.pathname)) {
+    console.log("Ruta pública detectada, permitiendo acceso:", location.pathname);
+    return <Outlet />; // Permite el acceso sin autenticación para rutas públicas
+  }
+
   if (!user) {
-    console.log("Usuario no autenticado, redirigiendo a /login");
+    console.log("Usuario no autenticado, redirigiendo a /login desde ruta privada");
     return <Navigate to="/login" replace />;
   }
 
-  return <Outlet />; // Usa Outlet para renderizar las rutas hijas
+  return <Outlet />; // Renderiza las rutas hijas para rutas protegidas
 };
 
-export default PrivateRoute; // Exportación por defecto corregida
+export default PrivateRoute;
