@@ -13,7 +13,7 @@ const Login = () => {
     if (login(email, password)) {
       navigate("/rutinas/consultar");
     } else {
-      alert("Credenciales incorrectas. Usa usuario: 123, contraseña: 123");
+      alert("Credenciales incorrectas. Usa usuario: usuario@123, contraseña: 123");
     }
   };
 
