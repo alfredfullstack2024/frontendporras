@@ -89,8 +89,7 @@ const RoleBasedRoute = ({ element, allowedRoles }) => {
   return element;
 };
 
-// Componente personalizado para manejar la ruta raíz
-const RootRedirect = () => {
+const App = () => {
   const { user } = useAuth();
   const location = useLocation();
 
@@ -104,18 +103,6 @@ const RootRedirect = () => {
     "/videos-entrenamiento",
   ];
 
-  if (publicRoutes.includes(location.pathname)) {
-    return <Outlet />; // No redirige si es una ruta pública
-  }
-
-  return localStorage.getItem("token") && user ? (
-    <Navigate to="/dashboard" replace />
-  ) : (
-    <Navigate to="/login" replace />
-  );
-};
-
-const App = () => {
   return (
     <Routes>
       {/* Rutas Públicas */}
@@ -129,8 +116,19 @@ const App = () => {
       />
       <Route path="/videos-entrenamiento" element={<VideosEntrenamiento />} />
 
-      {/* Ruta raíz con lógica personalizada */}
-      <Route path="/" element={<RootRedirect />} />
+      {/* Ruta raíz con lógica integrada */}
+      <Route
+        path="/"
+        element={
+          publicRoutes.includes(location.pathname) ? (
+            <Outlet />
+          ) : user && localStorage.getItem("token") ? (
+            <Navigate to="/dashboard" replace />
+          ) : (
+            <Navigate to="/login" replace />
+          )
+        }
+      />
 
       {/* Rutas Protegidas dentro del DashboardLayout */}
       <Route element={<PrivateRoute />}>
