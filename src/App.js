@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import DashboardLayout from "./layouts/DashboardLayout";
 import PrivateRoute from "./components/PrivateRoute";
@@ -90,19 +90,6 @@ const RoleBasedRoute = ({ element, allowedRoles }) => {
 };
 
 const App = () => {
-  const { user } = useAuth();
-  const location = useLocation();
-
-  // Rutas públicas que no requieren redirección
-  const publicRoutes = [
-    "/login",
-    "/register",
-    "/consulta-usuario",
-    "/rutinas/consultar",
-    "/consultar-composicion-corporal",
-    "/videos-entrenamiento",
-  ];
-
   return (
     <Routes>
       {/* Rutas Públicas */}
@@ -115,18 +102,13 @@ const App = () => {
         element={<ConsultarComposicionCorporal />}
       />
       <Route path="/videos-entrenamiento" element={<VideosEntrenamiento />} />
-
-      {/* Ruta raíz con lógica integrada */}
       <Route
         path="/"
         element={
-          publicRoutes.includes(location.pathname) ? (
-            <Outlet />
-          ) : user && localStorage.getItem("token") ? (
-            <Navigate to="/dashboard" replace />
-          ) : (
-            <Navigate to="/login" replace />
-          )
+          <Navigate
+            to={localStorage.getItem("token") ? "/dashboard" : "/login"}
+            replace
+          />
         }
       />
 
@@ -347,6 +329,9 @@ const App = () => {
             }
           />
 
+          {/* Rutas para Recepcionistas, Entrenadores y Admins (eliminadas como públicas) */}
+          {/* /consultar-composicion-corporal y /videos-entrenamiento ya están fuera */}
+
           {/* Rutas Solo para Admins */}
           <Route
             path="/contabilidad"
@@ -419,4 +404,4 @@ const App = () => {
   );
 };
 
-export default App;
+export default App;  por favor verificar
