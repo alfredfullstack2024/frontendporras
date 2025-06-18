@@ -1,4 +1,3 @@
-// src/App.js
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
@@ -10,12 +9,13 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import ConsultaUsuario from "./pages/ConsultaUsuario";
+import ConsultarRutina from "./pages/ConsultarRutina";
+import ConsultarComposicionCorporal from "./pages/ConsultarComposicionCorporal";
+import VideosEntrenamiento from "./pages/videos/VideosEntrenamiento";
 
 // Páginas Protegidas
 import Dashboard from "./pages/Dashboard";
 import Suscripcion from "./pages/Suscripcion";
-import ConsultarRutina from "./pages/ConsultarRutina";
-import VideosEntrenamiento from "./pages/videos/VideosEntrenamiento";
 
 // Clientes
 import ListaClientes from "./pages/ListaClientes";
@@ -66,7 +66,6 @@ import EditarAsignacionRutina from "./pages/rutinas/EditarAsignacionRutina";
 
 // Composición Corporal
 import ComposicionCorporal from "./pages/ComposicionCorporal";
-import ConsultarComposicionCorporal from "./pages/ConsultarComposicionCorporal";
 
 // Indicadores
 import Indicadores from "./pages/Indicadores";
@@ -97,6 +96,12 @@ const App = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/consulta-usuario" element={<ConsultaUsuario />} />
+      <Route path="/rutinas/consultar" element={<ConsultarRutina />} />
+      <Route
+        path="/consultar-composicion-corporal"
+        element={<ConsultarComposicionCorporal />}
+      />
+      <Route path="/videos-entrenamiento" element={<VideosEntrenamiento />} />
       <Route
         path="/"
         element={
@@ -106,6 +111,7 @@ const App = () => {
           />
         }
       />
+
       {/* Rutas Protegidas dentro del DashboardLayout */}
       <Route element={<PrivateRoute />}>
         <Route element={<DashboardLayout />}>
@@ -115,15 +121,6 @@ const App = () => {
           {/* Rutas para Recepcionistas y Admins */}
           <Route
             path="/consultar-rutina"
-            element={
-              <RoleBasedRoute
-                element={<ConsultarRutina />}
-                allowedRoles={["recepcionista", "entrenador", "admin"]}
-              />
-            }
-          />
-          <Route
-            path="/rutinas/consultar"
             element={
               <RoleBasedRoute
                 element={<ConsultarRutina />}
@@ -332,25 +329,8 @@ const App = () => {
             }
           />
 
-          {/* Rutas para Recepcionistas, Entrenadores y Admins */}
-          <Route
-            path="/consultar-composicion-corporal"
-            element={
-              <RoleBasedRoute
-                element={<ConsultarComposicionCorporal />}
-                allowedRoles={["recepcionista", "entrenador", "admin"]}
-              />
-            }
-          />
-          <Route
-            path="/videos-entrenamiento"
-            element={
-              <RoleBasedRoute
-                element={<VideosEntrenamiento />}
-                allowedRoles={["recepcionista", "entrenador", "admin"]}
-              />
-            }
-          />
+          {/* Rutas para Recepcionistas, Entrenadores y Admins (eliminadas como públicas) */}
+          {/* /consultar-composicion-corporal y /videos-entrenamiento ya están fuera */}
 
           {/* Rutas Solo para Admins */}
           <Route
