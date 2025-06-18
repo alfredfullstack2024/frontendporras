@@ -9,21 +9,19 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
-      // Recuperar usuario si existe en localStorage
       const savedUser = localStorage.getItem("user");
       if (savedUser) {
         setUser(JSON.parse(savedUser));
       } else {
-        setUser({ token, rol: "anonymous" }); // Usuario anónimo por defecto
+        setUser({ token, rol: "anonymous" });
       }
     }
     setLoading(false);
   }, []);
 
   const login = (email, password) => {
-    // Lógica de login simulada para el perfil "123"
-    if (email === "123" && password === "123") {
-      const newUser = { token: "public-token-123", rol: "public" };
+    if (email === "usuario@123" && password === "123") {
+      const newUser = { token: "public-token-123", rol: "public-user" };
       localStorage.setItem("token", newUser.token);
       localStorage.setItem("user", JSON.stringify(newUser));
       setUser(newUser);
