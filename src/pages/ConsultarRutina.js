@@ -1,4 +1,4 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Container, Form, Button, Table, Alert } from "react-bootstrap";
 import {
   consultarRutinaPorNumeroIdentificacion,
@@ -6,7 +6,6 @@ import {
   consultarClasesPorNumeroIdentificacion,
 } from "../api/axios";
 import { useNavigate } from "react-router-dom";
-import { AuthContext } from "../context/AuthContext";
 
 const ConsultarRutina = () => {
   const [numeroIdentificacion, setNumeroIdentificacion] = useState("");
@@ -17,15 +16,6 @@ const ConsultarRutina = () => {
   const [success, setSuccess] = useState(null);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
-
-  // Verificar autenticación
-  useEffect(() => {
-    if (!user || !user.token) {
-      setError("Debes iniciar sesión para consultar rutinas.");
-      navigate("/login");
-    }
-  }, [user, navigate]);
 
   // Limpiar mensajes de error/éxito después de 5 segundos
   useEffect(() => {
@@ -63,12 +53,9 @@ const ConsultarRutina = () => {
     );
 
     try {
-      const config = { headers: { Authorization: `Bearer ${user.token}` } };
-
-      // Consultar rutinas
+      // Consultar rutinas (sin token, asumiendo que la API lo permite públicamente)
       const rutinasResponse = await consultarRutinaPorNumeroIdentificacion(
-        cleanNumeroIdentificacion,
-        config
+        cleanNumeroIdentificacion
       );
       console.log("Rutinas obtenidas:", rutinasResponse.data);
       const rutinasData = Array.isArray(rutinasResponse.data)
@@ -113,7 +100,7 @@ const ConsultarRutina = () => {
       setError(
         err.response?.data?.mensaje ||
           err.message ||
-          "Error al consultar los datos."
+          "Error al consultar los datos. Asegúrate de que la API permita acceso público."
       );
     } finally {
       setLoading(false);
