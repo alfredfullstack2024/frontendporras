@@ -23,7 +23,7 @@ const PrivateRoute = () => {
     return (
       <div className="d-flex justify-content-center align-items-center vh-100">
         <h4 className="text-muted">Cargando... 🌀</h4>
-      </div>
+    </div>
     );
   }
 
@@ -37,11 +37,12 @@ const PrivateRoute = () => {
     "/videos-entrenamiento",
   ];
 
+  // Si la ruta es pública, permite el acceso sin autenticación
   if (publicRoutes.includes(location.pathname)) {
-    console.log("Ruta pública detectada, permitiendo acceso:", location.pathname);
-    return <Outlet />; // Permite el acceso sin autenticación para rutas públicas
+    return <Outlet />; // Permite el acceso sin verificar user
   }
 
+  // Para rutas protegidas, redirige si no hay usuario
   if (!user) {
     console.log("Usuario no autenticado, redirigiendo a /login desde ruta privada");
     return <Navigate to="/login" replace />;
