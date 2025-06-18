@@ -404,4 +404,4 @@ const App = () => {
   );
 };
 
-export default App;  por favor verificar
+export default App;
