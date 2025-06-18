@@ -1,78 +1,52 @@
-// src/pages/Login.js
-import React, { useState } from "react";
-import { Form, Button, Alert, Card } from "react-bootstrap";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { AuthContext } from "../context/AuthContext";
 
 const Login = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
-  const [error, setError] = useState("");
-  const { login } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { login } = useContext(AuthContext);
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-  };
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
-    setError("");
-
-    try {
-      await login(formData.email, formData.password);
-    } catch (err) {
-      console.error("Error desde Login.js:", err.message);
-      setError(err.message);
+    if (login(email, password)) {
+      // Redirige a uno de los módulos públicos tras login exitoso
+      navigate("/rutinas/consultar");
+    } else {
+      alert("Credenciales incorrectas. Usa usuario: 123, contraseña: 123");
     }
   };
 
   return (
-    <div className="container mt-5">
-      <h2>Iniciar Sesión</h2>
-
-      {error && <Alert variant="danger">{error}</Alert>}
-
-      <Card style={{ maxWidth: "400px", margin: "0 auto" }}>
-        <Card.Body>
-          <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3" controlId="email">
-              <Form.Label>Email</Form.Label>
-              <Form.Control
-                type="email"
-                name="email"
-                value={formData.email}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
-
-            <Form.Group className="mb-3" controlId="password">
-              <Form.Label>Contraseña</Form.Label>
-              <Form.Control
-                type="password"
-                name="password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
-            </Form.Group>
-
-            <Button variant="primary" type="submit" className="w-100">
-              Iniciar Sesión
-            </Button>
-          </Form>
-        </Card.Body>
-      </Card>
-
-      <div className="text-center mt-3">
-        <Button variant="link" onClick={() => navigate("/register")}>
-          ¿No tienes una cuenta? Regístrate
-        </Button>
-      </div>
+    <div className="d-flex justify-content-center align-items-center vh-100">
+      <form onSubmit={handleSubmit} className="p-4 border rounded bg-light">
+        <h2 className="text-center mb-4">Iniciar sesión</h2>
+        <div className="mb-3">
+          <input
+            type="text"
+            className="form-control"
+            placeholder="Usuario"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </div>
+        <div className="mb-3">
+          <input
+            type="password"
+            className="form-control"
+            placeholder="Contraseña"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+          />
+        </div>
+        <button type="submit" className="btn btn-primary w-100">
+          Iniciar sesión
+        </button>
+        <p className="text-center mt-3">
+          ¿No tienes una cuenta? <a href="/register">Registrarse</a>
+        </p>
+      </p>
     </div>
   );
 };
