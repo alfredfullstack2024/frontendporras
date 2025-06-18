@@ -123,6 +123,7 @@ const EditarUsuario = () => {
                 <option value="admin">Admin</option>
                 <option value="recepcionista">Recepcionista</option>
                 <option value="entrenador">Entrenador</option>
+                <option value="user">Usuario</option>
               </Form.Control>
             </Form.Group>
 
