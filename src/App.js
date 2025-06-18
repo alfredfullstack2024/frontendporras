@@ -1,36 +1,8 @@
 import React from "react";
-import { Routes, Route, Navigate, useLocation } from "react-router-dom"; // Añadimos useLocation
+import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import DashboardLayout from "./layouts/DashboardLayout";
 import PrivateRoute from "./components/PrivateRoute";
-
-// Componente para manejar la redirección de la ruta raíz
-const RootRedirect = () => {
-  const { user } = useAuth();
-  const location = useLocation();
-
-  // Rutas públicas que no requieren redirección
-  const publicRoutes = [
-    "/login",
-    "/register",
-    "/consulta-usuario",
-    "/rutinas/consultar",
-    "/consultar-composicion-corporal",
-    "/videos-entrenamiento",
-  ];
-
-  // Si la ruta es pública, no redirige
-  if (publicRoutes.includes(location.pathname)) {
-    return null; // No redirige, deja que la ruta pública se maneje
-  }
-
-  // Redirección basada en token y user
-  return localStorage.getItem("token") && user ? (
-    <Navigate to="/dashboard" replace />
-  ) : (
-    <Navigate to="/login" replace />
-  );
-};
 
 // Páginas Públicas
 import Login from "./pages/Login";
@@ -130,7 +102,15 @@ const App = () => {
         element={<ConsultarComposicionCorporal />}
       />
       <Route path="/videos-entrenamiento" element={<VideosEntrenamiento />} />
-      <Route path="/" element={<RootRedirect />} /> {/* Cambiamos a RootRedirect */}
+      <Route
+        path="/"
+        element={
+          <Navigate
+            to={localStorage.getItem("token") ? "/dashboard" : "/login"}
+            replace
+          />
+        }
+      />
 
       {/* Rutas Protegidas dentro del DashboardLayout */}
       <Route element={<PrivateRoute />}>
@@ -349,6 +329,9 @@ const App = () => {
             }
           />
 
+          {/* Rutas para Recepcionistas, Entrenadores y Admins (eliminadas como públicas) */}
+          {/* /consultar-composicion-corporal y /videos-entrenamiento ya están fuera */}
+
           {/* Rutas Solo para Admins */}
           <Route
             path="/contabilidad"
@@ -422,3 +405,4 @@ const App = () => {
 };
 
 export default App;
+
