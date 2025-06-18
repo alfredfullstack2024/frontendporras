@@ -9,9 +9,6 @@ import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import ConsultaUsuario from "./pages/ConsultaUsuario";
-import ConsultarRutina from "./pages/ConsultarRutina";
-import ConsultarComposicionCorporal from "./pages/ConsultarComposicionCorporal";
-import VideosEntrenamiento from "./pages/videos/VideosEntrenamiento";
 
 // Páginas Protegidas
 import Dashboard from "./pages/Dashboard";
@@ -60,15 +57,20 @@ import Asistencias from "./pages/asistencias/Asistencias";
 import RegistrarAsistencia from "./pages/asistencias/RegistrarAsistencia";
 
 // Rutinas
+import ConsultarRutina from "./pages/ConsultarRutina";
 import CrearRutina from "./pages/rutinas/CrearRutina";
 import AsignarRutina from "./pages/rutinas/AsignarRutina";
 import EditarAsignacionRutina from "./pages/rutinas/EditarAsignacionRutina";
 
 // Composición Corporal
+import ConsultarComposicionCorporal from "./pages/ConsultarComposicionCorporal";
 import ComposicionCorporal from "./pages/ComposicionCorporal";
 
 // Indicadores
 import Indicadores from "./pages/Indicadores";
+
+// Videos
+import VideosEntrenamiento from "./pages/videos/VideosEntrenamiento";
 
 // Componente para proteger rutas basadas en roles
 const RoleBasedRoute = ({ element, allowedRoles }) => {
@@ -96,12 +98,6 @@ const App = () => {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/consulta-usuario" element={<ConsultaUsuario />} />
-      <Route path="/rutinas/consultar" element={<ConsultarRutina />} />
-      <Route
-        path="/consultar-composicion-corporal"
-        element={<ConsultarComposicionCorporal />}
-      />
-      <Route path="/videos-entrenamiento" element={<VideosEntrenamiento />} />
       <Route
         path="/"
         element={
@@ -119,15 +115,6 @@ const App = () => {
           <Route path="/suscripcion" element={<Suscripcion />} />
 
           {/* Rutas para Recepcionistas y Admins */}
-          <Route
-            path="/consultar-rutina"
-            element={
-              <RoleBasedRoute
-                element={<ConsultarRutina />}
-                allowedRoles={["recepcionista", "entrenador", "admin"]}
-              />
-            }
-          />
           <Route
             path="/clientes"
             element={
@@ -325,6 +312,35 @@ const App = () => {
               <RoleBasedRoute
                 element={<ComposicionCorporal />}
                 allowedRoles={["entrenador", "admin"]}
+              />
+            }
+          />
+
+          {/* Rutas para Usuarios */}
+          <Route
+            path="/rutinas/consultar"
+            element={
+              <RoleBasedRoute
+                element={<ConsultarRutina />}
+                allowedRoles={["user"]}
+              />
+            }
+          />
+          <Route
+            path="/consultar-composicion-corporal"
+            element={
+              <RoleBasedRoute
+                element={<ConsultarComposicionCorporal />}
+                allowedRoles={["user"]}
+              />
+            }
+          />
+          <Route
+            path="/videos-entrenamiento"
+            element={
+              <RoleBasedRoute
+                element={<VideosEntrenamiento />}
+                allowedRoles={["user"]}
               />
             }
           />
