@@ -15,17 +15,63 @@ import {
   FaSearch,
   FaUser,
   FaVideo,
-  FaEdit, // Ícono para editar asignación
+  FaEdit,
 } from "react-icons/fa";
 
 const DashboardLayout = () => {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
+
+  // Menú dinámico basado en el rol
+  const menuItems = {
+    admin: [
+      { path: "/dashboard", icon: <FaTachometerAlt />, label: "Dashboard" },
+      { path: "/clientes", icon: <FaUsers />, label: "Clientes" },
+      { path: "/membresias", icon: <FaIdCard />, label: "Membresías" },
+      { path: "/entrenadores", icon: <FaUsersCog />, label: "Entrenadores" },
+      { path: "/productos", icon: <FaShoppingCart />, label: "Productos" },
+      { path: "/pagos", icon: <FaMoneyBillWave />, label: "Pagos" },
+      { path: "/contabilidad", icon: <FaChartBar />, label: "Contabilidad" },
+      { path: "/clases", icon: <FaDumbbell />, label: "Clases" },
+      { path: "/asistencias", icon: <FaUser />, label: "Asistencias" },
+      { path: "/rutinas/crear", icon: <FaDumbbell />, label: "Crear rutina" },
+      { path: "/rutinas/asignar", icon: <FaPlus />, label: "Asignar rutina" },
+      { path: "/rutinas/editar-asignacion", icon: <FaEdit />, label: "Editar Asignación Rutina" },
+      { path: "/composicion-corporal", icon: <FaUser />, label: "Composición Corporal" },
+      { path: "/usuarios", icon: <FaUsersCog />, label: "Usuarios" },
+      { path: "/indicadores", icon: <FaChartBar />, label: "Indicadores" },
+      { path: "/videos-entrenamiento", icon: <FaVideo />, label: "Asesoramiento Ejercicios" },
+    ],
+    recepcionista: [
+      { path: "/dashboard", icon: <FaTachometerAlt />, label: "Dashboard" },
+      { path: "/clientes", icon: <FaUsers />, label: "Clientes" },
+      { path: "/membresias", icon: <FaIdCard />, label: "Membresías" },
+      { path: "/entrenadores", icon: <FaUsersCog />, label: "Entrenadores" },
+      { path: "/productos", icon: <FaShoppingCart />, label: "Productos" },
+      { path: "/pagos", icon: <FaMoneyBillWave />, label: "Pagos" },
+      { path: "/clases", icon: <FaDumbbell />, label: "Clases" },
+      { path: "/asistencias", icon: <FaUser />, label: "Asistencias" },
+    ],
+    entrenador: [
+      { path: "/dashboard", icon: <FaTachometerAlt />, label: "Dashboard" },
+      { path: "/rutinas/crear", icon: <FaDumbbell />, label: "Crear rutina" },
+      { path: "/rutinas/asignar", icon: <FaPlus />, label: "Asignar rutina" },
+      { path: "/rutinas/editar-asignacion", icon: <FaEdit />, label: "Editar Asignación Rutina" },
+      { path: "/composicion-corporal", icon: <FaUser />, label: "Composición Corporal" },
+    ],
+    user: [
+      { path: "/rutinas/consultar", icon: <FaSearch />, label: "Consultar Rutina" },
+      { path: "/consultar-composicion-corporal", icon: <FaSearch />, label: "Consultar Composición Corporal" },
+      { path: "/videos-entrenamiento", icon: <FaVideo />, label: "Asesoramiento Ejercicios" },
+    ],
+  };
+
+  const userMenu = user?.rol ? menuItems[user.rol] || menuItems["user"] : [];
 
   return (
     <div className="d-flex" style={{ minHeight: "100vh" }}>
@@ -50,82 +96,11 @@ const DashboardLayout = () => {
           <h5>Admin Gimnasios</h5>
         </div>
         <Nav className="flex-column">
-          <Nav.Link as={NavLink} to="/dashboard" className="text-white">
-            <FaTachometerAlt className="me-2" /> Dashboard
-          </Nav.Link>
-          {/* Comentamos la opción de Suscripción para ocultarla del menú */}
-          {/* <Nav.Link as={NavLink} to="/suscripcion" className="text-white">
-            <FaIdCard className="me-2" /> Suscripción
-          </Nav.Link> */}
-          <Nav.Link as={NavLink} to="/clientes" className="text-white">
-            <FaUsers className="me-2" /> Clientes
-          </Nav.Link>
-          <Nav.Link as={NavLink} to="/membresias" className="text-white">
-            <FaIdCard className="me-2" /> Membresías
-          </Nav.Link>
-          <Nav.Link as={NavLink} to="/entrenadores" className="text-white">
-            <FaUsersCog className="me-2" /> Entrenadores
-          </Nav.Link>
-          <Nav.Link as={NavLink} to="/productos" className="text-white">
-            <FaShoppingCart className="me-2" /> Productos
-          </Nav.Link>
-          <Nav.Link as={NavLink} to="/pagos" className="text-white">
-            <FaMoneyBillWave className="me-2" /> Pagos
-          </Nav.Link>
-          <Nav.Link as={NavLink} to="/contabilidad" className="text-white">
-            <FaChartBar className="me-2" /> Contabilidad
-          </Nav.Link>
-          <Nav.Link as={NavLink} to="/clases" className="text-white">
-            <FaDumbbell className="me-2" /> Clases
-          </Nav.Link>
-          {/* Comentamos la opción de Asistencias para ocultarla del menú */}
-          {/* <Nav.Link as={NavLink} to="/asistencias" className="text-white">
-            <FaUserCheck className="me-2" /> Asistencias
-          </Nav.Link> */}
-          <Nav.Link as={NavLink} to="/rutinas/crear" className="text-white">
-            <FaDumbbell className="me-2" /> Crear rutina
-          </Nav.Link>
-          <Nav.Link as={NavLink} to="/rutinas/asignar" className="text-white">
-            <FaPlus className="me-2" /> Asignar rutina
-          </Nav.Link>
-          <Nav.Link
-            as={NavLink}
-            to="/rutinas/editar-asignacion"
-            className="text-white"
-          >
-            <FaEdit className="me-2" /> Editar Asignación Rutina
-          </Nav.Link>
-          <Nav.Link as={NavLink} to="/rutinas/consultar" className="text-white">
-            <FaSearch className="me-2" /> Consultar rutina
-          </Nav.Link>
-          <Nav.Link
-            as={NavLink}
-            to="/composicion-corporal"
-            className="text-white"
-          >
-            <FaUser className="me-2" /> Composición Corporal
-          </Nav.Link>
-          <Nav.Link
-            as={NavLink}
-            to="/consultar-composicion-corporal"
-            className="text-white"
-          >
-            <FaSearch className="me-2" /> Consultar Composición Corporal
-          </Nav.Link>
-          <Nav.Link as={NavLink} to="/usuarios" className="text-white">
-            <FaUsersCog className="me-2" /> Usuarios
-          </Nav.Link>
-          {/* Comentamos la opción de Indicadores para ocultarla del menú */}
-          {/* <Nav.Link as={NavLink} to="/indicadores" className="text-white">
-            <FaChartPie className="me-2" /> Indicadores
-          </Nav.Link> */}
-          <Nav.Link
-            as={NavLink}
-            to="/videos-entrenamiento"
-            className="text-white"
-          >
-            <FaVideo className="me-2" /> Asesoramiento Ejercicios
-          </Nav.Link>
+          {userMenu.map((item, index) => (
+            <Nav.Link key={index} as={NavLink} to={item.path} className="text-white">
+              {item.icon} {item.label}
+            </Nav.Link>
+          ))}
           <Button
             variant="danger"
             className="mt-4 w-75 mx-auto"
