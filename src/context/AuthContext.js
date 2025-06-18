@@ -1,4 +1,3 @@
-// src/context/AuthContext.js
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
@@ -20,22 +19,6 @@ const AuthProvider = ({ children }) => {
       console.log("No hay token para configurar en headers");
     }
   }, [user]);
-
-  // Desactivamos temporalmente la llamada a /auth/me
-  // useEffect(() => {
-  //   const token = localStorage.getItem("token");
-  //   console.log("Token en localStorage al iniciar:", token);
-  //   if (token) {
-  //     api.get("/auth/me").then((response) => {
-  //       console.log("Datos de /auth/me:", response.data);
-  //       setUser({ ...response.data, token });
-  //     }).catch((error) => {
-  //       console.error("Error en /auth/me:", error.message);
-  //       localStorage.removeItem("token");
-  //       setUser(null);
-  //     });
-  //   }
-  // }, []);
 
   const login = async (email, password) => {
     try {
@@ -87,7 +70,7 @@ const AuthProvider = ({ children }) => {
 
   return (
     <AuthContext.Provider value={{ user, setUser, loading, login, register, logout, hasPermission }}>
-      {children} {/* Renderizamos siempre por ahora */}
+      {children}
     </AuthContext.Provider>
   );
 };
