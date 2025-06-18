@@ -1,5 +1,5 @@
 import React from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { Routes, Route, Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import DashboardLayout from "./layouts/DashboardLayout";
 import PrivateRoute from "./components/PrivateRoute";
@@ -89,6 +89,32 @@ const RoleBasedRoute = ({ element, allowedRoles }) => {
   return element;
 };
 
+// Componente personalizado para manejar la ruta raíz
+const RootRedirect = () => {
+  const { user } = useAuth();
+  const location = useLocation();
+
+  // Rutas públicas que no requieren redirección
+  const publicRoutes = [
+    "/login",
+    "/register",
+    "/consulta-usuario",
+    "/rutinas/consultar",
+    "/consultar-composicion-corporal",
+    "/videos-entrenamiento",
+  ];
+
+  if (publicRoutes.includes(location.pathname)) {
+    return <Outlet />; // No redirige si es una ruta pública
+  }
+
+  return localStorage.getItem("token") && user ? (
+    <Navigate to="/dashboard" replace />
+  ) : (
+    <Navigate to="/login" replace />
+  );
+};
+
 const App = () => {
   return (
     <Routes>
@@ -102,15 +128,9 @@ const App = () => {
         element={<ConsultarComposicionCorporal />}
       />
       <Route path="/videos-entrenamiento" element={<VideosEntrenamiento />} />
-      <Route
-        path="/"
-        element={
-          <Navigate
-            to={localStorage.getItem("token") ? "/dashboard" : "/login"}
-            replace
-          />
-        }
-      />
+
+      {/* Ruta raíz con lógica personalizada */}
+      <Route path="/" element={<RootRedirect />} />
 
       {/* Rutas Protegidas dentro del DashboardLayout */}
       <Route element={<PrivateRoute />}>
@@ -328,9 +348,6 @@ const App = () => {
               />
             }
           />
-
-          {/* Rutas para Recepcionistas, Entrenadores y Admins (eliminadas como públicas) */}
-          {/* /consultar-composicion-corporal y /videos-entrenamiento ya están fuera */}
 
           {/* Rutas Solo para Admins */}
           <Route
