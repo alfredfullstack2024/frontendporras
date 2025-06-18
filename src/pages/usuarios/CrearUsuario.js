@@ -90,6 +90,7 @@ const CrearUsuario = () => {
                 <option value="admin">Admin</option>
                 <option value="recepcionista">Recepcionista</option>
                 <option value="entrenador">Entrenador</option>
+                <option value="user">Usuario</option>
               </Form.Control>
             </Form.Group>
 
@@ -97,7 +98,7 @@ const CrearUsuario = () => {
               Crear Usuario
             </Button>
             <Button
-              variable="secondary"
+              variant="secondary"
               className="ms-2"
               onClick={() => navigate("/usuarios")}
             >
