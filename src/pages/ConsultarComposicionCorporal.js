@@ -12,9 +12,8 @@ const ConsultarComposicionCorporal = () => {
   const fetchComposiciones = async () => {
     try {
       const response = await consultarComposicionPorCliente(identificacion);
-      // Verifica si la respuesta tiene el formato esperado
       if (response.data.success) {
-        setComposiciones(response.data.data); // Ajusta según la estructura de la respuesta
+        setComposiciones(response.data.data);
         setError("");
       } else {
         setError(
@@ -41,7 +40,6 @@ const ConsultarComposicionCorporal = () => {
 
   const evaluarMejora = (current, previous) => {
     if (!previous) return null;
-    // Ajusta los campos según la respuesta real del backend
     const pesoMejor = current.peso < previous.peso;
     const grasaMejor = current.porcentajeGrasa < previous.porcentajeGrasa;
     const musculoMejor = current.porcentajeMusculo > previous.porcentajeMusculo;
