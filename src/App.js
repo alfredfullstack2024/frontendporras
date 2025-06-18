@@ -1,10 +1,9 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
-import DashboardLayout from "./layouts/DashboardLayout";
 import PrivateRoute from "./components/PrivateRoute";
 
-// Páginas Públicas
+// Páginas
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
@@ -13,7 +12,7 @@ import ConsultarRutina from "./pages/ConsultarRutina";
 import ConsultarComposicionCorporal from "./pages/ConsultarComposicionCorporal";
 import VideosEntrenamiento from "./pages/videos/VideosEntrenamiento";
 
-// Componente para proteger rutas basadas en roles
+// Componente para proteger rutas públicas
 const PublicRoute = ({ element, allowedRole }) => {
   const { user } = useAuth();
 
