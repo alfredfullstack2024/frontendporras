@@ -70,7 +70,9 @@ const Sidebar = () => {
 
   return (
     <div className="sidebar p-3 bg-dark text-white vh-100">
-      <h4 className="text-center mb-4">🏋️ Admin Gym</h4>
+      <div className="text-center mb-4">
+        <img src="/logo192.png" alt="Logo Admin Gym" style={{ width: "100px" }} />
+      </div>
       <ListGroup variant="flush">
         {itemsToShow.map((item) => (
           <ListGroup.Item
