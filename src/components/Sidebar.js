@@ -13,7 +13,7 @@ const Sidebar = () => {
     return null;
   }
   const { user } = context;
-  console.log("Usuario en Sidebar:", user);
+  console.log("Usuario en Sidebar - Rol:", user ? user.rol : "No autenticado");
 
   // Definir los ítems del menú según el rol
   const menuItems = {
@@ -47,16 +47,18 @@ const Sidebar = () => {
     ],
     // Ítems públicos para usuarios (incluyendo rol "user")
     public: [
-  { label: "🔍 Consultar Rutinas", path: "/rutinas/consultar" },
-  { label: "📏 Consultar Composición Corporal", path: "/consultar-composicion-corporal" },
-  { label: "🎥 Asesoramiento de Ejercicios", path: "/videos-entrenamiento" },
-  { label: "🕒 Clases", path: "/clases" }, // Añadido para rol "user"
-],
+      { label: "🔍 Consultar Rutinas", path: "/rutinas/consultar" },
+      { label: "📏 Consultar Composición Corporal", path: "/consultar-composicion-corporal" },
+      { label: "🎥 Asesoramiento de Ejercicios", path: "/videos-entrenamiento" },
+      { label: "🕒 Clases", path: "/clases" }, // Asegurado para rol "user"
+    ],
   };
 
   // Seleccionar ítems según el rol, o mostrar ítems públicos si no hay usuario
   const itemsToShow = user
-    ? [...menuItems[user.rol] || menuItems.entrenador, ...menuItems.public]
+    ? user.rol === "user"
+      ? [...menuItems.public] // Solo ítems públicos para rol "user"
+      : [...menuItems[user.rol] || menuItems.entrenador, ...menuItems.public]
     : menuItems.public;
 
   console.log(
