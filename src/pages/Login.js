@@ -69,9 +69,9 @@ const Login = () => {
       </Card>
 
       <div className="text-center mt-3">
-        // <Button variant="link" onClick={() => navigate("/register")}>
+        <Button variant="link" onClick={() => navigate("/register")}>
           ¿No tienes una cuenta? Regístrate
-        </Button> //
+        </Button> 
       </div>
     </div>
   );
