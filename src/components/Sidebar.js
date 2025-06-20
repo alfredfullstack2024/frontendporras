@@ -27,7 +27,7 @@ const Sidebar = () => {
       { label: "👥 Usuarios", path: "/usuarios" },
       { label: "🏋️♂️ Entrenadores", path: "/entrenadores" },
       { label: "🕒 Clases", path: "/clases" },
-      { label: "📋 Registrar Asistencia", path: "/asistencias/registrar" },
+      // { label: "📋 Registrar Asistencia", path: "/asistencias/registrar" }, // Eliminado
       { label: "📝 Suscripción", path: "/suscripcion" },
       { label: "📈 Indicadores", path: "/indicadores" },
       { label: "🏋️ Rutinas", path: "/rutinas/crear" },
@@ -45,11 +45,12 @@ const Sidebar = () => {
       { label: "🎥 Videos Entrenamiento", path: "/videos-entrenamiento" },
       { label: "✏️ Editar Clases", path: "/entrenadores/editar-clases" }, // Ruta intermedia
     ],
-    // Ítems públicos para usuarios no autenticados o sin rol específico
+    // Ítems públicos para usuarios (incluyendo rol "user")
     public: [
       { label: "🔍 Consultar Rutinas", path: "/rutinas/consultar" },
       { label: "📏 Consultar Composición Corporal", path: "/consultar-composicion-corporal" },
       { label: "🎥 Asesoramiento de Ejercicios", path: "/videos-entrenamiento" },
+      { label: "🕒 Clases", path: "/clases" }, // Añadido para rol "user"
     ],
   };
 
