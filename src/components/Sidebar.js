@@ -47,11 +47,11 @@ const Sidebar = () => {
     ],
     // Ítems públicos para usuarios (incluyendo rol "user")
     public: [
-      { label: "🔍 Consultar Rutinas", path: "/rutinas/consultar" },
-      { label: "📏 Consultar Composición Corporal", path: "/consultar-composicion-corporal" },
-      { label: "🎥 Asesoramiento de Ejercicios", path: "/videos-entrenamiento" },
-      { label: "🕒 Clases", path: "/clases" }, // Añadido para rol "user"
-    ],
+  { label: "🔍 Consultar Rutinas", path: "/rutinas/consultar" },
+  { label: "📏 Consultar Composición Corporal", path: "/consultar-composicion-corporal" },
+  { label: "🎥 Asesoramiento de Ejercicios", path: "/videos-entrenamiento" },
+  { label: "🕒 Clases", path: "/clases" }, // Añadido para rol "user"
+],
   };
 
   // Seleccionar ítems según el rol, o mostrar ítems públicos si no hay usuario
