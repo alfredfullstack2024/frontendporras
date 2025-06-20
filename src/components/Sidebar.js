@@ -27,7 +27,7 @@ const Sidebar = () => {
       { label: "👥 Usuarios", path: "/usuarios" },
       { label: "🏋️♂️ Entrenadores", path: "/entrenadores" },
       { label: "🕒 Clases", path: "/clases" },
-      { label: "📋 Registrar Asistencia", path: "/asistencias/registrar" },
+      //{ label: "📋 Registrar Asistencia", path: "/asistencias/registrar" },//
       { label: "📝 Suscripción", path: "/suscripcion" },
       { label: "📈 Indicadores", path: "/indicadores" },
       { label: "🏋️ Rutinas", path: "/rutinas/crear" },
@@ -49,6 +49,7 @@ const Sidebar = () => {
     public: [
       { label: "🔍 Consultar Rutinas", path: "/rutinas/consultar" },
       { label: "📏 Consultar Composición Corporal", path: "/consultar-composicion-corporal" },
+      { label: "🕒 Clases", path: "/clases" },
       { label: "🎥 Asesoramiento de Ejercicios", path: "/videos-entrenamiento" },
     ],
   };
