@@ -16,7 +16,6 @@ const Sidebar = () => {
   console.log("Usuario en Sidebar - Rol:", user ? user.rol : "No autenticado");
   console.log("Usuario completo:", user ? JSON.stringify(user) : "Sin usuario");
 
-  // Definir los ítems del menú según el rol
   const menuItems = {
     admin: [
       { label: "📊 Panel", path: "/dashboard" },
@@ -28,7 +27,6 @@ const Sidebar = () => {
       { label: "👥 Usuarios", path: "/usuarios" },
       { label: "🏋️♂️ Entrenadores", path: "/entrenadores" },
       { label: "🕒 Clases", path: "/clases" },
-      // { label: "📋 Registrar Asistencia", path: "/asistencias/registrar" }, // Eliminado
       { label: "📝 Suscripción", path: "/suscripcion" },
       { label: "📈 Indicadores", path: "/indicadores" },
       { label: "🏋️ Rutinas", path: "/rutinas/crear" },
@@ -36,7 +34,7 @@ const Sidebar = () => {
       { label: "📏 Composición Corporal", path: "/composicion-corporal" },
       { label: "🔍 Consultar Composición", path: "/consultar-composicion-corporal" },
       { label: "🎥 Videos Entrenamiento", path: "/videos-entrenamiento" },
-      { label: "✏️ Editar Clases", path: "/entrenadores/editar-clases" }, // Ruta intermedia
+      { label: "✏️ Editar Clases", path: "/entrenadores/editar-clases" },
     ],
     entrenador: [
       { label: "🏋️ Rutinas", path: "/rutinas/crear" },
@@ -44,31 +42,26 @@ const Sidebar = () => {
       { label: "📏 Composición Corporal", path: "/composicion-corporal" },
       { label: "🔍 Consultar Composición", path: "/consultar-composicion-corporal" },
       { label: "🎥 Videos Entrenamiento", path: "/videos-entrenamiento" },
-      { label: "✏️ Editar Clases", path: "/entrenadores/editar-clases" }, // Ruta intermedia
+      { label: "✏️ Editar Clases", path: "/entrenadores/editar-clases" },
     ],
-    // Ítems públicos para usuarios (incluyendo rol "user")
     public: [
       { label: "🔍 Consultar Rutinas", path: "/rutinas/consultar" },
       { label: "📏 Consultar Composición Corporal", path: "/consultar-composicion-corporal" },
       { label: "🎥 Asesoramiento de Ejercicios", path: "/videos-entrenamiento" },
-      { label: "🕒 Clases", path: "/clases" }, // Asegurado para rol "user"
+      { label: "🕒 Clases", path: "/clases" }, // Igual que las otras opciones
     ],
   };
 
-  // Forzar ítems, asegurando Clases para "user" y depuración
   const itemsToShow = user
-    ? user.rol === "user" || !user.rol // Forzar para "user" o rol indefinido
-      ? [
-          ...menuItems.public,
-          { label: "🕒 Clases", path: "/clases" }, // Garantizar Clases
-        ]
+    ? user.rol === "user" || !user.rol // Incluir para "user" o rol no definido
+      ? [...menuItems.public]
       : [...menuItems[user.rol] || menuItems.entrenador, ...menuItems.public]
     : menuItems.public;
 
   console.log("Renderizando Sidebar... Items:", itemsToShow.map((item) => item.label));
 
   const handleEditarClasesClick = () => {
-    navigate("/entrenadores"); // Redirige a la lista de entrenadores para seleccionar ID
+    navigate("/entrenadores");
   };
 
   return (
