@@ -6,7 +6,7 @@ const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false); // Iniciamos sin loading
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -28,7 +28,9 @@ const AuthProvider = ({ children }) => {
       if (!token) throw new Error("No se recibió un token.");
       localStorage.setItem("token", token);
       const userData = response.data.user || {};
-      setUser({ ...userData, token });
+      // Usar 'role' como clave principal, fallback a 'rol' si existe
+      const role = userData.role || userData.rol || "user"; // Asumir "user" por defecto
+      setUser({ ...userData, role, token });
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       setTimeout(() => navigate("/dashboard"), 0);
     } catch (error) {
@@ -45,7 +47,8 @@ const AuthProvider = ({ children }) => {
       if (!token) throw new Error("No se recibió un token.");
       localStorage.setItem("token", token);
       const userData = response.data.user || {};
-      setUser({ ...userData, token });
+      const role = userData.role || userData.rol || rol || "user"; // Usar rol pasado o "user"
+      setUser({ ...userData, role, token });
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       setTimeout(() => navigate("/dashboard"), 0);
     } catch (error) {
