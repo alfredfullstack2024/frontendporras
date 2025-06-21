@@ -13,7 +13,7 @@ const Sidebar = () => {
     return null;
   }
   const { user } = context;
-  console.log("Usuario en Sidebar - Rol:", user ? user.rol : "No autenticado");
+  console.log("Usuario en Sidebar - Rol:", user ? user.role : "No autenticado");
   console.log("Usuario completo:", user ? JSON.stringify(user) : "Sin usuario");
 
   const menuItems = {
@@ -48,14 +48,14 @@ const Sidebar = () => {
       { label: "🔍 Consultar Rutinas", path: "/rutinas/consultar" },
       { label: "📏 Consultar Composición Corporal", path: "/consultar-composicion-corporal" },
       { label: "🎥 Asesoramiento de Ejercicios", path: "/videos-entrenamiento" },
-      { label: "🕒 Clases", path: "/clases" }, // Igual que las otras opciones
+      { label: "🕒 Clases", path: "/clases" },
     ],
   };
 
   const itemsToShow = user
-    ? user.rol === "user" || !user.rol // Incluir para "user" o rol no definido
+    ? user.role === "user" || !user.role // Incluir para "user" o rol no definido
       ? [...menuItems.public]
-      : [...menuItems[user.rol] || menuItems.entrenador, ...menuItems.public]
+      : [...menuItems[user.role] || menuItems.entrenador, ...menuItems.public]
     : menuItems.public;
 
   console.log("Renderizando Sidebar... Items:", itemsToShow.map((item) => item.label));
