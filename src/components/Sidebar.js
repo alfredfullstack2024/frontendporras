@@ -14,6 +14,7 @@ const Sidebar = () => {
   }
   const { user } = context;
   console.log("Usuario en Sidebar - Rol:", user ? user.rol : "No autenticado");
+  console.log("Usuario completo:", user ? JSON.stringify(user) : "Sin usuario");
 
   // Definir los ítems del menú según el rol
   const menuItems = {
@@ -54,17 +55,17 @@ const Sidebar = () => {
     ],
   };
 
-  // Seleccionar ítems según el rol, o mostrar ítems públicos si no hay usuario
+  // Forzar ítems, asegurando Clases para "user" y depuración
   const itemsToShow = user
-    ? user.rol === "user"
-      ? [...menuItems.public] // Solo ítems públicos para rol "user"
+    ? user.rol === "user" || !user.rol // Forzar para "user" o rol indefinido
+      ? [
+          ...menuItems.public,
+          { label: "🕒 Clases", path: "/clases" }, // Garantizar Clases
+        ]
       : [...menuItems[user.rol] || menuItems.entrenador, ...menuItems.public]
     : menuItems.public;
 
-  console.log(
-    "Renderizando Sidebar... Items:",
-    itemsToShow.map((item) => item.label)
-  );
+  console.log("Renderizando Sidebar... Items:", itemsToShow.map((item) => item.label));
 
   const handleEditarClasesClick = () => {
     navigate("/entrenadores"); // Redirige a la lista de entrenadores para seleccionar ID
