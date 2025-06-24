@@ -35,6 +35,7 @@ const Sidebar = () => {
       { label: "🔍 Consultar Composición", path: "/consultar-composicion-corporal" },
       { label: "🎥 Videos Entrenamiento", path: "/videos-entrenamiento" },
       { label: "✏️ Editar Clases", path: "/entrenadores/editar-clases" },
+      { label: "📋 Inscripciones", path: "/admin/inscripciones" }, // Nuevo ítem
     ],
     entrenador: [
       { label: "🏋️ Rutinas", path: "/rutinas/crear" },
