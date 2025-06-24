@@ -12,14 +12,14 @@ const Clases = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
-  const numeroIdentificacion = user?.numeroIdentificacion || "";
+  const numeroIdentificacion = user?.numeroIdentificacion || ""; // Obtener del contexto
 
   useEffect(() => {
-    const fetchClasesDisponibles = async () => {
+    const fetchClases = async () => {
       setIsLoading(true);
       setError("");
       try {
-        const response = await api.get("/clases/disponibles");
+        const response = await api.get("/clases/consultar/" + numeroIdentificacion); // Usar ruta permitida
         if (response.data && Array.isArray(response.data)) {
           setClases(response.data);
         } else {
@@ -27,72 +27,34 @@ const Clases = () => {
           setError("No hay clases disponibles o formato inesperado");
         }
       } catch (err) {
-        setError("No se pudieron cargar las clases: " + (err.response?.data?.message || err.message));
+        setError("No se pudieron cargar las clases: " + (err.response?.data?.mensaje || err.message));
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchClasesDisponibles();
-  }, [navigate]);
+    if (numeroIdentificacion) fetchClases();
+  }, [numeroIdentificacion, navigate]);
 
   const handleInscribirse = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
-
-    const claseSeleccionada = clases.find((c) => c._id === selectedClase);
-    if (!claseSeleccionada) {
-      setError("Por favor, selecciona una clase válida.");
+    if (!selectedClase) {
+      setError("Por favor, selecciona una clase.");
       setIsLoading(false);
       return;
     }
-
-    if (claseSeleccionada.capacidadDisponible <= 0) {
-      setError("No hay cupos disponibles para esta clase.");
-      setIsLoading(false);
-      return;
-    }
-
-    if (!numeroIdentificacion) {
-      setError("Debes iniciar sesión para inscribirte.");
-      setIsLoading(false);
-      return;
-    }
-
-    // Validación de todos los campos antes de enviar
-    if (!claseSeleccionada.entrenadorId || !claseSeleccionada.nombreClase || !claseSeleccionada.dia || !claseSeleccionada.horarioInicio || !claseSeleccionada.horarioFin || !claseSeleccionada._id) {
-      setError("Datos de la clase incompletos. Por favor, intenta de nuevo o contacta al soporte.");
-      setIsLoading(false);
-      return;
-    }
-
-    console.log("Datos enviados antes de la solicitud:", {
-      numeroIdentificacion,
-      entrenadorId: claseSeleccionada.entrenadorId,
-      nombreClase: claseSeleccionada.nombreClase,
-      dia: claseSeleccionada.dia,
-      horarioInicio: claseSeleccionada.horarioInicio,
-      horarioFin: claseSeleccionada.horarioFin,
-      claseId: claseSeleccionada._id,
-    });
-
     try {
-      const response = await api.post("/clases/registrar", {
-        numeroIdentificacion,
-        entrenadorId: claseSeleccionada.entrenadorId,
-        nombreClase: claseSeleccionada.nombreClase,
-        dia: claseSeleccionada.dia,
-        horarioInicio: claseSeleccionada.horarioInicio,
-        horarioFin: claseSeleccionada.horarioFin,
-        claseId: claseSeleccionada._id,
-      });
+      await api.post("/clases/registrar", { claseId: selectedClase, numeroIdentificacion });
       setSelectedClase("");
-      const updatedClases = await api.get("/clases/disponibles");
-      setClases(updatedClases.data);
+      const response = await api.get("/clases/consultar/" + numeroIdentificacion);
+      if (response.data && Array.isArray(response.data)) {
+        setClases(response.data);
+      }
       alert("Inscripción exitosa");
     } catch (err) {
-      setError("Error al inscribirse: " + (err.response?.data?.message || err.message));
+      setError("Error al inscribirse: " + (err.response?.data?.mensaje || err.message));
     } finally {
       setIsLoading(false);
     }
@@ -104,7 +66,7 @@ const Clases = () => {
       {error && <Alert variant="danger">{error}</Alert>}
       {isLoading && <Alert variant="info">Cargando...</Alert>}
       {!isLoading && !error && clases.length === 0 && (
-        <Alert variant="info">No hay clases disponibles.</Alert>
+        <Alert variant="info">No estás inscrito en ninguna clase. Selecciona una para inscribirte.</Alert>
       )}
       <Form onSubmit={handleInscribirse}>
         <Form.Group controlId="clase">
@@ -118,37 +80,28 @@ const Clases = () => {
             <option value="">Selecciona una clase</option>
             {clases.map((clase) => (
               <option key={clase._id} value={clase._id}>
-                {clase.nombreClase} - {clase.dia} {clase.horarioInicio}-{clase.horarioFin} (Cupos: {clase.capacidadDisponible})
+                {clase.nombre} - {clase.horario}
               </option>
             ))}
           </Form.Control>
         </Form.Group>
-        <Button
-          variant="primary"
-          type="submit"
-          className="mt-3"
-          disabled={isLoading || !selectedClase || !numeroIdentificacion || clases.find((c) => c._id === selectedClase)?.capacidadDisponible <= 0}
-        >
+        <Button variant="primary" type="submit" className="mt-3" disabled={isLoading || !selectedClase}>
           Inscribirse
         </Button>
       </Form>
-      {!isLoading && !error && (
+      {!isLoading && !error && clases.length > 0 && (
         <Table striped bordered hover className="mt-3">
           <thead>
             <tr>
               <th>Nombre</th>
-              <th>Día</th>
               <th>Horario</th>
-              <th>Cupos Disponibles</th>
             </tr>
           </thead>
           <tbody>
             {clases.map((clase) => (
               <tr key={clase._id}>
-                <td>{clase.nombreClase}</td>
-                <td>{clase.dia}</td>
-                <td>{clase.horarioInicio} - {clase.horarioFin}</td>
-                <td>{clase.capacidadDisponible}</td>
+                <td>{clase.nombre}</td>
+                <td>{clase.horario}</td>
               </tr>
             ))}
           </tbody>
