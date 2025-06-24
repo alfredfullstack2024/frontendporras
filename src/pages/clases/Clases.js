@@ -40,18 +40,42 @@ const Clases = () => {
     e.preventDefault();
     setIsLoading(true);
     setError("");
-    if (!selectedClase) {
-      setError("Por favor, selecciona una clase.");
+
+    const claseSeleccionada = clases.find((c) => c._id === selectedClase);
+    if (!claseSeleccionada) {
+      setError("Por favor, selecciona una clase válida.");
       setIsLoading(false);
       return;
     }
 
-    const claseSeleccionada = clases.find((c) => c._id === selectedClase);
-    if (!claseSeleccionada || claseSeleccionada.capacidadDisponible <= 0) {
+    if (claseSeleccionada.capacidadDisponible <= 0) {
       setError("No hay cupos disponibles para esta clase.");
       setIsLoading(false);
       return;
     }
+
+    if (!numeroIdentificacion) {
+      setError("Debes iniciar sesión para inscribirte.");
+      setIsLoading(false);
+      return;
+    }
+
+    // Validación de todos los campos antes de enviar
+    if (!claseSeleccionada.entrenadorId || !claseSeleccionada.nombreClase || !claseSeleccionada.dia || !claseSeleccionada.horarioInicio || !claseSeleccionada.horarioFin || !claseSeleccionada._id) {
+      setError("Datos de la clase incomplejos. Por favor, intenta de nuevo o contacta al soporte.");
+      setIsLoading(false);
+      return;
+    }
+
+    console.log("Datos enviados:", {
+      numeroIdentificacion,
+      entrenadorId: claseSeleccionada.entrenadorId,
+      nombreClase: claseSeleccionada.nombreClase,
+      dia: claseSeleccionada.dia,
+      horarioInicio: claseSeleccionada.horarioInicio,
+      horarioFin: claseSeleccionada.horarioFin,
+      claseId: claseSeleccionada._id,
+    });
 
     try {
       await api.post("/clases/registrar", {
@@ -61,7 +85,7 @@ const Clases = () => {
         dia: claseSeleccionada.dia,
         horarioInicio: claseSeleccionada.horarioInicio,
         horarioFin: claseSeleccionada.horarioFin,
-        claseId: claseSeleccionada._id, // Añadimos el ID único
+        claseId: claseSeleccionada._id,
       });
       setSelectedClase("");
       const response = await api.get("/clases/disponibles");
@@ -99,7 +123,12 @@ const Clases = () => {
             ))}
           </Form.Control>
         </Form.Group>
-        <Button variant="primary" type="submit" className="mt-3" disabled={isLoading || !selectedClase}>
+        <Button
+          variant="primary"
+          type="submit"
+          className="mt-3"
+          disabled={isLoading || !selectedClase || !numeroIdentificacion || clases.find((c) => c._id === selectedClase)?.capacidadDisponible <= 0}
+        >
           Inscribirse
         </Button>
       </Form>
