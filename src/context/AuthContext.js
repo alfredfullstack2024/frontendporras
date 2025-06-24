@@ -28,9 +28,9 @@ const AuthProvider = ({ children }) => {
       if (!token) throw new Error("No se recibió un token.");
       localStorage.setItem("token", token);
       const userData = response.data.user || {};
-      // Usar 'role' como clave principal, fallback a 'rol' si existe
-      const role = userData.role || userData.rol || "user"; // Asumir "user" por defecto
-      setUser({ ...userData, role, token });
+      // Usar 'rol' como clave principal, fallback a 'role' si existe
+      const rol = userData.rol || userData.role || "user"; // Cambiado de 'role' a 'rol'
+      setUser({ ...userData, rol, token }); // Cambiado de 'role' a 'rol'
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       setTimeout(() => navigate("/dashboard"), 0);
     } catch (error) {
@@ -47,10 +47,8 @@ const AuthProvider = ({ children }) => {
       if (!token) throw new Error("No se recibió un token.");
       localStorage.setItem("token", token);
       const userData = response.data.user || {};
-      const role = userData.role || userData.rol || rol || "user"; // Usar rol pasado o "user"
-      setUser({ ...userData, role, token });
-      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      setTimeout(() => navigate("/dashboard"), 0);
+      const rol = userData.rol || userData.role || rol || "user"; // Cambiado de 'role' a 'rol'
+      setUser({ ...userData, rol, token }); // Cambiado de 'role' a 'rol'
     } catch (error) {
       console.error("Error al registrar usuario:", error.message);
       throw new Error(error.response?.data?.message || "Error al registrar usuario");
@@ -66,9 +64,9 @@ const AuthProvider = ({ children }) => {
 
   const hasPermission = (requiredRole) => {
     if (!user) return false;
-    console.log("Rol del usuario:", user.role, "Rol requerido:", requiredRole);
-    if (user.role === "admin") return true;
-    return user.role === requiredRole;
+    console.log("Rol del usuario:", user.rol, "Rol requerido:", requiredRole); // Cambiado de user.role a user.rol
+    if (user.rol === "admin") return true; // Cambiado de user.role a user.rol
+    return user.rol === requiredRole; // Cambiado de user.role a user.rol
   };
 
   return (
