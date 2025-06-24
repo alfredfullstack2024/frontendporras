@@ -129,7 +129,6 @@ const ListaClases = () => {
                   <th>Clase</th>
                   <th>Día</th>
                   <th>Horario</th>
-                  <th>Capacidad Disponible</th>
                   <th>Acciones</th>
                 </tr>
               </thead>
@@ -142,11 +141,6 @@ const ListaClases = () => {
                     <td>{clase.dia}</td>
                     <td>
                       {clase.horarioInicio} - {clase.horarioFin}
-                    </td>
-                    <td>
-                      {clase.capacidadMaxima > 0
-                        ? clase.capacidadMaxima
-                        : "Lleno"}
                     </td>
                     <td>
                       <Button
