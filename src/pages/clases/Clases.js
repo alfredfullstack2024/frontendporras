@@ -12,14 +12,14 @@ const Clases = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
-  const numeroIdentificacion = user?.numeroIdentificacion || ""; // Obtener del contexto
+  const numeroIdentificacion = user?.numeroIdentificacion || "";
 
   useEffect(() => {
-    const fetchClases = async () => {
+    const fetchClasesDisponibles = async () => {
       setIsLoading(true);
       setError("");
       try {
-        const response = await api.get("/clases/consultar/" + numeroIdentificacion); // Usar ruta permitida
+        const response = await api.get("/clases/disponibles");
         if (response.data && Array.isArray(response.data)) {
           setClases(response.data);
         } else {
@@ -27,14 +27,14 @@ const Clases = () => {
           setError("No hay clases disponibles o formato inesperado");
         }
       } catch (err) {
-        setError("No se pudieron cargar las clases: " + (err.response?.data?.mensaje || err.message));
+        setError("No se pudieron cargar las clases: " + (err.response?.data?.message || err.message));
       } finally {
         setIsLoading(false);
       }
     };
 
-    if (numeroIdentificacion) fetchClases();
-  }, [numeroIdentificacion, navigate]);
+    fetchClasesDisponibles();
+  }, [navigate]);
 
   const handleInscribirse = async (e) => {
     e.preventDefault();
@@ -45,16 +45,29 @@ const Clases = () => {
       setIsLoading(false);
       return;
     }
+
+    const claseSeleccionada = clases.find((c) => c._id === selectedClase);
+    if (claseSeleccionada.capacidadDisponible <= 0) {
+      setError("No hay cupos disponibles para esta clase.");
+      setIsLoading(false);
+      return;
+    }
+
     try {
-      await api.post("/clases/registrar", { claseId: selectedClase, numeroIdentificacion });
+      await api.post("/clases/registrar", {
+        numeroIdentificacion,
+        entrenadorId: claseSeleccionada.entrenadorId,
+        nombreClase: claseSeleccionada.nombreClase,
+        dia: claseSeleccionada.dia,
+        horarioInicio: claseSeleccionada.horarioInicio,
+        horarioFin: claseSeleccionada.horarioFin,
+      });
       setSelectedClase("");
-      const response = await api.get("/clases/consultar/" + numeroIdentificacion);
-      if (response.data && Array.isArray(response.data)) {
-        setClases(response.data);
-      }
+      const response = await api.get("/clases/disponibles");
+      setClases(response.data);
       alert("Inscripción exitosa");
     } catch (err) {
-      setError("Error al inscribirse: " + (err.response?.data?.mensaje || err.message));
+      setError("Error al inscribirse: " + (err.response?.data?.message || err.message));
     } finally {
       setIsLoading(false);
     }
@@ -66,7 +79,7 @@ const Clases = () => {
       {error && <Alert variant="danger">{error}</Alert>}
       {isLoading && <Alert variant="info">Cargando...</Alert>}
       {!isLoading && !error && clases.length === 0 && (
-        <Alert variant="info">No estás inscrito en ninguna clase. Selecciona una para inscribirte.</Alert>
+        <Alert variant="info">No hay clases disponibles.</Alert>
       )}
       <Form onSubmit={handleInscribirse}>
         <Form.Group controlId="clase">
@@ -80,7 +93,7 @@ const Clases = () => {
             <option value="">Selecciona una clase</option>
             {clases.map((clase) => (
               <option key={clase._id} value={clase._id}>
-                {clase.nombre} - {clase.horario}
+                {clase.nombreClase} - {clase.dia} {clase.horarioInicio}-{clase.horarioFin} (Cupos: {clase.capacidadDisponible})
               </option>
             ))}
           </Form.Control>
@@ -89,19 +102,23 @@ const Clases = () => {
           Inscribirse
         </Button>
       </Form>
-      {!isLoading && !error && clases.length > 0 && (
+      {!isLoading && !error && (
         <Table striped bordered hover className="mt-3">
           <thead>
             <tr>
               <th>Nombre</th>
+              <th>Día</th>
               <th>Horario</th>
+              <th>Cupos Disponibles</th>
             </tr>
           </thead>
           <tbody>
             {clases.map((clase) => (
               <tr key={clase._id}>
-                <td>{clase.nombre}</td>
-                <td>{clase.horario}</td>
+                <td>{clase.nombreClase}</td>
+                <td>{clase.dia}</td>
+                <td>{clase.horarioInicio} - {clase.horarioFin}</td>
+                <td>{clase.capacidadDisponible}</td>
               </tr>
             ))}
           </tbody>
