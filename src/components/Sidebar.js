@@ -13,7 +13,7 @@ const Sidebar = () => {
     return null;
   }
   const { user } = context;
-  console.log("Usuario en Sidebar - Rol:", user ? user.role : "No autenticado");
+  console.log("Usuario en Sidebar - Rol:", user ? user.rol : "No autenticado"); // Cambiado de user.role a user.rol
   console.log("Usuario completo:", user ? JSON.stringify(user) : "Sin usuario");
 
   const menuItems = {
@@ -54,9 +54,9 @@ const Sidebar = () => {
   };
 
   const itemsToShow = user
-    ? user.role === "user" || !user.role // Incluir para "user" o rol no definido
+    ? user.rol === "user" || !user.rol // Cambiado de user.role a user.rol
       ? [...menuItems.public]
-      : [...menuItems[user.role] || menuItems.entrenador, ...menuItems.public]
+      : [...menuItems[user.rol] || menuItems.entrenador, ...menuItems.public] // Cambiado de user.role a user.rol
     : menuItems.public;
 
   console.log("Renderizando Sidebar... Items:", itemsToShow.map((item) => item.label));
