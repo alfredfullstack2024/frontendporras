@@ -38,7 +38,6 @@ const DashboardLayout = () => {
       { path: "/pagos", icon: <FaMoneyBillWave />, label: "Pagos" },
       { path: "/contabilidad", icon: <FaChartBar />, label: "Contabilidad" },
       { path: "/clases", icon: <FaDumbbell />, label: "Clases" },
-      { path: "/asistencias", icon: <FaUser />, label: "Asistencias" },
       { path: "/rutinas/crear", icon: <FaDumbbell />, label: "Crear rutina" },
       { path: "/rutinas/asignar", icon: <FaPlus />, label: "Asignar rutina" },
       { path: "/rutinas/editar-asignacion", icon: <FaEdit />, label: "Editar Asignación Rutina" },
@@ -55,8 +54,7 @@ const DashboardLayout = () => {
       { path: "/productos", icon: <FaShoppingCart />, label: "Productos" },
       { path: "/pagos", icon: <FaMoneyBillWave />, label: "Pagos" },
       { path: "/clases", icon: <FaDumbbell />, label: "Clases" },
-      { path: "/asistencias", icon: <FaUser />, label: "Asistencias" },
-    ],
+      ],
     entrenador: [
       { path: "/dashboard", icon: <FaTachometerAlt />, label: "Dashboard" },
       { path: "/rutinas/crear", icon: <FaDumbbell />, label: "Crear rutina" },
