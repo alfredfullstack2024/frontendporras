@@ -72,6 +72,9 @@ import Indicadores from "./pages/Indicadores";
 // Videos
 import VideosEntrenamiento from "./pages/videos/VideosEntrenamiento";
 
+// Nueva página
+import AdminInscripciones from "./pages/admin/AdminInscripciones";
+
 // Componente para proteger rutas basadas en roles
 const RoleBasedRoute = ({ element, allowedRoles }) => {
   const { user } = useAuth();
@@ -405,6 +408,15 @@ const App = () => {
             element={
               <RoleBasedRoute
                 element={<Indicadores />}
+                allowedRoles={["admin"]}
+              />
+            }
+          />
+          <Route
+            path="/admin/inscripciones"
+            element={
+              <RoleBasedRoute
+                element={<AdminInscripciones />}
                 allowedRoles={["admin"]}
               />
             }
