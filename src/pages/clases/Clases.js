@@ -47,7 +47,7 @@ const Clases = () => {
     }
 
     const claseSeleccionada = clases.find((c) => c._id === selectedClase);
-    if (claseSeleccionada.capacidadDisponible <= 0) {
+    if (!claseSeleccionada || claseSeleccionada.capacidadDisponible <= 0) {
       setError("No hay cupos disponibles para esta clase.");
       setIsLoading(false);
       return;
@@ -61,6 +61,7 @@ const Clases = () => {
         dia: claseSeleccionada.dia,
         horarioInicio: claseSeleccionada.horarioInicio,
         horarioFin: claseSeleccionada.horarioFin,
+        claseId: claseSeleccionada._id, // Añadimos el ID único
       });
       setSelectedClase("");
       const response = await api.get("/clases/disponibles");
