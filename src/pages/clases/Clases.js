@@ -62,12 +62,12 @@ const Clases = () => {
 
     // Validación de todos los campos antes de enviar
     if (!claseSeleccionada.entrenadorId || !claseSeleccionada.nombreClase || !claseSeleccionada.dia || !claseSeleccionada.horarioInicio || !claseSeleccionada.horarioFin || !claseSeleccionada._id) {
-      setError("Datos de la clase incomplejos. Por favor, intenta de nuevo o contacta al soporte.");
+      setError("Datos de la clase incompletos. Por favor, intenta de nuevo o contacta al soporte.");
       setIsLoading(false);
       return;
     }
 
-    console.log("Datos enviados:", {
+    console.log("Datos enviados antes de la solicitud:", {
       numeroIdentificacion,
       entrenadorId: claseSeleccionada.entrenadorId,
       nombreClase: claseSeleccionada.nombreClase,
@@ -78,7 +78,7 @@ const Clases = () => {
     });
 
     try {
-      await api.post("/clases/registrar", {
+      const response = await api.post("/clases/registrar", {
         numeroIdentificacion,
         entrenadorId: claseSeleccionada.entrenadorId,
         nombreClase: claseSeleccionada.nombreClase,
@@ -88,8 +88,8 @@ const Clases = () => {
         claseId: claseSeleccionada._id,
       });
       setSelectedClase("");
-      const response = await api.get("/clases/disponibles");
-      setClases(response.data);
+      const updatedClases = await api.get("/clases/disponibles");
+      setClases(updatedClases.data);
       alert("Inscripción exitosa");
     } catch (err) {
       setError("Error al inscribirse: " + (err.response?.data?.message || err.message));
