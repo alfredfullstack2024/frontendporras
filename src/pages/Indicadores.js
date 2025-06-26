@@ -52,69 +52,90 @@ const Indicadores = () => {
 
   return (
     <Container className="mt-4">
-      <h2>Indicadores del Gimnasio</h2>
+      <h2 className="text-center text-primary mb-4">Indicadores del Gimnasio</h2>
       <Row>
         <Col md={4} className="mb-4">
-          <Card>
-            <Card.Body>
+          <Card
+            style={{
+              background: "linear-gradient(135deg, #28a745, #218838)",
+              borderRadius: "15px",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+              transition: "transform 0.3s",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          >
+            <Card.Body className="text-white text-center">
               <Card.Title>Clientes Activos</Card.Title>
-              <Card.Text>{indicadores.clientesActivos}</Card.Text>
+              <Card.Text className="display-4">{indicadores.clientesActivos}</Card.Text>
             </Card.Body>
           </Card>
         </Col>
         <Col md={4} className="mb-4">
-          <Card>
-            <Card.Body>
-              <Card.Title>Clientes Inactivos</Card.Title>
-              <Card.Text>{indicadores.clientesInactivos}</Card.Text>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col md={4} className="mb-4">
-          <Card>
-            <Card.Body>
-              <Card.Title>Total de Productos</Card.Title>
-              <Card.Text>{indicadores.totalProductos}</Card.Text>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col md={4} className="mb-4">
-          <Card>
-            <Card.Body>
-              <Card.Title>Existencias Totales</Card.Title>
-              <Card.Text>{indicadores.existenciasTotales}</Card.Text>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Col md={4} className="mb-4">
-          <Card>
-            <Card.Body>
+          <Card
+            style={{
+              background: "linear-gradient(135deg, #007bff, #0056b3)",
+              borderRadius: "15px",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+              transition: "transform 0.3s",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          >
+            <Card.Body className="text-white text-center">
               <Card.Title>Entrenadores</Card.Title>
-              <Card.Text>{indicadores.entrenadores}</Card.Text>
+              <Card.Text className="display-4">{indicadores.entrenadores}</Card.Text>
             </Card.Body>
           </Card>
         </Col>
         <Col md={4} className="mb-4">
-          <Card>
-            <Card.Body>
-              <Card.Title>Clases Activas</Card.Title>
-              <Card.Text>{indicadores.clasesActivas}</Card.Text>
+          <Card
+            style={{
+              background: "linear-gradient(135deg, #ffc107, #e0a800)",
+              borderRadius: "15px",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+              transition: "transform 0.3s",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          >
+            <Card.Body className="text-white text-center">
+              <Card.Title>Total de Productos</Card.Title>
+              <Card.Text className="display-4">{indicadores.totalProductos}</Card.Text>
             </Card.Body>
           </Card>
         </Col>
         <Col md={4} className="mb-4">
-          <Card>
-            <Card.Body>
+          <Card
+            style={{
+              background: "linear-gradient(135deg, #dc3545, #c82333)",
+              borderRadius: "15px",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+              transition: "transform 0.3s",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          >
+            <Card.Body className="text-white text-center">
               <Card.Title>Membresías Activas</Card.Title>
-              <Card.Text>{indicadores.membresiasActivas}</Card.Text>
+              <Card.Text className="display-4">{indicadores.membresiasActivas}</Card.Text>
             </Card.Body>
           </Card>
         </Col>
         <Col md={4} className="mb-4">
-          <Card>
-            <Card.Body>
+          <Card
+            style={{
+              background: "linear-gradient(135deg, #17a2b8, #138496)",
+              borderRadius: "15px",
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
+              transition: "transform 0.3s",
+            }}
+            onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.05)")}
+            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+          >
+            <Card.Body className="text-white text-center">
               <Card.Title>Membresías por Vencer (5 días)</Card.Title>
-              <Card.Text>{indicadores.membresiasPorVencer}</Card.Text>
+              <Card.Text className="display-4">{indicadores.membresiasPorVencer}</Card.Text>
             </Card.Body>
           </Card>
         </Col>
