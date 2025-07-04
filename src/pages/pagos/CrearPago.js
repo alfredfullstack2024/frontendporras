@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+  import React, { useState, useEffect } from "react";
 import { Form, Button, Alert, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { obtenerClientes, obtenerProductos, crearPago } from "../../api/axios";
@@ -15,13 +15,22 @@ const CrearPago = () => {
     metodoPago: "Efectivo",
   });
   const [error, setError] = useState("");
-  const [tiqueteConfig, setTiqueteConfig] = useState({
-    nombreEstablecimiento: "GoldenGym Studio",
-    direccion: "Carrera 123 # 65A 57",
-    telefonos: "350 425 4643 - 350 555 4995",
-    nit: "123456789",
-  });
+  const [showTiquete, setShowTiquete] = useState(false);
   const navigate = useNavigate();
+
+  // Configuración del tiquete
+  const tiqueteConfig = {
+    nombreEstablecimiento: "Nombre del Gimnasio",
+    direccion: "Carrera 123 # 45 67",
+    telefonos: "350 000 0000 - 350 111 1111",
+    nit: "123456789",
+  };
+
+  // Obtener y actualizar el contador del tiquete desde localStorage
+  const [ticketNumber, setTicketNumber] = useState(() => {
+    const savedTicketNumber = localStorage.getItem("lastTicketNumber");
+    return savedTicketNumber ? parseInt(savedTicketNumber, 10) + 1 : 1;
+  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,7 +51,6 @@ const CrearPago = () => {
         }
       }
     };
-
     fetchData();
   }, [navigate]);
 
@@ -70,8 +78,7 @@ const CrearPago = () => {
 
     try {
       await crearPago(formData);
-      generarTiquete();
-      navigate("/pagos");
+      setShowTiquete(true); // Mostrar tiquete tras registrar
     } catch (err) {
       setError("Error al registrar el pago: " + err.message);
       if (err.message.includes("Sesión expirada")) {
@@ -80,35 +87,37 @@ const CrearPago = () => {
     }
   };
 
-  const generarTiquete = () => {
-    const fechaFinal = new Date(formData.fecha);
-    fechaFinal.setMonth(fechaFinal.getMonth() + 1);
-    const tiqueteHTML = `
-      <div style="width: 300px; font-family: Arial, sans-serif; padding: 10px;">
-        <h1 style="text-align: center;">${tiqueteConfig.nombreEstablecimiento}</h1>
-        <p style="text-align: center;">${tiqueteConfig.direccion}</p>
-        <p style="text-align: center;">Tel: ${tiqueteConfig.telefonos} | NIT: ${tiqueteConfig.nit}</p>
-        <p>Fecha: ${new Date().toLocaleDateString("es-CO")}</p>
-        <p>Recibo #: ${Math.floor(Math.random() * 10000) + 1}</p>
-        <p>Cliente: ${clientes.find((c) => c._id === formData.cliente)?.nombre || "No especificado"}</p>
-        <h3>Mensualidad Gym 2025</h3>
-        <p>Fecha Inicio: ${new Date(formData.fecha).toLocaleDateString("es-CO")}</p>
-        <p>Fecha Final: ${fechaFinal.toLocaleDateString("es-CO")}</p>
-        <p>Pago: ${formData.monto.toLocaleString("es-CO", { style: "currency", currency: "COP" })}</p>
-        <p>Saldo: 0.00</p>
-        <p>Forma Pago: ${formData.metodoPago}</p>
-        <p style="font-size: 8px;">Mensualidad Intransferible, No Congelable, No Se Hace Devolución de Dinero</p>
-      </div>
-    `;
+  const imprimirTiquete = () => {
+    // Incrementar y guardar el nuevo número de tiquete
+    const newTicketNumber = ticketNumber;
+    localStorage.setItem("lastTicketNumber", newTicketNumber);
+    setTicketNumber(newTicketNumber + 1);
 
+    const printContent = document.getElementById("tiquete").innerHTML;
     const printWindow = window.open("", "", "height=500,width=300");
-    printWindow.document.write("<html><head><title>Tiquete</title></head><body>");
-    printWindow.document.write(tiqueteHTML);
-    printWindow.document.write("</body></html>");
+    printWindow.document.write(`
+      <html>
+        <head>
+          <title>Tiquete de Pago</title>
+          <style>
+            body { font-family: Arial, sans-serif; padding: 10px; }
+            h1 { text-align: center; }
+            p { margin: 0; }
+            .small-text { font-size: 8px; }
+          </style>
+        </head>
+        <body>${printContent}</body>
+      </html>
+    `);
     printWindow.document.close();
     printWindow.print();
     printWindow.close();
+    setShowTiquete(false); // Ocultar tras imprimir
+    navigate("/pagos"); // Redirigir después de imprimir
   };
+
+  const fechaFinal = new Date(formData.fecha);
+  fechaFinal.setMonth(fechaFinal.getMonth() + 1);
 
   return (
     <div className="container mt-4">
@@ -206,6 +215,66 @@ const CrearPago = () => {
               Cancelar
             </Button>
           </Form>
+
+          {showTiquete && (
+            <div>
+              <div
+                id="tiquete"
+                style={{
+                  width: "300px",
+                  fontFamily: "Arial, sans-serif",
+                  padding: "10px",
+                  border: "1px solid #000",
+                  marginTop: "20px",
+                }}
+              >
+                <h1 style={{ textAlign: "center" }}>
+                  {tiqueteConfig.nombreEstablecimiento}
+                </h1>
+                <p style={{ textAlign: "center" }}>{tiqueteConfig.direccion}</p>
+                <p style={{ textAlign: "center" }}>
+                  Tel: {tiqueteConfig.telefonos} | NIT: {tiqueteConfig.nit}
+                </p>
+                <p>Fecha: {new Date().toLocaleDateString("es-CO")}</p>
+                <p>Recibo #: {ticketNumber}</p>
+                <p>
+                  Cliente:{" "}
+                  {clientes.find((c) => c._id === formData.cliente)?.nombre ||
+                    "No especificado"}
+                </p>
+                <h3>Mensualidad Gym 2025</h3>
+                <p>Fecha Inicio: {formData.fecha}</p>
+                <p>Fecha Final: {fechaFinal.toLocaleDateString("es-CO")}</p>
+                <p>
+                  Pago:{" "}
+                  {formData.monto.toLocaleString("es-CO", {
+                    style: "currency",
+                    currency: "COP",
+                  })}
+                </p>
+                <p>Saldo: 0.00</p>
+                <p>Forma Pago: {formData.metodoPago}</p>
+                <p style={{ fontSize: "8px" }}>
+                  Mensualidad Intransferible, No Congelable, No Se Hace
+                  Devolución de Dinero
+                </p>
+              </div>
+              <Button
+                variant="primary"
+                className="mt-2"
+                onClick={imprimirTiquete}
+              >
+                Imprimir Tiquete
+              </Button>
+              <Button
+                variant="secondary"
+                className="ms-2 mt-2"
+                onClick={() => setShowTiquete(false)}
+              >
+                Cancelar
+              </Button>
+            </div>
+          )}
         </Card.Body>
       </Card>
     </div>
