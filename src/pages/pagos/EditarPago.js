@@ -22,6 +22,12 @@ const EditarPago = () => {
   });
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [tiqueteConfig, setTiqueteConfig] = useState({
+    nombreEstablecimiento: "GoldenGym Studio",
+    direccion: "Carrera 123 # 65A 57",
+    telefonos: "350 425 4643 - 350 555 4995",
+    nit: "123456789",
+  });
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -116,6 +122,7 @@ const EditarPago = () => {
 
     try {
       await editarPago(id, datosEnvio);
+      generarTiquete();
       navigate("/pagos");
     } catch (err) {
       setError(
@@ -128,6 +135,36 @@ const EditarPago = () => {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const generarTiquete = () => {
+    const fechaFinal = new Date(formData.fecha);
+    fechaFinal.setMonth(fechaFinal.getMonth() + 1);
+    const tiqueteHTML = `
+      <div style="width: 300px; font-family: Arial, sans-serif; padding: 10px;">
+        <h1 style="text-align: center;">${tiqueteConfig.nombreEstablecimiento}</h1>
+        <p style="text-align: center;">${tiqueteConfig.direccion}</p>
+        <p style="text-align: center;">Tel: ${tiqueteConfig.telefonos} | NIT: ${tiqueteConfig.nit}</p>
+        <p>Fecha: ${new Date().toLocaleDateString("es-CO")}</p>
+        <p>Recibo #: ${Math.floor(Math.random() * 10000) + 1}</p>
+        <p>Cliente: ${clientes.find((c) => c._id === formData.cliente)?.nombre || "No especificado"}</p>
+        <h3>Mensualidad Gym 2025</h3>
+        <p>Fecha Inicio: ${new Date(formData.fecha).toLocaleDateString("es-CO")}</p>
+        <p>Fecha Final: ${fechaFinal.toLocaleDateString("es-CO")}</p>
+        <p>Pago: ${parseFloat(formData.monto).toLocaleString("es-CO", { style: "currency", currency: "COP" })}</p>
+        <p>Saldo: 0.00</p>
+        <p>Forma Pago: ${formData.metodoPago}</p>
+        <p style="font-size: 8px;">Mensualidad Intransferible, No Congelable, No Se Hace Devolución de Dinero</p>
+      </div>
+    `;
+
+    const printWindow = window.open("", "", "height=500,width=300");
+    printWindow.document.write("<html><head><title>Tiquete</title></head><body>");
+    printWindow.document.write(tiqueteHTML);
+    printWindow.document.write("</body></html>");
+    printWindow.document.close();
+    printWindow.print();
+    printWindow.close();
   };
 
   return (
