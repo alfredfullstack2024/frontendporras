@@ -14,7 +14,8 @@ const getBaseUrl = () => {
     NODE_ENV: process.env.NODE_ENV,
     BaseUrlSeleccionada: baseUrl,
   });
-
+return baseUrl; 
+};
 
 const api = axios.create({
   baseURL: getBaseUrl(),
