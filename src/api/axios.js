@@ -4,8 +4,10 @@ import axios from "axios";
 const getBaseUrl = () => {
   const envUrl = process.env.REACT_APP_API_URL;
   const defaultDevUrl = "http://localhost:5000/api";
-  const defaultProdUrl = "https://backendporras.onrender.com/api"; // Actualiza a la URL del nuevo backend
-  const baseUrl = envUrl || (process.env.NODE_ENV === "development" ? defaultDevUrl : defaultProdUrl);
+  const defaultProdUrl = "https://backendporras.onrender.com/api";
+  const baseUrl =
+    envUrl ||
+    (process.env.NODE_ENV === "development" ? defaultDevUrl : defaultProdUrl);
 
   console.log("Depuración de URL - Variables de entorno:", {
     REACT_APP_API_URL: envUrl,
@@ -13,8 +15,6 @@ const getBaseUrl = () => {
     BaseUrlSeleccionada: baseUrl,
   });
 
-  return baseUrl;
-};
 
 const api = axios.create({
   baseURL: getBaseUrl(),
