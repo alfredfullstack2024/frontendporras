@@ -18,7 +18,7 @@ const AuthProvider = ({ children }) => {
       delete api.defaults.headers.common["Authorization"];
       console.log("No hay token para configurar en headers");
     }
-  }, []);
+  }, [user]);
 
   const login = async (data) => {
     try {
