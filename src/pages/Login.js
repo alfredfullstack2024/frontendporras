@@ -23,7 +23,8 @@ const Login = () => {
     setError("");
 
     try {
-      await login(formData); // Cambiado a pasar el objeto formData
+      await login(formData.email, formData.password); // ✅ Correcto
+
     } catch (err) {
       console.error("Error desde Login.js:", err.message);
       setError(err.message);
