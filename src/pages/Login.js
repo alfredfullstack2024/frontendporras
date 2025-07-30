@@ -23,7 +23,7 @@ const Login = () => {
     setError("");
 
     try {
-      await login(formData.email, formData.password);
+      await login(formData); // Cambiado a pasar el objeto formData
     } catch (err) {
       console.error("Error desde Login.js:", err.message);
       setError(err.message);
@@ -61,18 +61,15 @@ const Login = () => {
               />
             </Form.Group>
 
+            <Button variant="link" onClick={() => navigate("/register")}>
+              ¿No tienes una cuenta? Regístrate
+            </Button>
             <Button variant="primary" type="submit" className="w-100">
               Iniciar Sesión
             </Button>
           </Form>
         </Card.Body>
       </Card>
-
-      <div className="text-center mt-3">
-        <Button variant="link" onClick={() => navigate("/register")}>
-          ¿No tienes una cuenta? Regístrate
-        </Button> 
-      </div>
     </div>
   );
 };
