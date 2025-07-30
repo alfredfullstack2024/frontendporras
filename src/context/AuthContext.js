@@ -14,17 +14,16 @@ const AuthProvider = ({ children }) => {
     if (token) {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
       console.log("Token configurado en headers:", token);
-      // Opción: podría validar el token con una ruta /me o /profile
     } else {
       delete api.defaults.headers.common["Authorization"];
       console.log("No hay token para configurar en headers");
     }
   }, []);
 
-  const login = async (email, password) => {
+  const login = async (data) => {
     try {
       setLoading(true);
-      const response = await api.post("/auth/login", { email, password });
+      const response = await api.post("/auth/login", data);
       const token = response.data.token;
       if (!token) throw new Error("No se recibió un token.");
 
@@ -43,10 +42,10 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  const register = async (nombre, email, password, rol) => {
+  const register = async (data) => {
     try {
       setLoading(true);
-      const response = await api.post("/auth/register", { nombre, email, password, role: rol });
+      const response = await api.post("/auth/register", data);
       const token = response.data.token;
       if (!token) throw new Error("No se recibió un token.");
 
@@ -54,7 +53,7 @@ const AuthProvider = ({ children }) => {
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
       const userData = response.data.user || {};
-      const userRol = userData.rol || userData.role || rol || "user";
+      const userRol = userData.rol || userData.role || data.rol || "user";
       setUser({ ...userData, rol: userRol, token });
       navigate("/dashboard");
     } catch (error) {
