@@ -18,52 +18,52 @@ const AuthProvider = ({ children }) => {
       delete api.defaults.headers.common["Authorization"];
       console.log("No hay token para configurar en headers");
     }
-  }, [user]);
+  }, []);
 
-  const login = async (data) => {
-    try {
-      setLoading(true);
-      const response = await api.post("/auth/login", data);
-      const token = response.data.token;
-      if (!token) throw new Error("No se recibió un token.");
+  const login = async (email, password) => {
+  try {
+    setLoading(true);
+    const response = await api.post("/auth/login", { email, password });
+    const token = response.data.token;
+    if (!token) throw new Error("No se recibió un token.");
 
-      localStorage.setItem("token", token);
-      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    localStorage.setItem("token", token);
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-      const userData = response.data.user || {};
-      const rol = userData.rol || userData.role || "user";
-      setUser({ ...userData, rol, token });
-      navigate("/dashboard");
-    } catch (error) {
-      console.error("Error al iniciar sesión:", error.message);
-      throw new Error(error.response?.data?.message || "Error al iniciar sesión");
-    } finally {
-      setLoading(false);
-    }
-  };
+    const userData = response.data.user || {};
+    const rol = userData.rol || userData.role || "user";
+    setUser({ ...userData, rol, token });
+    navigate("/dashboard");
+  } catch (error) {
+    console.error("Error al iniciar sesión:", error.message);
+    throw new Error(error.response?.data?.message || "Error al iniciar sesión");
+  } finally {
+    setLoading(false);
+  }
+};
+const register = async (nombre, email, password, rol) => {
+  try {
+    setLoading(true);
+    const response = await api.post("/auth/register", { nombre, email, password, role: rol });
+    const token = response.data.token;
+    if (!token) throw new Error("No se recibió un token.");
 
-  const register = async (data) => {
-    try {
-      setLoading(true);
-      const response = await api.post("/auth/register", data);
-      const token = response.data.token;
-      if (!token) throw new Error("No se recibió un token.");
+    localStorage.setItem("token", token);
+    api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
 
-      localStorage.setItem("token", token);
-      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+    const userData = response.data.user || {};
+    const finalRol = userData.rol || userData.role || rol || "user";
+    setUser({ ...userData, rol: finalRol, token });
+    navigate("/dashboard");
+  } catch (error) {
+    console.error("Error al registrar usuario:", error.message);
+    throw new Error(error.response?.data?.message || "Error al registrar usuario");
+  } finally {
+    setLoading(false);
+  }
+};
 
-      const userData = response.data.user || {};
-      const userRol = userData.rol || userData.role || data.rol || "user";
-      setUser({ ...userData, rol: userRol, token });
-      navigate("/dashboard");
-    } catch (error) {
-      console.error("Error al registrar usuario:", error.message);
-      throw new Error(error.response?.data?.message || "Error al registrar usuario");
-    } finally {
-      setLoading(false);
-    }
-  };
-
+ 
   const logout = () => {
     localStorage.removeItem("token");
     setUser(null);
