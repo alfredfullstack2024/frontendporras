@@ -69,7 +69,7 @@ const DashboardLayout = () => {
     ],
   };
 
-  const userMenu = user?.role ? menuItems[user.role] : [];
+  const userMenu = user?.rol ? menuItems[user.rol] : [];
 
 
   return (
