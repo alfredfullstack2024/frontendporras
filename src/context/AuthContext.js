@@ -1,104 +1,83 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import api from "../api/axios";
+import axios from "axios";
 
+// Crear el contexto
 const AuthContext = createContext();
 
+// Hook personalizado para usar el contexto
+export const useAuth = () => useContext(AuthContext);
+
 const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [usuario, setUsuario] = useState(null);
+  const [token, setToken] = useState(localStorage.getItem("token") || "");
+  const [cargando, setCargando] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      console.log("Token configurado en headers:", token);
-    } else {
-      delete api.defaults.headers.common["Authorization"];
-      console.log("No hay token para configurar en headers");
-    }
-  }, []);
+    const cargarUsuario = async () => {
+      if (!token) {
+        setCargando(false);
+        return;
+      }
+
+      try {
+        const { data } = await axios.get(
+          `${import.meta.env.VITE_BACKEND_URL}/usuarios/perfil`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        setUsuario(data);
+      } catch (error) {
+        console.error("Error cargando usuario:", error.response?.data?.msg || error.message);
+        setUsuario(null);
+      } finally {
+        setCargando(false);
+      }
+    };
+
+    cargarUsuario();
+  }, [token]);
 
   const login = async (email, password) => {
     try {
-      setLoading(true);
-      const response = await api.post("/auth/login", { email, password });
-      const token = response.data.token;
-      if (!token) throw new Error("No se recibió un token.");
-
-      localStorage.setItem("token", token);
-      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-      const userData = response.data.user || {};
-      const rol = userData.rol || userData.role || "user";
-      setUser({ ...userData, rol, token });
-
-      navigate("/dashboard");
-    } catch (error) {
-      console.error("Error al iniciar sesión:", error.message);
-      throw new Error(error.response?.data?.message || "Error al iniciar sesión");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const register = async (nombre, email, password, rol) => {
-    try {
-      setLoading(true);
-      const response = await api.post("/auth/register", {
-        nombre,
+      const { data } = await axios.post(`${import.meta.env.VITE_BACKEND_URL}/usuarios/login`, {
         email,
         password,
-        role: rol, // El backend espera "role"
       });
 
-      const token = response.data.token;
-      if (!token) throw new Error("No se recibió un token.");
-
-      localStorage.setItem("token", token);
-      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-
-      const userData = response.data.user || {};
-      const nuevoRol = userData.rol || userData.role || rol || "user";
-      setUser({ ...userData, rol: nuevoRol, token });
-
-      navigate("/dashboard");
+      localStorage.setItem("token", data.token);
+      setToken(data.token);
+      setUsuario(data.usuario);
+      return { success: true };
     } catch (error) {
-      console.error("Error al registrar usuario:", error.message);
-      throw new Error(error.response?.data?.message || "Error al registrar usuario");
-    } finally {
-      setLoading(false);
+      console.error("Error al iniciar sesión:", error.response?.data?.msg || error.message);
+      return { success: false, msg: error.response?.data?.msg || "Error al iniciar sesión" };
     }
   };
 
   const logout = () => {
     localStorage.removeItem("token");
-    setUser(null);
-    delete api.defaults.headers.common["Authorization"];
-    navigate("/login");
-  };
-
-  const hasPermission = (requiredRole) => {
-    if (!user) return false;
-    const userRole = user.rol || user.role;
-    if (userRole === "admin") return true;
-    return userRole === requiredRole;
+    setToken("");
+    setUsuario(null);
   };
 
   return (
     <AuthContext.Provider
-      value={{ user, setUser, loading, login, register, logout, hasPermission }}
+      value={{
+        usuario,
+        setUsuario,
+        token,
+        setToken,
+        cargando,
+        login,
+        logout,
+      }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
 
-const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) throw new Error("useAuth debe ser usado dentro de un AuthProvider");
-  return context;
-};
-
-export { AuthProvider, useAuth };
+export default AuthProvider;
