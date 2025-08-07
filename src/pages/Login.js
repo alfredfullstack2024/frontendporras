@@ -23,10 +23,13 @@ const Login = () => {
     setError("");
 
     try {
-      await login(formData.email, formData.password);
+      console.log("Intentando login con:", formData);
+      await login(formData); // Pasar objeto completo
+      console.log("Login exitoso, redirigiendo...");
+      navigate("/dashboard");
     } catch (err) {
       console.error("Error desde Login.js:", err.message);
-      setError(err.message);
+      setError(err.response?.data?.message || "Error al iniciar sesión. Verifica tus credenciales.");
     }
   };
 
@@ -71,7 +74,7 @@ const Login = () => {
       <div className="text-center mt-3">
         <Button variant="link" onClick={() => navigate("/register")}>
           ¿No tienes una cuenta? Regístrate
-        </Button> 
+        </Button>
       </div>
     </div>
   );
