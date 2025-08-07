@@ -102,109 +102,40 @@ const Categorizacion = () => {
     });
   };
 
-  const nivelesPorEquipo = {
-    "Equipo 1": [
-      { nivel: "Principiante A", division: "A" },
-      { nivel: "Principiante B", division: "B" },
-      { nivel: "Principiante C", division: "C" },
-    ],
-    "Equipo 2": [
-      { nivel: "Principiante A", division: "A" },
-      { nivel: "Principiante B", division: "B" },
-      { nivel: "Principiante C", division: "C" },
-    ],
-    // Extiende hasta Equipo 20
-    "Equipo 3": [
-      { nivel: "Intermedio A", division: "A" },
-      { nivel: "Intermedio B", division: "B" },
-      { nivel: "Intermedio C", division: "C" },
-    ],
-    "Equipo 4": [
-      { nivel: "Intermedio A", division: "A" },
-      { nivel: "Intermedio B", division: "B" },
-      { nivel: "Intermedio C", division: "C" },
-    ],
-    "Equipo 5": [
-      { nivel: "Avanzado A", division: "A" },
-      { nivel: "Avanzado B", division: "B" },
-      { nivel: "Avanzado C", division: "C" },
-    ],
-    "Equipo 6": [
-      { nivel: "Avanzado A", division: "A" },
-      { nivel: "Avanzado B", division: "B" },
-      { nivel: "Avanzado C", division: "C" },
-    ],
-    "Equipo 7": [
-      { nivel: "Principiante A", division: "A" },
-      { nivel: "Principiante B", division: "B" },
-      { nivel: "Principiante C", division: "C" },
-    ],
-    "Equipo 8": [
-      { nivel: "Intermedio A", division: "A" },
-      { nivel: "Intermedio B", division: "B" },
-      { nivel: "Intermedio C", division: "C" },
-    ],
-    "Equipo 9": [
-      { nivel: "Avanzado A", division: "A" },
-      { nivel: "Avanzado B", division: "B" },
-      { nivel: "Avanzado C", division: "C" },
-    ],
-    "Equipo 10": [
-      { nivel: "Principiante A", division: "A" },
-      { nivel: "Principiante B", division: "B" },
-      { nivel: "Principiante C", division: "C" },
-    ],
-    "Equipo 11": [
-      { nivel: "Intermedio A", division: "A" },
-      { nivel: "Intermedio B", division: "B" },
-      { nivel: "Intermedio C", division: "C" },
-    ],
-    "Equipo 12": [
-      { nivel: "Avanzado A", division: "A" },
-      { nivel: "Avanzado B", division: "B" },
-      { nivel: "Avanzado C", division: "C" },
-    ],
-    "Equipo 13": [
-      { nivel: "Principiante A", division: "A" },
-      { nivel: "Principiante B", division: "B" },
-      { nivel: "Principiante C", division: "C" },
-    ],
-    "Equipo 14": [
-      { nivel: "Intermedio A", division: "A" },
-      { nivel: "Intermedio B", division: "B" },
-      { nivel: "Intermedio C", division: "C" },
-    ],
-    "Equipo 15": [
-      { nivel: "Avanzado A", division: "A" },
-      { nivel: "Avanzado B", division: "B" },
-      { nivel: "Avanzado C", division: "C" },
-    ],
-    "Equipo 16": [
-      { nivel: "Principiante A", division: "A" },
-      { nivel: "Principiante B", division: "B" },
-      { nivel: "Principiante C", division: "C" },
-    ],
-    "Equipo 17": [
-      { nivel: "Intermedio A", division: "A" },
-      { nivel: "Intermedio B", division: "B" },
-      { nivel: "Intermedio C", division: "C" },
-    ],
-    "Equipo 18": [
-      { nivel: "Avanzado A", division: "A" },
-      { nivel: "Avanzado B", division: "B" },
-      { nivel: "Avanzado C", division: "C" },
-    ],
-    "Equipo 19": [
-      { nivel: "Principiante A", division: "A" },
-      { nivel: "Principiante B", division: "B" },
-      { nivel: "Principiante C", division: "C" },
-    ],
-    "Equipo 20": [
-      { nivel: "Intermedio A", division: "A" },
-      { nivel: "Intermedio B", division: "B" },
-      { nivel: "Intermedio C", division: "C" },
-    ],
-  };
+  const nivelesDeEquipo = [
+    "1.1 MINI",
+    "1.1 YOUTH",
+    "1.1 JUNIOR",
+    "1.1 SENIOR",
+    "2.1 JUNIOR",
+    "2.1 OPEN",
+    "2.2 JUNIOR",
+    "2.2 SENIOR",
+    "1 TINY",
+    "1 MINI",
+    "1 YOUTH",
+    "1 JUNIOR",
+    "1 SENIOR",
+    "2 YOUTH",
+    "2 JUNIOR",
+    "2 SENIOR",
+    "2 OPEN",
+    "3 YOUTH",
+    "3 JUNIOR",
+    "3 SENIOR",
+    "3 OPEN",
+    "3 OPEN NON TUMBLING",
+    "4.2 OPEN",
+    "4 SENIOR",
+    "4 OPEN FEM",
+    "4 OPEN MEDIUM",
+    "4 OPEN LARGE",
+    "5 OPEN",
+    "5 OPEN NON TUMBLING",
+    "6 OPEN",
+    "7.5 OPEN",
+    "7 OPEN",
+  ];
 
   return (
     <Container className="mt-4">
@@ -214,19 +145,14 @@ const Categorizacion = () => {
       <Form onSubmit={handleSubmit}>
         <Form.Group className="mb-3">
           <Form.Label>Equipo</Form.Label>
-          <Form.Select
+          <Form.Control
+            type="text"
             name="equipo"
             value={formData.equipo}
             onChange={handleChange}
+            placeholder="Ingrese el nombre del equipo"
             required
-          >
-            <option value="">Seleccione un equipo</option>
-            {Array.from({ length: 20 }, (_, i) => `Equipo ${i + 1}`).map((equipo) => (
-              <option key={equipo} value={equipo}>
-                {equipo}
-              </option>
-            ))}
-          </Form.Select>
+          />
         </Form.Group>
 
         <Form.Group className="mb-3">
@@ -238,12 +164,11 @@ const Categorizacion = () => {
             required
           >
             <option value="">Seleccione un nivel</option>
-            {formData.equipo &&
-              nivelesPorEquipo[formData.equipo].map((item, index) => (
-                <option key={index} value={`${item.nivel} ${item.division}`}>
-                  {`${item.nivel} ${item.division}`}
-                </option>
-              ))}
+            {nivelesDeEquipo.map((nivel, index) => (
+              <option key={index} value={nivel}>
+                {nivel}
+              </option>
+            ))}
           </Form.Select>
         </Form.Group>
 
