@@ -92,16 +92,23 @@ const RoleBasedRoute = ({ element, allowedRoles }) => {
 const App = () => {
   const { user, login } = useAuth();
 
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token && !user) {
-      console.log("Token encontrado, intentando autenticar...");
-      login(token); // Asegura que el contexto se actualice
-    } else if (!token) {
-      console.log("Sin token, redirigiendo a login...");
+useEffect(() => {
+  const token = localStorage.getItem("token");
+  if (token && !user) {
+    console.log("Token encontrado, intentando autenticar...");
+    const timer = setTimeout(() => {
+      console.log("Autenticación tardía, redirigiendo a login...");
       window.location.href = "/login";
-    }
-  }, [user, login]);
+    }, 5000); // 5 segundos de timeout
+    login(token).then(() => clearTimeout(timer)).catch(() => {
+      clearTimeout(timer);
+      window.location.href = "/login";
+    });
+  } else if (!token) {
+    console.log("Sin token, redirigiendo a login...");
+    window.location.href = "/login";
+  }
+}, [user, login]);
 
   return (
     <Routes>
