@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import DashboardLayout from "./layouts/DashboardLayout";
@@ -90,6 +90,19 @@ const RoleBasedRoute = ({ element, allowedRoles }) => {
 };
 
 const App = () => {
+  const { user, login } = useAuth();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token && !user) {
+      console.log("Token encontrado, intentando autenticar...");
+      login(token); // Asegura que el contexto se actualice
+    } else if (!token) {
+      console.log("Sin token, redirigiendo a login...");
+      window.location.href = "/login";
+    }
+  }, [user, login]);
+
   return (
     <Routes>
       {/* Rutas Públicas */}
