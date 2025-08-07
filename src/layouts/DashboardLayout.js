@@ -69,8 +69,7 @@ const DashboardLayout = () => {
     ],
   };
 
-  const userMenu = user?.rol ? menuItems[user.rol] : [];
-
+  const userMenu = user?.rol ? menuItems[user.rol] || menuItems["user"] : [];
 
   return (
     <div className="d-flex" style={{ minHeight: "100vh" }}>
