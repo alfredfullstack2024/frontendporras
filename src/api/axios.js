@@ -3,8 +3,8 @@ import axios from "axios";
 // Función para obtener y validar la URL base del backend
 const getBaseUrl = () => {
   const envUrl = process.env.REACT_APP_API_URL;
-  const defaultDevUrl = "http://localhost:5000/api";
   const defaultProdUrl = "https://backendporras.onrender.com/api";
+  const defaultDevUrl = "http://localhost:5000/api";
   const baseUrl = envUrl || (process.env.NODE_ENV === "development" ? defaultDevUrl : defaultProdUrl);
 
   console.log("Depuración de URL - Variables de entorno:", {
@@ -144,4 +144,5 @@ export const login = (data) => api.post("/auth/login", data);
 export const registrarse = (data) => api.post("/auth/register", data);
 
 export default api;
+
 
