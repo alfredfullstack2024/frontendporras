@@ -27,7 +27,7 @@ console.log("Base URL del API configurada finalmente:", api.defaults.baseURL);
 
 // Interceptor de solicitudes
 api.interceptors.request.use(
-  (config) => {
+  async (config) => {
     const token = localStorage.getItem("token");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -54,7 +54,7 @@ api.interceptors.response.use(
     console.log("Respuesta:", response.status, response.config.url, response.data);
     return response;
   },
-  (error) => {
+  async (error) => {
     if (error.code === "ECONNABORTED") {
       console.error("Timeout:", error.message);
       return Promise.reject(new Error("Tiempo agotado. Verifica conexión."));
@@ -66,7 +66,7 @@ api.interceptors.response.use(
         data: error.response.data,
       });
       if (error.response.status === 401) {
-        console.error("Sesión expirada, redirigiendo...");
+        console.error("Sesión expirada, intentando refrescar o redirigiendo...");
         localStorage.removeItem("token");
         window.location.href = "/login";
         return Promise.reject(new Error("Sesión expirada. Inicia sesión."));
@@ -144,5 +144,6 @@ export const login = (data) => api.post("/auth/login", data);
 export const registrarse = (data) => api.post("/auth/register", data);
 
 export default api;
+
 
 
