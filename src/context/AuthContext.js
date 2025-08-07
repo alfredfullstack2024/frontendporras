@@ -1,3 +1,4 @@
+// src/context/AuthContext.js
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
@@ -6,71 +7,83 @@ const AuthContext = createContext();
 
 const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      console.log("Token configurado en headers:", token);
-    } else {
-      delete api.defaults.headers.common["Authorization"];
-      console.log("No hay token para configurar en headers");
-    }
-  }, [user]);
+    const initializeAuth = async () => {
+      const token = localStorage.getItem("token");
+      if (token) {
+        try {
+          console.log("Validando token existente...");
+          const response = await api.get("/auth/validate-token"); // Añadir endpoint si existe
+          const userData = response.data.user || {};
+          const rol = userData.rol || userData.role || "user";
+          setUser({ ...userData, rol, token });
+        } catch (error) {
+          console.error("Token inválido, limpiando...", error.message);
+          localStorage.removeItem("token");
+        }
+      }
+      setLoading(false);
+    };
+    initializeAuth();
+  }, []);
 
-  const login = async (email, password) => {
+  const login = async (credentials) => {
     try {
-      const response = await api.post("/auth/login", { email, password });
+      setLoading(true);
+      const response = await api.post("/auth/login", credentials);
       console.log("Respuesta de /auth/login:", response.data);
       const token = response.data.token;
       if (!token) throw new Error("No se recibió un token.");
       localStorage.setItem("token", token);
       const userData = response.data.user || {};
-      // Usar 'rol' como clave principal, fallback a 'role' si existe
-      const rol = userData.rol || userData.role || "user"; // Cambiado de 'role' a 'rol'
-      setUser({ ...userData, rol, token }); // Cambiado de 'role' a 'rol'
-      api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      setTimeout(() => navigate("/dashboard"), 0);
+      const rol = userData.rol || userData.role || "user";
+      setUser({ ...userData, rol, token });
+      navigate("/dashboard");
     } catch (error) {
       console.error("Error al iniciar sesión:", error.message);
       throw new Error(error.response?.data?.message || "Error al iniciar sesión");
+    } finally {
+      setLoading(false);
     }
   };
 
   const register = async (nombre, email, password, rol) => {
     try {
+      setLoading(true);
       const response = await api.post("/auth/register", { nombre, email, password, role: rol });
       console.log("Respuesta de /auth/register:", response.data);
       const token = response.data.token;
       if (!token) throw new Error("No se recibió un token.");
       localStorage.setItem("token", token);
       const userData = response.data.user || {};
-      const rol = userData.rol || userData.role || rol || "user"; // Cambiado de 'role' a 'rol'
-      setUser({ ...userData, rol, token }); // Cambiado de 'role' a 'rol'
+      const userRol = userData.rol || userData.role || rol || "user";
+      setUser({ ...userData, rol: userRol, token });
     } catch (error) {
       console.error("Error al registrar usuario:", error.message);
       throw new Error(error.response?.data?.message || "Error al registrar usuario");
+    } finally {
+      setLoading(false);
     }
   };
 
   const logout = () => {
     localStorage.removeItem("token");
     setUser(null);
-    delete api.defaults.headers.common["Authorization"];
     navigate("/login");
   };
 
   const hasPermission = (requiredRole) => {
     if (!user) return false;
-    console.log("Rol del usuario:", user.rol, "Rol requerido:", requiredRole); // Cambiado de user.role a user.rol
-    if (user.rol === "admin") return true; // Cambiado de user.role a user.rol
-    return user.rol === requiredRole; // Cambiado de user.role a user.rol
+    console.log("Rol del usuario:", user.rol, "Rol requerido:", requiredRole);
+    if (user.rol === "admin") return true;
+    return user.rol === requiredRole;
   };
 
   return (
-    <AuthContext.Provider value={{ user, setUser, loading, login, register, logout, hasPermission }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, hasPermission }}>
       {children}
     </AuthContext.Provider>
   );
