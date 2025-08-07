@@ -23,11 +23,12 @@ const Login = () => {
     setError("");
 
     try {
-      await login(formData.email, formData.password); // ✅ Correcto
-
+      await login(formData); // ✅ Cambiado a pasar el objeto completo
+      console.log("Login exitoso, redirigiendo a dashboard...");
+      navigate("/dashboard"); // Redirige tras login exitoso
     } catch (err) {
       console.error("Error desde Login.js:", err.message);
-      setError(err.message);
+      setError(err.response?.data?.message || "Error al iniciar sesión. Verifica tus credenciales.");
     }
   };
 
