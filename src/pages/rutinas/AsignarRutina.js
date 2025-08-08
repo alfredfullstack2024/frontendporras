@@ -24,7 +24,7 @@ const AsignarRutina = () => {
   const [asignaciones, setAsignaciones] = useState([]);
   const [formData, setFormData] = useState({
     clienteId: "",
-    categorizacion: "",
+    equipo: "",
     diasEntrenamiento: [],
   });
   const [error, setError] = useState("");
@@ -142,7 +142,7 @@ const AsignarRutina = () => {
     e.preventDefault();
     if (
       !formData.clienteId ||
-      !formData.categorizacion ||
+      !formData.equipo ||
       formData.diasEntrenamiento.length === 0
     ) {
       setError(
@@ -157,7 +157,7 @@ const AsignarRutina = () => {
       setSuccess("Rutina asignada con éxito!");
       setFormData({
         clienteId: formData.clienteId,
-        categorizacion: "",
+        equipo: "",
         diasEntrenamiento: [],
       });
       if (formData.clienteId) fetchAsignaciones();
@@ -175,7 +175,7 @@ const AsignarRutina = () => {
   const handleClearForm = () => {
     setFormData({
       clienteId: "",
-      categorizacion: "",
+      equipo: "",
       diasEntrenamiento: [],
     });
     setAsignaciones([]);
@@ -217,19 +217,19 @@ const AsignarRutina = () => {
           </Col>
           <Col md={6}>
             <Form.Group className="mb-3">
-              <Form.Label>Categorización</Form.Label>
+              <Form.Label>Equipo</Form.Label>
               <Form.Select
-                name="categorizacion"
-                value={formData.categorizacion}
+                name="equipo"
+                value={formData.equipo}
                 onChange={handleChange}
                 required
                 disabled={loading}
               >
-                <option value="">Seleccione una categorización</option>
-                {[...new Set(rutinas.map((rutina) => rutina.categorizacion))].map(
-                  (categoria, index) => (
-                    <option key={index} value={categoria}>
-                      {categoria}
+                <option value="">Seleccione un equipo</option>
+                {[...new Set(rutinas.map((rutina) => rutina.equipo))].map(
+                  (equipo, index) => (
+                    <option key={index} value={equipo}>
+                      {equipo}
                     </option>
                   )
                 )}
@@ -281,14 +281,14 @@ const AsignarRutina = () => {
           <Table striped bordered hover>
             <thead>
               <tr>
-                <th>Categorización</th>
+                <th>Equipo</th>
                 <th>Días de Entrenamiento</th>
               </tr>
             </thead>
             <tbody>
               {asignaciones.map((asignacion) => (
                 <tr key={asignacion._id || asignacion.fechaAsignacion}>
-                  <td>{asignacion.categorizacion || "Desconocido"}</td>
+                  <td>{asignacion.equipo || "Desconocido"}</td>
                   <td>{asignacion.diasEntrenamiento.join(", ") || "N/A"}</td>
                 </tr>
               ))}
