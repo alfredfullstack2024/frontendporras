@@ -26,7 +26,6 @@ const AsignarRutina = () => {
     clienteId: "",
     categorizacion: "",
     diasEntrenamiento: [],
-    diasDescanso: [],
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
@@ -139,21 +138,15 @@ const AsignarRutina = () => {
     setFormData({ ...formData, diasEntrenamiento: dias });
   };
 
-  const handleDiasDescanso = (e) => {
-    const dias = Array.from(e.target.selectedOptions, (option) => option.value);
-    setFormData({ ...formData, diasDescanso: dias });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (
       !formData.clienteId ||
       !formData.categorizacion ||
-      formData.diasEntrenamiento.length === 0 ||
-      formData.diasDescanso.length === 0
+      formData.diasEntrenamiento.length === 0
     ) {
       setError(
-        "Todos los campos son obligatorios, incluyendo días de entrenamiento y descanso."
+        "Todos los campos son obligatorios, incluyendo días de entrenamiento."
       );
       return;
     }
@@ -166,7 +159,6 @@ const AsignarRutina = () => {
         clienteId: formData.clienteId,
         categorizacion: "",
         diasEntrenamiento: [],
-        diasDescanso: [],
       });
       if (formData.clienteId) fetchAsignaciones();
     } catch (err) {
@@ -185,7 +177,6 @@ const AsignarRutina = () => {
       clienteId: "",
       categorizacion: "",
       diasEntrenamiento: [],
-      diasDescanso: [],
     });
     setAsignaciones([]);
   };
@@ -247,7 +238,7 @@ const AsignarRutina = () => {
           </Col>
         </Row>
         <Row>
-          <Col md={6}>
+          <Col md={12}>
             <Form.Group className="mb-3">
               <Form.Label>Días de Entrenamiento</Form.Label>
               <Form.Select
@@ -255,27 +246,6 @@ const AsignarRutina = () => {
                 name="diasEntrenamiento"
                 value={formData.diasEntrenamiento}
                 onChange={handleDiasEntrenamiento}
-                required
-                disabled={loading}
-              >
-                <option value="Lunes">Lunes</option>
-                <option value="Martes">Martes</option>
-                <option value="Miércoles">Miércoles</option>
-                <option value="Jueves">Jueves</option>
-                <option value="Viernes">Viernes</option>
-                <option value="Sábado">Sábado</option>
-                <option value="Domingo">Domingo</option>
-              </Form.Select>
-            </Form.Group>
-          </Col>
-          <Col md={6}>
-            <Form.Group className="mb-3">
-              <Form.Label>Días de Descanso</Form.Label>
-              <Form.Select
-                multiple
-                name="diasDescanso"
-                value={formData.diasDescanso}
-                onChange={handleDiasDescanso}
                 required
                 disabled={loading}
               >
@@ -313,7 +283,6 @@ const AsignarRutina = () => {
               <tr>
                 <th>Categorización</th>
                 <th>Días de Entrenamiento</th>
-                <th>Días de Descanso</th>
               </tr>
             </thead>
             <tbody>
@@ -321,7 +290,6 @@ const AsignarRutina = () => {
                 <tr key={asignacion._id || asignacion.fechaAsignacion}>
                   <td>{asignacion.categorizacion || "Desconocido"}</td>
                   <td>{asignacion.diasEntrenamiento.join(", ") || "N/A"}</td>
-                  <td>{asignacion.diasDescanso.join(", ") || "N/A"}</td>
                 </tr>
               ))}
             </tbody>
