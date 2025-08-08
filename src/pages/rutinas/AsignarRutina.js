@@ -24,7 +24,7 @@ const AsignarRutina = () => {
   const [asignaciones, setAsignaciones] = useState([]);
   const [formData, setFormData] = useState({
     clienteId: "",
-    rutinaId: "",
+    categorizacion: "",
     diasEntrenamiento: [],
     diasDescanso: [],
   });
@@ -113,12 +113,12 @@ const AsignarRutina = () => {
     } finally {
       setLoading(false);
     }
-  }, [clientes, formData.clienteId, user.token]); // Dependencias de fetchAsignaciones
+  }, [clientes, formData.clienteId, user.token]);
 
   useEffect(() => {
     if (formData.clienteId) fetchAsignaciones();
     else setAsignaciones([]);
-  }, [formData.clienteId, fetchAsignaciones]); // Incluimos fetchAsignaciones en las dependencias
+  }, [formData.clienteId, fetchAsignaciones]);
 
   useEffect(() => {
     if (error || success) {
@@ -148,7 +148,7 @@ const AsignarRutina = () => {
     e.preventDefault();
     if (
       !formData.clienteId ||
-      !formData.rutinaId ||
+      !formData.categorizacion ||
       formData.diasEntrenamiento.length === 0 ||
       formData.diasDescanso.length === 0
     ) {
@@ -164,7 +164,7 @@ const AsignarRutina = () => {
       setSuccess("Rutina asignada con éxito!");
       setFormData({
         clienteId: formData.clienteId,
-        rutinaId: "",
+        categorizacion: "",
         diasEntrenamiento: [],
         diasDescanso: [],
       });
@@ -183,7 +183,7 @@ const AsignarRutina = () => {
   const handleClearForm = () => {
     setFormData({
       clienteId: "",
-      rutinaId: "",
+      categorizacion: "",
       diasEntrenamiento: [],
       diasDescanso: [],
     });
@@ -226,20 +226,22 @@ const AsignarRutina = () => {
           </Col>
           <Col md={6}>
             <Form.Group className="mb-3">
-              <Form.Label>Rutina</Form.Label>
+              <Form.Label>Categorización</Form.Label>
               <Form.Select
-                name="rutinaId"
-                value={formData.rutinaId}
+                name="categorizacion"
+                value={formData.categorizacion}
                 onChange={handleChange}
                 required
                 disabled={loading}
               >
-                <option value="">Seleccione una rutina</option>
-                {rutinas.map((rutina) => (
-                  <option key={rutina._id} value={rutina._id}>
-                    {rutina.nombreEjercicio} ({rutina.grupoMuscular})
-                  </option>
-                ))}
+                <option value="">Seleccione una categorización</option>
+                {[...new Set(rutinas.map((rutina) => rutina.categorizacion))].map(
+                  (categoria, index) => (
+                    <option key={index} value={categoria}>
+                      {categoria}
+                    </option>
+                  )
+                )}
               </Form.Select>
             </Form.Group>
           </Col>
@@ -309,7 +311,7 @@ const AsignarRutina = () => {
           <Table striped bordered hover>
             <thead>
               <tr>
-                <th>Rutina</th>
+                <th>Categorización</th>
                 <th>Días de Entrenamiento</th>
                 <th>Días de Descanso</th>
               </tr>
@@ -317,10 +319,7 @@ const AsignarRutina = () => {
             <tbody>
               {asignaciones.map((asignacion) => (
                 <tr key={asignacion._id || asignacion.fechaAsignacion}>
-                  <td>
-                    {asignacion.rutinaId?.nombreEjercicio || "Desconocido"} (
-                    {asignacion.rutinaId?.grupoMuscular || ""})
-                  </td>
+                  <td>{asignacion.categorizacion || "Desconocido"}</td>
                   <td>{asignacion.diasEntrenamiento.join(", ") || "N/A"}</td>
                   <td>{asignacion.diasDescanso.join(", ") || "N/A"}</td>
                 </tr>
