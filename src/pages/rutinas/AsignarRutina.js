@@ -4,6 +4,7 @@ import {
   obtenerRutinas,
   asignarRutina,
   consultarRutinaPorNumeroIdentificacion,
+  obtenerEntrenadores,
 } from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 import {
@@ -21,15 +22,17 @@ import { AuthContext } from "../../context/AuthContext";
 const AsignarRutina = () => {
   const [clientes, setClientes] = useState([]);
   const [rutinas, setRutinas] = useState([]);
+  const [entrenadores, setEntrenadores] = useState([]);
   const [asignaciones, setAsignaciones] = useState([]);
   const [formData, setFormData] = useState({
     clienteId: "",
     equipo: "",
-    diasEntrenamiento: [],
+    posicion: "",
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
 
@@ -45,13 +48,15 @@ const AsignarRutina = () => {
       try {
         setLoading(true);
         const config = { headers: { Authorization: `Bearer ${user.token}` } };
-        const [clientesRes, rutinasRes] = await Promise.all([
+        const [clientesRes, rutinasRes, entrenadoresRes] = await Promise.all([
           obtenerClientes(config),
           obtenerRutinas(config),
+          obtenerEntrenadores(config),
         ]);
         console.log("Clientes cargados:", clientesRes.data);
         setClientes(clientesRes.data);
         setRutinas(rutinasRes.data);
+        setEntrenadores(entrenadoresRes.data);
       } catch (err) {
         console.error("Error al cargar datos:", err);
         setError(
@@ -133,32 +138,23 @@ const AsignarRutina = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleDiasEntrenamiento = (e) => {
-    const dias = Array.from(e.target.selectedOptions, (option) => option.value);
-    setFormData({ ...formData, diasEntrenamiento: dias });
-  };
-
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (
-      !formData.clienteId ||
-      !formData.equipo ||
-      formData.diasEntrenamiento.length === 0
-    ) {
-      setError(
-        "Todos los campos son obligatorios, incluyendo días de entrenamiento."
-      );
+    if (!formData.clienteId || !formData.equipo || !formData.posicion) {
+      setError("Todos los campos son obligatorios.");
       return;
     }
     try {
       setLoading(true);
       const config = { headers: { Authorization: `Bearer ${user.token}` } };
-      await asignarRutina(formData, config);
+      const entrenador = entrenadores.find(e => e.especialidad.includes(formData.equipo));
+      const diasHorarios = entrenador ? entrenador.diasHorarios.map(d => `${d.dia} ${d.horario}`).join(", ") : "";
+      await asignarRutina({ ...formData, diasHorarios }, config);
       setSuccess("Rutina asignada con éxito!");
       setFormData({
         clienteId: formData.clienteId,
         equipo: "",
-        diasEntrenamiento: [],
+        posicion: "",
       });
       if (formData.clienteId) fetchAsignaciones();
     } catch (err) {
@@ -176,10 +172,15 @@ const AsignarRutina = () => {
     setFormData({
       clienteId: "",
       equipo: "",
-      diasEntrenamiento: [],
+      posicion: "",
     });
     setAsignaciones([]);
   };
+
+  const filteredEquipos = [...new Set(entrenadores.map((e) => e.especialidad.split(" (")[1].replace(")", "")))].filter(
+    (equipo) =>
+      equipo && equipo.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <Container className="mt-4">
@@ -218,6 +219,13 @@ const AsignarRutina = () => {
           <Col md={6}>
             <Form.Group className="mb-3">
               <Form.Label>Equipo</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Buscar equipo..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="mb-2"
+              />
               <Form.Select
                 name="equipo"
                 value={formData.equipo}
@@ -226,36 +234,30 @@ const AsignarRutina = () => {
                 disabled={loading}
               >
                 <option value="">Seleccione un equipo</option>
-                {[...new Set(rutinas.map((rutina) => rutina.equipo))].map(
-                  (equipo, index) => (
-                    <option key={index} value={equipo}>
-                      {equipo}
-                    </option>
-                  )
-                )}
+                {filteredEquipos.map((equipo, index) => (
+                  <option key={index} value={equipo}>
+                    {equipo}
+                  </option>
+                ))}
               </Form.Select>
             </Form.Group>
           </Col>
         </Row>
         <Row>
-          <Col md={12}>
+          <Col md={6}>
             <Form.Group className="mb-3">
-              <Form.Label>Días de Entrenamiento</Form.Label>
+              <Form.Label>Posición</Form.Label>
               <Form.Select
-                multiple
-                name="diasEntrenamiento"
-                value={formData.diasEntrenamiento}
-                onChange={handleDiasEntrenamiento}
+                name="posicion"
+                value={formData.posicion}
+                onChange={handleChange}
                 required
                 disabled={loading}
               >
-                <option value="Lunes">Lunes</option>
-                <option value="Martes">Martes</option>
-                <option value="Miércoles">Miércoles</option>
-                <option value="Jueves">Jueves</option>
-                <option value="Viernes">Viernes</option>
-                <option value="Sábado">Sábado</option>
-                <option value="Domingo">Domingo</option>
+                <option value="">Seleccione una posición</option>
+                <option value="Flyer">Flyer</option>
+                <option value="Base">Base</option>
+                <option value="Spotter">Spotter</option>
               </Form.Select>
             </Form.Group>
           </Col>
@@ -282,14 +284,16 @@ const AsignarRutina = () => {
             <thead>
               <tr>
                 <th>Equipo</th>
-                <th>Días de Entrenamiento</th>
+                <th>Posición</th>
+                <th>Días y Horarios</th>
               </tr>
             </thead>
             <tbody>
               {asignaciones.map((asignacion) => (
                 <tr key={asignacion._id || asignacion.fechaAsignacion}>
                   <td>{asignacion.equipo || "Desconocido"}</td>
-                  <td>{asignacion.diasEntrenamiento.join(", ") || "N/A"}</td>
+                  <td>{asignacion.posicion || "N/A"}</td>
+                  <td>{asignacion.diasHorarios || "N/A"}</td>
                 </tr>
               ))}
             </tbody>
