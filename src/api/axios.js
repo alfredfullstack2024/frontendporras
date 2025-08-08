@@ -34,9 +34,18 @@ api.interceptors.request.use(
       console.log("Token añadido a la solicitud:", {
         token: token.substring(0, 10) + "...", // Mostrar solo parte por seguridad
         url: `${config.baseURL}${config.url}`,
+        method: config.method,
+        data: config.data ? JSON.stringify(config.data).substring(0, 50) + "..." : "Sin datos",
       });
     } else {
       console.log("No se encontró token en localStorage. Solicitud sin autenticación a:", `${config.baseURL}${config.url}`);
+    }
+    // Validación básica de datos antes de enviar
+    if (config.method === "post" && config.url === "/entrenadores" && config.data) {
+      const { nombre, correo, especialidad, diasHorarios } = config.data;
+      if (!nombre || !correo || !especialidad || !Array.isArray(diasHorarios) || diasHorarios.length === 0) {
+        throw new Error("Datos inválidos para crear entrenador: nombre, correo, especialidad y diasHorarios son requeridos.");
+      }
     }
     console.log("Solicitud enviada a:", {
       url: `${config.baseURL}${config.url}`,
@@ -200,7 +209,3 @@ export const login = (data) => api.post("/auth/login", data);
 export const registrarse = (data) => api.post("/auth/register", data);
 
 export default api;
-
-
-
-
