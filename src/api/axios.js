@@ -110,7 +110,11 @@ api.interceptors.response.use(
         return Promise.reject(new Error("Recurso no encontrado. Verifica la ruta o los datos enviados."));
       }
       if (error.response.status === 400) {
-        console.error("Error 400 - Datos inválidos:", error.response.data);
+        console.error("Error 400 - Datos inválidos:", {
+          url: error.response.config.url,
+          dataSent: error.response.config.data,
+          responseData: error.response.data,
+        });
       }
     } else if (!error.response) {
       console.error("Error de conexión:", {
