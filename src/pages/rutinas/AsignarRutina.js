@@ -107,7 +107,7 @@ const AsignarRutina = () => {
       console.error("Error al cargar asignaciones:", err.response?.data || err);
       setError(
         "Error al cargar asignaciones: " +
-          (err.response?.data?.message || err.message)
+          (err.response?.data?.message || "Recurso no encontrado")
       );
       setAsignaciones([]);
     } finally {
