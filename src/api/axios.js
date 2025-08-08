@@ -32,20 +32,27 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
       console.log("Token añadido a la solicitud:", {
-        token: token.substring(0, 10) + "...", // Mostrar solo parte por seguridad
+        token: token.substring(0, 10) + "...",
         url: `${config.baseURL}${config.url}`,
         method: config.method,
-        data: config.data ? JSON.stringify(config.data).substring(0, 50) + "..." : "Sin datos",
+        data: config.data ? JSON.stringify(config.data) : "Sin datos",
       });
     } else {
-      console.log("No se encontró token en localStorage. Solicitud sin autenticación a:", `${config.baseURL}${config.url}`);
+      console.warn("No se encontró token en localStorage. Solicitud sin autenticación a:", `${config.baseURL}${config.url}`);
     }
-    // Validación básica de datos antes de enviar
+    // Validación mejorada para crear entrenador
     if (config.method === "post" && config.url === "/entrenadores" && config.data) {
       const { nombre, correo, especialidad, diasHorarios } = config.data;
       if (!nombre || !correo || !especialidad || !Array.isArray(diasHorarios) || diasHorarios.length === 0) {
+        console.error("Datos inválidos para crear entrenador:", config.data);
         throw new Error("Datos inválidos para crear entrenador: nombre, correo, especialidad y diasHorarios son requeridos.");
       }
+      diasHorarios.forEach((dh, index) => {
+        if (!dh.dia || !dh.horario) {
+          console.error(`Día/Horario inválido en índice ${index}:`, dh);
+          throw new Error(`Día/Horario inválido en índice ${index}: ambos campos son requeridos.`);
+        }
+      });
     }
     console.log("Solicitud enviada a:", {
       url: `${config.baseURL}${config.url}`,
@@ -101,6 +108,9 @@ api.interceptors.response.use(
       }
       if (error.response.status === 404) {
         return Promise.reject(new Error("Recurso no encontrado. Verifica la ruta o los datos enviados."));
+      }
+      if (error.response.status === 400) {
+        console.error("Error 400 - Datos inválidos:", error.response.data);
       }
     } else if (!error.response) {
       console.error("Error de conexión:", {
