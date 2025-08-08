@@ -3,11 +3,12 @@ import { crearRutina, obtenerRutinas, editarRutina } from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 import { Container, Form, Button, Table, Alert } from "react-bootstrap";
 
-const Categorizacion = () => {
+const CrearRutina = () => {
   const [formData, setFormData] = useState({
-    equipo: "",
-    nivelDeEquipo: "",
-    posicion: "",
+    grupoMuscular: "",
+    nombreEjercicio: "",
+    series: "",
+    repeticiones: "",
     descripcion: "",
   });
   const [rutinas, setRutinas] = useState([]);
@@ -22,7 +23,7 @@ const Categorizacion = () => {
     const token = localStorage.getItem("token");
     console.log("Token en localStorage:", token); // Depuración
     if (!token) {
-      setError("Debes iniciar sesión para categorizar.");
+      setError("Debes iniciar sesión para crear una rutina.");
       navigate("/login");
     }
   }, [navigate]);
@@ -35,7 +36,7 @@ const Categorizacion = () => {
       setRutinas(response.data);
     } catch (err) {
       console.error("Error al obtener rutinas:", err);
-      setError("Error al cargar las categorizaciones: " + err.message);
+      setError("Error al cargar las rutinas: " + err.message);
     }
   };
 
@@ -46,7 +47,10 @@ const Categorizacion = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]:
+        e.target.name === "series" || e.target.name === "repeticiones"
+          ? Number(e.target.value)
+          : e.target.value,
     });
   };
 
@@ -57,26 +61,31 @@ const Categorizacion = () => {
     try {
       let response;
       if (editMode) {
+        // Actualizar rutina existente
         response = await editarRutina(editId, formData);
         console.log("Respuesta del backend (editar):", response.data); // Depuración
-        setSuccess("Categorización actualizada con éxito!");
+        setSuccess("Rutina actualizada con éxito!");
         setEditMode(false);
         setEditId(null);
       } else {
+        // Crear nueva rutina
         response = await crearRutina(formData);
         console.log("Respuesta del backend (crear):", response.data); // Depuración
-        setSuccess("Categorización creada con éxito!");
+        setSuccess("Rutina creada con éxito!");
       }
 
+      // Limpiar el formulario
       setFormData({
-        equipo: "",
-        nivelDeEquipo: "",
-        posicion: "",
+        grupoMuscular: "",
+        nombreEjercicio: "",
+        series: "",
+        repeticiones: "",
         descripcion: "",
       });
+      // Recargar las rutinas para mostrar la actualización
       fetchRutinas();
     } catch (err) {
-      console.error("Error al procesar categorización:", err.response?.data || err);
+      console.error("Error al procesar rutina:", err.response?.data || err);
       if (err.response?.status === 401) {
         setError("Sesión expirada. Por favor, inicia sesión de nuevo.");
         localStorage.removeItem("token");
@@ -85,7 +94,7 @@ const Categorizacion = () => {
         setError(
           err.response?.data?.mensaje ||
             err.message ||
-            "Error al procesar la categorización. Revisa los datos e intenta de nuevo."
+            "Error al procesar la rutina. Revisa los datos e intenta de nuevo."
         );
       }
     }
@@ -95,96 +104,151 @@ const Categorizacion = () => {
     setEditMode(true);
     setEditId(rutina._id);
     setFormData({
-      equipo: rutina.equipo,
-      nivelDeEquipo: rutina.nivelDeEquipo,
-      posicion: rutina.posicion,
+      grupoMuscular: rutina.grupoMuscular,
+      nombreEjercicio: rutina.nombreEjercicio,
+      series: rutina.series,
+      repeticiones: rutina.repeticiones,
       descripcion: rutina.descripcion || "",
     });
   };
 
-  const nivelesDeEquipo = [
-    "1.1 MINI",
-    "1.1 YOUTH",
-    "1.1 JUNIOR",
-    "1.1 SENIOR",
-    "2.1 JUNIOR",
-    "2.1 OPEN",
-    "2.2 JUNIOR",
-    "2.2 SENIOR",
-    "1 TINY",
-    "1 MINI",
-    "1 YOUTH",
-    "1 JUNIOR",
-    "1 SENIOR",
-    "2 YOUTH",
-    "2 JUNIOR",
-    "2 SENIOR",
-    "2 OPEN",
-    "3 YOUTH",
-    "3 JUNIOR",
-    "3 SENIOR",
-    "3 OPEN",
-    "3 OPEN NON TUMBLING",
-    "4.2 OPEN",
-    "4 SENIOR",
-    "4 OPEN FEM",
-    "4 OPEN MEDIUM",
-    "4 OPEN LARGE",
-    "5 OPEN",
-    "5 OPEN NON TUMBLING",
-    "6 OPEN",
-    "7.5 OPEN",
-    "7 OPEN",
-  ];
+  const ejerciciosPorGrupo = {
+    Pecho: [
+      "Press de banca",
+      "Flexiones",
+      "Aperturas con mancuernas",
+      "Press inclinado",
+      "Cruces en polea",
+      "Fondos en paralelas",
+      "Press declinado",
+      "Pullover con mancuerna",
+      "Push-up diamante",
+      "Press con mancuernas",
+    ],
+    Piernas: [
+      "Sentadillas",
+      "Peso muerto",
+      "Zancadas",
+      "Prensa de piernas",
+      "Extensiones de cuádriceps",
+      "Peso muerto sumo",
+      "Elevación de talones",
+      "Step-ups",
+      "Sentadilla frontal",
+      "Curl femoral",
+    ],
+    Espalda: [
+      "Dominadas",
+      "Remo con barra",
+      "Jalón al pecho",
+      "Remo con mancuerna",
+      "Peso muerto rumano",
+      "Remo en máquina",
+      "Face pull",
+      "Pull-over con barra",
+      "Hiperextensiones",
+      "Jalón tras nuca",
+    ],
+    Brazos: [
+      "Curl de bíceps con mancuernas",
+      "Extensiones de tríceps en polea",
+      "Martillo con mancuernas",
+      "Press francés",
+      "Curl de bíceps con barra",
+      "Dips para tríceps",
+      "Curl concentrado",
+      "Extensiones sobre la cabeza",
+      "Curl martillo con barra",
+      "Kickback de tríceps",
+    ],
+    Hombros: [
+      "Press militar",
+      "Elevaciones laterales",
+      "Elevaciones frontales",
+      "Encogimientos de hombros",
+      "Remo al mentón",
+      "Press Arnold",
+      "Elevaciones traseras",
+      "Press con mancuernas",
+      "Rotaciones externas",
+      "Plancha con elevación",
+    ],
+    Abdomen: [
+      "Plancha",
+      "Crunches",
+      "Elevaciones de piernas",
+      "Russian twists",
+      "Bicicleta abdominal",
+      "Plancha lateral",
+      "Mountain climbers",
+      "Ab rollouts",
+      "Leg raises colgando",
+      "Vacío abdominal",
+    ],
+  };
 
   return (
     <Container className="mt-4">
-      <h2>{editMode ? "Editar Categorización" : "Categorización"}</h2>
+      <h2>{editMode ? "Editar Rutina" : "Crear Rutina"}</h2>
       {error && <Alert variant="danger">{error}</Alert>}
       {success && <Alert variant="success">{success}</Alert>}
       <Form onSubmit={handleSubmit}>
         <Form.Group className="mb-3">
-          <Form.Label>Equipo</Form.Label>
-          <Form.Control
-            type="text"
-            name="equipo"
-            value={formData.equipo}
+          <Form.Label>Grupo Muscular</Form.Label>
+          <Form.Select
+            name="grupoMuscular"
+            value={formData.grupoMuscular}
             onChange={handleChange}
-            placeholder="Ingrese el nombre del equipo"
+            required
+          >
+            <option value="">Seleccione un grupo muscular</option>
+            <option value="Pecho">Pecho</option>
+            <option value="Piernas">Piernas</option>
+            <option value="Espalda">Espalda</option>
+            <option value="Brazos">Brazos</option>
+            <option value="Hombros">Hombros</option>
+            <option value="Abdomen">Abdomen</option>
+          </Form.Select>
+        </Form.Group>
+
+        <Form.Group className="mb-3">
+          <Form.Label>Nombre del Ejercicio</Form.Label>
+          <Form.Select
+            name="nombreEjercicio"
+            value={formData.nombreEjercicio}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Seleccione un ejercicio</option>
+            {formData.grupoMuscular &&
+              ejerciciosPorGrupo[formData.grupoMuscular].map((ejercicio) => (
+                <option key={ejercicio} value={ejercicio}>
+                  {ejercicio}
+                </option>
+              ))}
+          </Form.Select>
+        </Form.Group>
+
+        <Form.Group className="mb-3">
+          <Form.Label>Series</Form.Label>
+          <Form.Control
+            type="number"
+            name="series"
+            value={formData.series}
+            onChange={handleChange}
             required
           />
         </Form.Group>
 
         <Form.Group className="mb-3">
-          <Form.Label>Nivel de Equipo</Form.Label>
-          <Form.Select
-            name="nivelDeEquipo"
-            value={formData.nivelDeEquipo}
+          <Form.Label>Repeticiones</Form.Label>
+          <Form.Control
+            type="number"
+            name="repeticiones"
+            value={formData.repeticiones}
             onChange={handleChange}
             required
-          >
-            <option value="">Seleccione un nivel</option>
-            {nivelesDeEquipo.map((nivel, index) => (
-              <option key={index} value={nivel}>
-                {nivel}
-              </option>
-            ))}
-          </Form.Select>
-        </Form.Group>
-
-        <Form.Group className="mb-3">
-          <Form.Label>Posición</Form.Label>
-          <Form.Select
-            name="posicion"
-            value={formData.posicion}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Seleccione una posición</option>
-            <option value="Flyer">Flyer</option>
-            <option value="Base">Base</option>
-            <option value="Spotter">Spotter</option>
-          </Form.Select>
+          />
         </Form.Group>
 
         <Form.Group className="mb-3">
@@ -199,7 +263,7 @@ const Categorizacion = () => {
         </Form.Group>
 
         <Button variant="primary" type="submit">
-          {editMode ? "Actualizar Categorización" : "Categorizar"}
+          {editMode ? "Actualizar Rutina" : "Crear Rutina"}
         </Button>
         {editMode && (
           <Button
@@ -209,9 +273,10 @@ const Categorizacion = () => {
               setEditMode(false);
               setEditId(null);
               setFormData({
-                equipo: "",
-                nivelDeEquipo: "",
-                posicion: "",
+                grupoMuscular: "",
+                nombreEjercicio: "",
+                series: "",
+                repeticiones: "",
                 descripcion: "",
               });
             }}
@@ -221,17 +286,19 @@ const Categorizacion = () => {
         )}
       </Form>
 
+      {/* Sección para listar las rutinas creadas */}
       <div className="mt-5">
-        <h3>Categorizaciones Creadas</h3>
+        <h3>Rutinas Creadas</h3>
         {rutinas.length === 0 ? (
-          <p>No hay categorizaciones creadas aún.</p>
+          <p>No hay rutinas creadas aún.</p>
         ) : (
           <Table striped bordered hover>
             <thead>
               <tr>
-                <th>Equipo</th>
-                <th>Nivel de Equipo</th>
-                <th>Posición</th>
+                <th>Grupo Muscular</th>
+                <th>Ejercicio</th>
+                <th>Series</th>
+                <th>Repeticiones</th>
                 <th>Descripción</th>
                 <th>Creado Por</th>
                 <th>Acciones</th>
@@ -240,9 +307,10 @@ const Categorizacion = () => {
             <tbody>
               {rutinas.map((rutina) => (
                 <tr key={rutina._id}>
-                  <td>{rutina.equipo}</td>
-                  <td>{rutina.nivelDeEquipo}</td>
-                  <td>{rutina.posicion}</td>
+                  <td>{rutina.grupoMuscular}</td>
+                  <td>{rutina.nombreEjercicio}</td>
+                  <td>{rutina.series}</td>
+                  <td>{rutina.repeticiones}</td>
                   <td>{rutina.descripcion || "N/A"}</td>
                   <td>
                     {rutina.creadoPor ? rutina.creadoPor.nombre : "Desconocido"}
@@ -266,4 +334,4 @@ const Categorizacion = () => {
   );
 };
 
-export default Categorizacion;
+export default CrearRutina;
