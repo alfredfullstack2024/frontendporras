@@ -4,7 +4,7 @@ import axios from "axios";
 const getBaseUrl = () => {
   const envUrl = process.env.REACT_APP_API_URL;
   const defaultDevUrl = "http://localhost:5000/api";
-  const defaultProdUrl = "https://backendporras.onrender.com/api";
+  const defaultProdUrl = "https://admin-gimnasios-backend.onrender.com/api";
   const baseUrl = envUrl || (process.env.NODE_ENV === "development" ? defaultDevUrl : defaultProdUrl);
 
   console.log("Depuración de URL - Variables de entorno:", {
