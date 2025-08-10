@@ -10,7 +10,7 @@ const CrearEntrenador = () => {
     apellido: "",
     correo: "",
     telefono: "",
-    especialidad: "",
+    especialidad (Equipo): "",
     clases: [{ nombreClase: "Entrenamiento General", dias: [], capacidadMaxima: 10 }],
   });
   const [error, setError] = useState(null);
@@ -170,3 +170,4 @@ const CrearEntrenador = () => {
 };
 
 export default CrearEntrenador;
+
