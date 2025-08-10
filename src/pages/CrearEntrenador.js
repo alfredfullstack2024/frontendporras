@@ -11,32 +11,27 @@ const CrearEntrenador = () => {
     correo: "",
     telefono: "",
     especialidad: "",
-    clases: [{ nombreClase: "Entrenamiento General", dias: [], capacidadMaxima: 10 }],
+    diasHorarios: [],
   });
   const [error, setError] = useState(null);
 
-  const handleClaseChange = (index, field, value) => {
-    const nuevasClases = [...entrenador.clases];
-    nuevasClases[index][field] = value;
-    setEntrenador({ ...entrenador, clases: nuevasClases });
+  const handleDiaChange = (index, field, value) => {
+    const nuevosDias = [...entrenador.diasHorarios];
+    nuevosDias[index][field] = value;
+    setEntrenador({ ...entrenador, diasHorarios: nuevosDias });
   };
 
-  const handleDiaChange = (claseIndex, diaIndex, field, value) => {
-    const nuevasClases = [...entrenador.clases];
-    nuevasClases[claseIndex].dias[diaIndex] = { ...nuevasClases[claseIndex].dias[diaIndex], [field]: value };
-    setEntrenador({ ...entrenador, clases: nuevasClases });
+  const agregarDia = () => {
+    setEntrenador({
+      ...entrenador,
+      diasHorarios: [...entrenador.diasHorarios, { dia: "", horario: "" }],
+    });
   };
 
-  const agregarDia = (claseIndex) => {
-    const nuevasClases = [...entrenador.clases];
-    nuevasClases[claseIndex].dias.push({ dia: "", horarioInicio: "", horarioFin: "" });
-    setEntrenador({ ...entrenador, clases: nuevasClases });
-  };
-
-  const eliminarDia = (claseIndex, diaIndex) => {
-    const nuevasClases = [...entrenador.clases];
-    nuevasClases[claseIndex].dias.splice(diaIndex, 1);
-    setEntrenador({ ...entrenador, clases: nuevasClases });
+  const eliminarDia = (index) => {
+    const nuevosDias = [...entrenador.diasHorarios];
+    nuevosDias.splice(index, 1);
+    setEntrenador({ ...entrenador, diasHorarios: nuevosDias });
   };
 
   const handleSubmit = async (e) => {
@@ -104,64 +99,39 @@ const CrearEntrenador = () => {
           />
         </Form.Group>
 
-        {entrenador.clases.map((clase, claseIndex) => (
-          <div key={claseIndex} className="mb-4">
-            <h5>Clase {claseIndex + 1}</h5>
-            <Form.Group className="mb-3">
-              <Form.Label>Nombre de la Clase</Form.Label>
+        <h5>Días y Horarios</h5>
+        {entrenador.diasHorarios.map((item, index) => (
+          <Row key={index} className="mb-2">
+            <Col>
               <Form.Control
                 type="text"
-                value={clase.nombreClase}
-                onChange={(e) => handleClaseChange(claseIndex, "nombreClase", e.target.value)}
+                placeholder="Día (ej. Lunes)"
+                value={item.dia}
+                onChange={(e) => handleDiaChange(index, "dia", e.target.value)}
+                required
               />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Label>Capacidad Máxima</Form.Label>
+            </Col>
+            <Col>
               <Form.Control
-                type="number"
-                value={clase.capacidadMaxima}
-                onChange={(e) => handleClaseChange(claseIndex, "capacidadMaxima", Number(e.target.value))}
+                type="text"
+                placeholder="Horario (ej. 08:00 a.m. - 10:00 a.m.)"
+                value={item.horario}
+                onChange={(e) => handleDiaChange(index, "horario", e.target.value)}
+                required
               />
-            </Form.Group>
-            <h6>Días y Horarios</h6>
-            {clase.dias.map((dia, diaIndex) => (
-              <Row key={diaIndex} className="mb-2">
-                <Col>
-                  <Form.Control
-                    type="text"
-                    placeholder="Día"
-                    value={dia.dia}
-                    onChange={(e) => handleDiaChange(claseIndex, diaIndex, "dia", e.target.value)}
-                  />
-                </Col>
-                <Col>
-                  <Form.Control
-                    type="time"
-                    value={dia.horarioInicio}
-                    onChange={(e) => handleDiaChange(claseIndex, diaIndex, "horarioInicio", e.target.value)}
-                  />
-                </Col>
-                <Col>
-                  <Form.Control
-                    type="time"
-                    value={dia.horarioFin}
-                    onChange={(e) => handleDiaChange(claseIndex, diaIndex, "horarioFin", e.target.value)}
-                  />
-                </Col>
-                <Col>
-                  <Button variant="danger" onClick={() => eliminarDia(claseIndex, diaIndex)}>
-                    Eliminar
-                  </Button>
-                </Col>
-              </Row>
-            ))}
-            <Button variant="secondary" onClick={() => agregarDia(claseIndex)}>
-              Agregar Día
-            </Button>
-          </div>
+            </Col>
+            <Col>
+              <Button variant="danger" onClick={() => eliminarDia(index)}>
+                Eliminar
+              </Button>
+            </Col>
+          </Row>
         ))}
+        <Button variant="secondary" onClick={agregarDia}>
+          Agregar Día
+        </Button>
 
-        <Button variant="primary" type="submit">
+        <Button variant="primary" type="submit" className="mt-3">
           Crear
         </Button>
       </Form>
