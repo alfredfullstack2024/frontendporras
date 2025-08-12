@@ -4,7 +4,7 @@ import axios from "axios";
 const getBaseUrl = () => {
   const envUrl = process.env.REACT_APP_API_URL;
   const defaultDevUrl = "http://localhost:5000/api";
-  const defaultProdUrl = "https://admin-gimnasios-backend.onrender.com/api";
+  const defaultProdUrl = "https://backendporras.onrender.com/api";
   const baseUrl = envUrl || (process.env.NODE_ENV === "development" ? defaultDevUrl : defaultProdUrl);
 
   console.log("Depuración de URL - Variables de entorno:", {
@@ -194,6 +194,11 @@ export const editarUsuario = (id, data, config) => api.put(`/users/${id}`, data,
 export const crearComposicionCorporal = (data, config) => api.post("/composicion-corporal", data, config);
 export const consultarComposicionPorCliente = (identificacion, config) =>
   api.get(`/composicion-corporal/cliente/${identificacion}`, config);
+
+// Funciones exportadas para medición porristas
+export const crearMedicionPorristas = (data, config) => api.post("/medicion-porristas", data, config);
+export const obtenerMedicionesPorristas = (config) => api.get("/medicion-porristas", config);
+export const editarMedicionPorristas = (id, data, config) => api.put(`/medicion-porristas/${id}`, data, config);
 
 // Funciones exportadas para autenticación
 export const login = (data) => api.post("/auth/login", data);
