@@ -150,7 +150,6 @@ const CrearMedicionPorristas = () => {
                 </option>
               ))}
             </Form.Select>
-          </Form.Select>
           </Form.Group>
 
           <Form.Group className="mb-3">
