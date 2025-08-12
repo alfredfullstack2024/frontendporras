@@ -17,7 +17,7 @@ const CrearMedicionPorristas = () => {
   const [success, setSuccess] = useState("");
   const [editMode, setEditMode] = useState(false);
   const [editId, setEditId] = useState(null);
-  const [loading, setLoading] = useState(true); // Nuevo estado de carga
+  const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   // Categorías predefinidas
@@ -44,7 +44,7 @@ const CrearMedicionPorristas = () => {
 
   // Cargar entrenadores y mediciones al montar el componente
   const fetchData = async () => {
-    setLoading(true); // Iniciar carga
+    setLoading(true);
     try {
       console.log("Iniciando fetch de entrenadores y mediciones...");
       const [entrenadoresResponse, medicionesResponse] = await Promise.all([
@@ -52,6 +52,7 @@ const CrearMedicionPorristas = () => {
         obtenerMedicionesPorristas()
       ]);
       console.log("Entrenadores recibidos:", entrenadoresResponse.data);
+      entrenadoresResponse.data.forEach(e => console.log(`Entrenador ${e._id}: especialidad =`, e.especialidad));
       console.log("Mediciones recibidas:", medicionesResponse.data);
       setEntrenadores(entrenadoresResponse.data);
       setMediciones(medicionesResponse.data);
@@ -59,7 +60,7 @@ const CrearMedicionPorristas = () => {
       console.error("Error al cargar datos:", err);
       setError("Error al cargar datos: " + (err.response?.data?.mensaje || err.message));
     } finally {
-      setLoading(false); // Finalizar carga
+      setLoading(false);
     }
   };
 
@@ -68,10 +69,12 @@ const CrearMedicionPorristas = () => {
   }, []);
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+    const { name, value } = e.target;
+    console.log(`Cambiando ${name} a:`, value);
+    setFormData(prev => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -122,6 +125,7 @@ const CrearMedicionPorristas = () => {
   };
 
   const equiposPorEntrenador = entrenadores.find(e => e._id === formData.entrenadorId)?.especialidad || [];
+  console.log("Equipos disponibles para entrenador seleccionado:", equiposPorEntrenador);
 
   return (
     <Container className="mt-4">
@@ -146,6 +150,7 @@ const CrearMedicionPorristas = () => {
                 </option>
               ))}
             </Form.Select>
+          </Form.Select>
           </Form.Group>
 
           <Form.Group className="mb-3">
@@ -155,14 +160,18 @@ const CrearMedicionPorristas = () => {
               value={formData.equipo}
               onChange={handleChange}
               required
-              disabled={!formData.entrenadorId}
+              disabled={!formData.entrenadorId || !Array.isArray(equiposPorEntrenador) || equiposPorEntrenador.length === 0}
             >
               <option value="">Seleccione un equipo</option>
-              {equiposPorEntrenador.map((equipo, index) => (
-                <option key={index} value={equipo}>
-                  {equipo}
-                </option>
-              ))}
+              {Array.isArray(equiposPorEntrenador) && equiposPorEntrenador.length > 0 ? (
+                equiposPorEntrenador.map((equipo, index) => (
+                  <option key={index} value={equipo}>
+                    {equipo}
+                  </option>
+                ))
+              ) : (
+                <option value="" disabled>No hay equipos disponibles</option>
+              )}
             </Form.Select>
           </Form.Group>
 
