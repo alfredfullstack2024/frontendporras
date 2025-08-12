@@ -75,6 +75,9 @@ import VideosEntrenamiento from "./pages/videos/VideosEntrenamiento";
 // Nueva página
 import AdminInscripciones from "./pages/admin/AdminInscripciones";
 
+// Medición Porristas
+import CrearMedicionPorristas from "./pages/medicionPorristas/CrearMedicionPorristas";
+
 // Componente para proteger rutas basadas en roles
 const RoleBasedRoute = ({ element, allowedRoles }) => {
   const { user } = useAuth();
@@ -314,6 +317,15 @@ const App = () => {
             element={
               <RoleBasedRoute
                 element={<ComposicionCorporal />}
+                allowedRoles={["entrenador", "admin"]}
+              />
+            }
+          />
+          <Route
+            path="/medicion-porristas"
+            element={
+              <RoleBasedRoute
+                element={<CrearMedicionPorristas />}
                 allowedRoles={["entrenador", "admin"]}
               />
             }
