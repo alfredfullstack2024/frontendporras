@@ -45,6 +45,7 @@ const DashboardLayout = () => {
       { path: "/usuarios", icon: <FaUsersCog />, label: "Usuarios" },
       { path: "/indicadores", icon: <FaChartBar />, label: "Indicadores" },
       { path: "/videos-entrenamiento", icon: <FaVideo />, label: "Asesoramiento Ejercicios" },
+      { path: "/medicion-porristas", icon: <FaDumbbell />, label: "Medición Porristas" },
     ],
     recepcionista: [
       { path: "/dashboard", icon: <FaTachometerAlt />, label: "Dashboard" },
@@ -54,13 +55,14 @@ const DashboardLayout = () => {
       { path: "/productos", icon: <FaShoppingCart />, label: "Productos" },
       { path: "/pagos", icon: <FaMoneyBillWave />, label: "Pagos" },
       { path: "/clases", icon: <FaDumbbell />, label: "Clases" },
-      ],
+    ],
     entrenador: [
       { path: "/dashboard", icon: <FaTachometerAlt />, label: "Dashboard" },
       { path: "/rutinas/crear", icon: <FaDumbbell />, label: "Crear rutina" },
       { path: "/rutinas/asignar", icon: <FaPlus />, label: "Asignar rutina" },
       { path: "/rutinas/editar-asignacion", icon: <FaEdit />, label: "Editar Asignación Rutina" },
       { path: "/composicion-corporal", icon: <FaUser />, label: "Composición Corporal" },
+      { path: "/medicion-porristas", icon: <FaDumbbell />, label: "Medición Porristas" },
     ],
     user: [
       { path: "/rutinas/consultar", icon: <FaSearch />, label: "Consultar Rutina" },
