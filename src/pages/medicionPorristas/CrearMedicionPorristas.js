@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+  import React, { useState, useEffect } from "react";
 import { crearMedicionPorristas, obtenerMedicionesPorristas, editarMedicionPorristas, obtenerEntrenadores } from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 import { Container, Form, Button, Table, Alert } from "react-bootstrap";
@@ -67,6 +67,14 @@ const CrearMedicionPorristas = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Actualizar equipo cuando cambie el entrenador
+  useEffect(() => {
+    if (formData.entrenadorId && !entrenadores.find(e => e._id === formData.entrenadorId)?.especialidad?.length) {
+      setFormData(prev => ({ ...prev, equipo: "" }));
+      console.log("Reiniciando equipo: no hay especialidades para el entrenador seleccionado");
+    }
+  }, [formData.entrenadorId, entrenadores]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
