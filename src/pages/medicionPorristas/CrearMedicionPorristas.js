@@ -7,7 +7,7 @@ const CrearMedicionPorristas = () => {
   const [formData, setFormData] = useState({
     clienteId: "",
     entrenadorId: "",
-    equipo: "", // Mantenido para el modelo, pero cargado como especialidad
+    equipo: "",
     categoria: "",
     posicion: "",
     ejercicios: [],
@@ -67,6 +67,21 @@ const CrearMedicionPorristas = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
+  // Actualizar equipo (especialidad) al cambiar el entrenador
+  useEffect(() => {
+    if (formData.entrenadorId) {
+      const entrenador = entrenadores.find(e => e._id === formData.entrenadorId);
+      const especialidades = Array.isArray(entrenador?.especialidad) ? entrenador.especialidad : [];
+      console.log("Entrenador:", entrenador?.nombre, "Especialidades:", especialidades);
+      setFormData(prev => ({
+        ...prev,
+        equipo: especialidades.length > 0 ? especialidades[0] : "",
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, equipo: "" }));
+    }
+  }, [formData.entrenadorId, entrenadores]);
 
   const handleChange = (e) => {
     setFormData({
@@ -155,7 +170,8 @@ const CrearMedicionPorristas = () => {
     });
   };
 
-  const especialidadesPorEntrenador = entrenadores.find(e => e._id === formData.entrenadorId)?.especialidad || [];
+  const especialidadesPorEntrenador = Array.isArray(entrenadores.find(e => e._id === formData.entrenadorId)?.especialidad) ? entrenadores.find(e => e._id === formData.entrenadorId)?.especialidad : [];
+  console.log("Especialidades disponibles:", especialidadesPorEntrenador);
 
   return (
     <Container className="mt-4">
@@ -209,11 +225,15 @@ const CrearMedicionPorristas = () => {
               disabled={!formData.entrenadorId}
             >
               <option value="">Seleccione una especialidad</option>
-              {especialidadesPorEntrenador.map((esp, index) => (
-                <option key={index} value={esp}>
-                  {esp}
-                </option>
-              ))}
+              {Array.isArray(especialidadesPorEntrenador) && especialidadesPorEntrenador.length > 0 ? (
+                especialidadesPorEntrenador.map((esp, index) => (
+                  <option key={index} value={esp}>
+                    {esp}
+                  </option>
+                ))
+              ) : (
+                <option value="" disabled>No hay especialidades disponibles</option>
+              )}
             </Form.Select>
           </Form.Group>
 
