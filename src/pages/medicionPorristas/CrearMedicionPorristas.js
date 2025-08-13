@@ -24,7 +24,6 @@ const CrearMedicionPorristas = () => {
   const [nuevoEjercicio, setNuevoEjercicio] = useState({ nombre: "", calificacion: "" });
   const navigate = useNavigate();
 
-  // Categorías predefinidas
   const categorias = [
     "1.1 MINI", "1.1 YOUTH", "1.1 SENIOR", "2.1 JUNIOR", "2.1 OPEN", "2.2 JUNIOR", "2.2 SENIOR",
     "1 TINY", "1 MINI", "1 YOUTH", "1 JUNIOR", "1 SENIOR", "2 YOUTH", "2 JUNIOR", "2 SENIOR",
@@ -33,10 +32,8 @@ const CrearMedicionPorristas = () => {
     "6 OPEN", "7.5 OPEN", "7 OPEN"
   ];
 
-  // Posiciones predefinidas
   const posiciones = ["Flyer", "Base", "Spotter", "Backspot", "Frontspot"];
 
-  // Verificar token al cargar el componente
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -45,7 +42,6 @@ const CrearMedicionPorristas = () => {
     }
   }, [navigate]);
 
-  // Cargar clientes, entrenadores y mediciones
   const fetchData = async () => {
     setLoading(true);
     try {
@@ -68,15 +64,14 @@ const CrearMedicionPorristas = () => {
     fetchData();
   }, []);
 
-  // Actualizar equipo (especialidad) al cambiar el entrenador
   useEffect(() => {
     if (formData.entrenadorId) {
       const entrenador = entrenadores.find(e => e._id === formData.entrenadorId);
-      const especialidades = Array.isArray(entrenador?.especialidad) ? entrenador.especialidad : [];
+      const especialidades = Array.isArray(entrenador?.especialidad) ? entrenador.especialidad : [entrenador?.especialidad || "Sin especialidad"];
       console.log("Entrenador seleccionado:", entrenador?.nombre, "Especialidades:", especialidades);
       setFormData(prev => ({
         ...prev,
-        equipo: especialidades.length > 0 ? especialidades[0] : "",
+        equipo: especialidades.length > 0 ? especialidades[0] : "Sin especialidad",
       }));
     } else {
       setFormData(prev => ({ ...prev, equipo: "" }));
@@ -116,7 +111,6 @@ const CrearMedicionPorristas = () => {
     }));
   };
 
-  // Cálculo de ponderación con useMemo
   const ponderacion = useMemo(() => {
     if (formData.ejercicios.length === 0) return 0;
     const sum = formData.ejercicios.reduce((acc, ej) => acc + (ej.calificacion || 0), 0);
@@ -170,7 +164,7 @@ const CrearMedicionPorristas = () => {
     });
   };
 
-  const especialidadesPorEntrenador = Array.isArray(entrenadores.find(e => e._id === formData.entrenadorId)?.especialidad) ? entrenadores.find(e => e._id === formData.entrenadorId)?.especialidad : [];
+  const especialidadesPorEntrenador = Array.isArray(entrenadores.find(e => e._id === formData.entrenadorId)?.especialidad) ? entrenadores.find(e => e._id === formData.entrenadorId)?.especialidad : [entrenadores.find(e => e._id === formData.entrenadorId)?.especialidad || "Sin especialidad"];
   console.log("Especialidades disponibles:", especialidadesPorEntrenador);
 
   return (
@@ -232,7 +226,7 @@ const CrearMedicionPorristas = () => {
                   </option>
                 ))
               ) : (
-                <option value="" disabled>No hay especialidades disponibles</option>
+                <option value="Sin especialidad">Sin especialidad</option>
               )}
             </Form.Select>
           </Form.Group>
