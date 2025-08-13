@@ -101,7 +101,7 @@ const CrearMedicionPorristas = () => {
     if (nuevoEjercicio.nombre && nuevoEjercicio.calificacion >= 1 && nuevoEjercicio.calificacion <= 10) {
       setFormData(prev => ({
         ...prev,
-        ejercicios: [...prev.ejercicios, nuevoEjercicio],
+        ejercicios: [...prev.ejercicios, { ...nuevoEjercicio }],
       }));
       setNuevoEjercicio({ nombre: "", calificacion: "" });
     } else {
@@ -116,13 +116,14 @@ const CrearMedicionPorristas = () => {
     }));
   };
 
+  // Cálculo de ponderación con useMemo
   const ponderacion = useMemo(() => {
     if (formData.ejercicios.length === 0) return 0;
-    const sum = formData.ejercicios.reduce((acc, ej) => acc + ej.calificacion, 0);
+    const sum = formData.ejercicios.reduce((acc, ej) => acc + (ej.calificacion || 0), 0);
     return (sum / formData.ejercicios.length).toFixed(2);
   }, [formData.ejercicios]);
 
-  const pasaNivel = ponderacion >= 7;
+  const pasaNivel = Number(ponderacion) >= 7;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -164,7 +165,7 @@ const CrearMedicionPorristas = () => {
       equipo: medicion.equipo,
       categoria: medicion.categoria,
       posicion: medicion.posicion,
-      ejercicios: medicion.ejercicios,
+      ejercicios: medicion.ejercicios || [],
       descripcion: medicion.descripcion || "",
     });
   };
@@ -224,11 +225,15 @@ const CrearMedicionPorristas = () => {
               disabled={!formData.entrenadorId}
             >
               <option value="">Seleccione una especialidad</option>
-              {especialidadesPorEntrenador.map((esp, index) => (
-                <option key={index} value={esp}>
-                  {esp}
-                </option>
-              ))}
+              {especialidadesPorEntrenador.length > 0 ? (
+                especialidadesPorEntrenador.map((esp, index) => (
+                  <option key={index} value={esp}>
+                    {esp}
+                  </option>
+                ))
+              ) : (
+                <option value="" disabled>No hay especialidades disponibles</option>
+              )}
             </Form.Select>
           </Form.Group>
 
