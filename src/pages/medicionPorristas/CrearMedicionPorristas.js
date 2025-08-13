@@ -1,16 +1,19 @@
-  import React, { useState, useEffect } from "react";
-import { crearMedicionPorristas, obtenerMedicionesPorristas, editarMedicionPorristas, obtenerEntrenadores } from "../../api/axios";
+import React, { useState, useEffect } from "react";
+import { crearMedicionPorristas, obtenerMedicionesPorristas, editarMedicionPorristas, obtenerEntrenadores, obtenerClientes } from "../../api/axios";
 import { useNavigate } from "react-router-dom";
-import { Container, Form, Button, Table, Alert } from "react-bootstrap";
+import { Container, Form, Button, Table, Alert, Row, Col, InputGroup } from "react-bootstrap";
 
 const CrearMedicionPorristas = () => {
   const [formData, setFormData] = useState({
+    clienteId: "",
     entrenadorId: "",
     equipo: "",
     categoria: "",
     posicion: "",
+    ejercicios: [],
     descripcion: "",
   });
+  const [clientes, setClientes] = useState([]);
   const [entrenadores, setEntrenadores] = useState([]);
   const [mediciones, setMediciones] = useState([]);
   const [error, setError] = useState("");
@@ -18,6 +21,7 @@ const CrearMedicionPorristas = () => {
   const [editMode, setEditMode] = useState(false);
   const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [nuevoEjercicio, setNuevoEjercicio] = useState({ nombre: "", calificacion: "" });
   const navigate = useNavigate();
 
   // Categorías predefinidas
@@ -35,30 +39,26 @@ const CrearMedicionPorristas = () => {
   // Verificar token al cargar el componente
   useEffect(() => {
     const token = localStorage.getItem("token");
-    console.log("Token verificado:", token ? "Presente" : "Ausente");
     if (!token) {
       setError("Debes iniciar sesión para crear una medición.");
       navigate("/login");
     }
   }, [navigate]);
 
-  // Cargar entrenadores y mediciones al montar el componente
+  // Cargar clientes, entrenadores y mediciones
   const fetchData = async () => {
     setLoading(true);
     try {
-      console.log("Iniciando fetch de entrenadores y mediciones...");
-      const [entrenadoresResponse, medicionesResponse] = await Promise.all([
+      const [clientesResponse, entrenadoresResponse, medicionesResponse] = await Promise.all([
+        obtenerClientes(),
         obtenerEntrenadores(),
         obtenerMedicionesPorristas()
       ]);
-      console.log("Entrenadores recibidos:", entrenadoresResponse.data);
-      entrenadoresResponse.data.forEach(e => console.log(`Entrenador ${e._id}: especialidad =`, e.especialidad));
-      console.log("Mediciones recibidas:", medicionesResponse.data);
+      setClientes(clientesResponse.data);
       setEntrenadores(entrenadoresResponse.data);
       setMediciones(medicionesResponse.data);
     } catch (err) {
-      console.error("Error al cargar datos:", err);
-      setError("Error al cargar datos: " + (err.response?.data?.mensaje || err.message));
+      setError("Error al cargar datos: " + err.message);
     } finally {
       setLoading(false);
     }
@@ -68,22 +68,47 @@ const CrearMedicionPorristas = () => {
     fetchData();
   }, []);
 
-  // Actualizar equipo cuando cambie el entrenador
-  useEffect(() => {
-    if (formData.entrenadorId && !entrenadores.find(e => e._id === formData.entrenadorId)?.especialidad?.length) {
-      setFormData(prev => ({ ...prev, equipo: "" }));
-      console.log("Reiniciando equipo: no hay especialidades para el entrenador seleccionado");
-    }
-  }, [formData.entrenadorId, entrenadores]);
-
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    console.log(`Cambiando ${name} a:`, value);
-    setFormData(prev => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
   };
+
+  const handleEjercicioChange = (e) => {
+    setNuevoEjercicio({
+      ...nuevoEjercicio,
+      [e.target.name]: e.target.name === "calificacion" ? Number(e.target.value) : e.target.value,
+    });
+  };
+
+  const añadirEjercicio = () => {
+    if (nuevoEjercicio.nombre && nuevoEjercicio.calificacion >= 1 && nuevoEjercicio.calificacion <= 10) {
+      setFormData({
+        ...formData,
+        ejercicios: [...formData.ejercicios, nuevoEjercicio],
+      });
+      setNuevoEjercicio({ nombre: "", calificacion: "" });
+    } else {
+      setError("El ejercicio debe tener nombre y calificación entre 1 y 10.");
+    }
+  };
+
+  const eliminarEjercicio = (index) => {
+    const ejerciciosActualizados = formData.ejercicios.filter((_, i) => i !== index);
+    setFormData({
+      ...formData,
+      ejercicios: ejerciciosActualizados,
+    });
+  };
+
+  const calcularPonderacion = () => {
+    if (formData.ejercicios.length === 0) return 0;
+    const sum = formData.ejercicios.reduce((acc, ej) => acc + ej.calificacion, 0);
+    return (sum / formData.ejercicios.length).toFixed(2);
+  };
+
+  const pasaNivel = calcularPonderacion() >= 7;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -102,21 +127,17 @@ const CrearMedicionPorristas = () => {
       }
 
       setFormData({
+        clienteId: "",
         entrenadorId: "",
         equipo: "",
         categoria: "",
         posicion: "",
+        ejercicios: [],
         descripcion: "",
       });
       fetchData();
     } catch (err) {
-      if (err.response?.status === 401) {
-        setError("Sesión expirada. Por favor, inicia sesión de nuevo.");
-        localStorage.removeItem("token");
-        navigate("/login");
-      } else {
-        setError(err.response?.data?.mensaje || "Error al procesar la medición.");
-      }
+      setError(err.response?.data?.mensaje || "Error al procesar la medición.");
     }
   };
 
@@ -124,16 +145,17 @@ const CrearMedicionPorristas = () => {
     setEditMode(true);
     setEditId(medicion._id);
     setFormData({
-      entrenadorId: medicion.entrenadorId?._id || "",
-      equipo: medicion.equipo || "",
-      categoria: medicion.categoria || "",
-      posicion: medicion.posicion || "",
+      clienteId: medicion.clienteId._id,
+      entrenadorId: medicion.entrenadorId._id,
+      equipo: medicion.equipo,
+      categoria: medicion.categoria,
+      posicion: medicion.posicion,
+      ejercicios: medicion.ejercicios,
       descripcion: medicion.descripcion || "",
     });
   };
 
   const equiposPorEntrenador = entrenadores.find(e => e._id === formData.entrenadorId)?.especialidad || [];
-  console.log("Equipos disponibles para entrenador seleccionado:", equiposPorEntrenador);
 
   return (
     <Container className="mt-4">
@@ -143,6 +165,23 @@ const CrearMedicionPorristas = () => {
       {success && <Alert variant="success">{success}</Alert>}
       {!loading && (
         <Form onSubmit={handleSubmit}>
+          <Form.Group className="mb-3">
+            <Form.Label>Deportista (Cliente)</Form.Label>
+            <Form.Select
+              name="clienteId"
+              value={formData.clienteId}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Seleccione un cliente</option>
+              {clientes.map((cliente) => (
+                <option key={cliente._id} value={cliente._id}>
+                  {cliente.nombre}
+                </option>
+              ))}
+            </Form.Select>
+          </Form.Group>
+
           <Form.Group className="mb-3">
             <Form.Label>Entrenador</Form.Label>
             <Form.Select
@@ -167,18 +206,14 @@ const CrearMedicionPorristas = () => {
               value={formData.equipo}
               onChange={handleChange}
               required
-              disabled={!formData.entrenadorId || !Array.isArray(equiposPorEntrenador) || equiposPorEntrenador.length === 0}
+              disabled={!formData.entrenadorId}
             >
               <option value="">Seleccione un equipo</option>
-              {Array.isArray(equiposPorEntrenador) && equiposPorEntrenador.length > 0 ? (
-                equiposPorEntrenador.map((equipo, index) => (
-                  <option key={index} value={equipo}>
-                    {equipo}
-                  </option>
-                ))
-              ) : (
-                <option value="" disabled>No hay equipos disponibles</option>
-              )}
+              {equiposPorEntrenador.map((equipo, index) => (
+                <option key={index} value={equipo}>
+                  {equipo}
+                </option>
+              ))}
             </Form.Select>
           </Form.Group>
 
@@ -217,6 +252,65 @@ const CrearMedicionPorristas = () => {
           </Form.Group>
 
           <Form.Group className="mb-3">
+            <Form.Label>Ejercicios</Form.Label>
+            <Row>
+              <Col md={6}>
+                <Form.Control
+                  type="text"
+                  name="nombre"
+                  placeholder="Nombre del ejercicio"
+                  value={nuevoEjercicio.nombre}
+                  onChange={handleEjercicioChange}
+                />
+              </Col>
+              <Col md={3}>
+                <Form.Control
+                  type="number"
+                  name="calificacion"
+                  placeholder="Calificación (1-10)"
+                  value={nuevoEjercicio.calificacion}
+                  onChange={handleEjercicioChange}
+                  min={1}
+                  max={10}
+                />
+              </Col>
+              <Col md={3}>
+                <Button variant="secondary" onClick={añadirEjercicio}>
+                  Añadir Ejercicio
+                </Button>
+              </Col>
+            </Row>
+            {formData.ejercicios.length > 0 && (
+              <Table striped bordered hover className="mt-3">
+                <thead>
+                  <tr>
+                    <th>Nombre</th>
+                    <th>Calificación</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {formData.ejercicios.map((ej, index) => (
+                    <tr key={index}>
+                      <td>{ej.nombre}</td>
+                      <td>{ej.calificacion}</td>
+                      <td>
+                        <Button variant="danger" size="sm" onClick={() => eliminarEjercicio(index)}>
+                          Eliminar
+                        </Button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </Table>
+            )}
+          </Form.Group>
+
+          <Alert variant="info">
+            Ponderación: {calcularPonderacion()} - {pasaNivel ? "Pasa Nivel" : "No Pasa Nivel"}
+          </Alert>
+
+          <Form.Group className="mb-3">
             <Form.Label>Descripción (Opcional)</Form.Label>
             <Form.Control
               as="textarea"
@@ -238,10 +332,12 @@ const CrearMedicionPorristas = () => {
                 setEditMode(false);
                 setEditId(null);
                 setFormData({
+                  clienteId: "",
                   entrenadorId: "",
                   equipo: "",
                   categoria: "",
                   posicion: "",
+                  ejercicios: [],
                   descripcion: "",
                 });
               }}
@@ -260,10 +356,13 @@ const CrearMedicionPorristas = () => {
           <Table striped bordered hover>
             <thead>
               <tr>
+                <th>Deportista</th>
                 <th>Entrenador</th>
                 <th>Equipo</th>
                 <th>Categoría</th>
                 <th>Posición</th>
+                <th>Ponderación</th>
+                <th>Pasa Nivel</th>
                 <th>Descripción</th>
                 <th>Creado Por</th>
                 <th>Acciones</th>
@@ -272,10 +371,13 @@ const CrearMedicionPorristas = () => {
             <tbody>
               {mediciones.map((medicion) => (
                 <tr key={medicion._id}>
+                  <td>{medicion.clienteId?.nombre || "Desconocido"}</td>
                   <td>{medicion.entrenadorId?.nombre || "Desconocido"}</td>
                   <td>{medicion.equipo}</td>
                   <td>{medicion.categoria}</td>
                   <td>{medicion.posicion}</td>
+                  <td>{medicion.ponderacion}</td>
+                  <td>{medicion.pasaNivel ? "Sí" : "No"}</td>
                   <td>{medicion.descripcion || "N/A"}</td>
                   <td>{medicion.creadoPor?.nombre || "Desconocido"}</td>
                   <td>
