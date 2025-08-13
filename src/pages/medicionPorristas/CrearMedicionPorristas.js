@@ -68,6 +68,18 @@ const CrearMedicionPorristas = () => {
     fetchData();
   }, []);
 
+  // Actualizar equipo cuando cambie el entrenador
+  useEffect(() => {
+    if (formData.entrenadorId) {
+      const entrenador = entrenadores.find(e => e._id === formData.entrenadorId);
+      const equipos = entrenador?.especialidad || [];
+      console.log("Entrenador seleccionado:", entrenador?.nombre, "Especialidad:", equipos);
+      if (!Array.isArray(equipos) || equipos.length === 0) {
+        setFormData(prev => ({ ...prev, equipo: "" }));
+      }
+    }
+  }, [formData.entrenadorId, entrenadores]);
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -156,6 +168,7 @@ const CrearMedicionPorristas = () => {
   };
 
   const equiposPorEntrenador = entrenadores.find(e => e._id === formData.entrenadorId)?.especialidad || [];
+  console.log("Equipos disponibles:", equiposPorEntrenador);
 
   return (
     <Container className="mt-4">
@@ -209,11 +222,15 @@ const CrearMedicionPorristas = () => {
               disabled={!formData.entrenadorId}
             >
               <option value="">Seleccione un equipo</option>
-              {equiposPorEntrenador.map((equipo, index) => (
-                <option key={index} value={equipo}>
-                  {equipo}
-                </option>
-              ))}
+              {Array.isArray(equiposPorEntrenador) && equiposPorEntrenador.length > 0 ? (
+                equiposPorEntrenador.map((equipo, index) => (
+                  <option key={index} value={equipo}>
+                    {equipo}
+                  </option>
+                ))
+              ) : (
+                <option value="" disabled>No hay equipos disponibles</option>
+              )}
             </Form.Select>
           </Form.Group>
 
