@@ -199,6 +199,7 @@ export const consultarComposicionPorCliente = (identificacion, config) =>
 export const crearMedicionPorristas = (data, config) => api.post("/medicion-porristas", data, config);
 export const obtenerMedicionesPorristas = (config) => api.get("/medicion-porristas", config);
 export const editarMedicionPorristas = (id, data, config) => api.put(`/medicion-porristas/${id}`, data, config);
+export const eliminarMedicionPorristas = (id, config) => api.delete(`/medicion-porristas/${id}`, config); // Nueva función
 
 // Funciones exportadas para autenticación
 export const login = (data) => api.post("/auth/login", data);
