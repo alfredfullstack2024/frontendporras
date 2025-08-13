@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { crearMedicionPorristas, obtenerMedicionesPorristas, editarMedicionPorristas, obtenerEntrenadores, obtenerClientes } from "../../api/axios";
+import { crearMedicionPorristas, obtenerMedicionesPorristas, editarMedicionPorristas, eliminarMedicionPorristas, obtenerEntrenadores, obtenerClientes } from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 import { Container, Form, Button, Table, Alert, Row, Col } from "react-bootstrap";
 
@@ -164,6 +164,16 @@ const CrearMedicionPorristas = () => {
     });
   };
 
+  const eliminarMedicion = async (id) => {
+    try {
+      await eliminarMedicionPorristas(id);
+      setSuccess("Medición eliminada con éxito!");
+      fetchData(); // Recarga las mediciones
+    } catch (err) {
+      setError("Error al eliminar la medición: " + err.message);
+    }
+  };
+
   const especialidadesPorEntrenador = Array.isArray(entrenadores.find(e => e._id === formData.entrenadorId)?.especialidad) ? entrenadores.find(e => e._id === formData.entrenadorId)?.especialidad : [entrenadores.find(e => e._id === formData.entrenadorId)?.especialidad || "Sin especialidad"];
   console.log("Especialidades disponibles:", especialidadesPorEntrenador);
 
@@ -186,7 +196,7 @@ const CrearMedicionPorristas = () => {
               <option value="">Seleccione un cliente</option>
               {clientes.map((cliente) => (
                 <option key={cliente._id} value={cliente._id}>
-                  {cliente.nombre}
+                  {cliente.nombre + " " + cliente.apellido}
                 </option>
               ))}
             </Form.Select>
@@ -203,7 +213,7 @@ const CrearMedicionPorristas = () => {
               <option value="">Seleccione un entrenador</option>
               {entrenadores.map((entrenador) => (
                 <option key={entrenador._id} value={entrenador._id}>
-                  {entrenador.nombre}
+                  {entrenador.nombre + " " + entrenador.apellido}
                 </option>
               ))}
             </Form.Select>
@@ -385,8 +395,8 @@ const CrearMedicionPorristas = () => {
             <tbody>
               {mediciones.map((medicion) => (
                 <tr key={medicion._id}>
-                  <td>{medicion.clienteId?.nombre || "Desconocido"}</td>
-                  <td>{medicion.entrenadorId?.nombre || "Desconocido"}</td>
+                  <td>{medicion.clienteId?.nombre + " " + medicion.clienteId?.apellido || "Desconocido"}</td>
+                  <td>{medicion.entrenadorId?.nombre + " " + medicion.entrenadorId?.apellido || "Desconocido"}</td>
                   <td>{medicion.equipo}</td>
                   <td>{medicion.categoria}</td>
                   <td>{medicion.posicion}</td>
@@ -399,8 +409,16 @@ const CrearMedicionPorristas = () => {
                       variant="warning"
                       size="sm"
                       onClick={() => handleEdit(medicion)}
+                      className="me-2"
                     >
                       Editar
+                    </Button>
+                    <Button
+                      variant="danger"
+                      size="sm"
+                      onClick={() => eliminarMedicion(medicion._id)}
+                    >
+                      Eliminar
                     </Button>
                   </td>
                 </tr>
