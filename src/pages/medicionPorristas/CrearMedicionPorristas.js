@@ -45,19 +45,22 @@ const CrearMedicionPorristas = () => {
     }
   }, [navigate]);
 
-  // Cargar clientes, entrenadores y mediciones
+  // Cargar datos iniciales
   const fetchData = async () => {
     setLoading(true);
     try {
+      console.log("Iniciando carga de datos...");
       const [clientesResponse, entrenadoresResponse, medicionesResponse] = await Promise.all([
         obtenerClientes(),
         obtenerEntrenadores(),
         obtenerMedicionesPorristas()
       ]);
+      console.log("Entrenadores cargados:", entrenadoresResponse.data);
       setClientes(clientesResponse.data);
       setEntrenadores(entrenadoresResponse.data);
       setMediciones(medicionesResponse.data);
     } catch (err) {
+      console.error("Error al cargar datos:", err);
       setError("Error al cargar datos: " + err.message);
     } finally {
       setLoading(false);
@@ -73,7 +76,7 @@ const CrearMedicionPorristas = () => {
     if (formData.entrenadorId) {
       const entrenador = entrenadores.find(e => e._id === formData.entrenadorId);
       const especialidades = Array.isArray(entrenador?.especialidad) ? entrenador.especialidad : [];
-      console.log("Entrenador:", entrenador?.nombre, "Especialidades:", especialidades);
+      console.log("Entrenador seleccionado:", entrenador?.nombre, "Especialidades:", especialidades);
       setFormData(prev => ({
         ...prev,
         equipo: especialidades.length > 0 ? especialidades[0] : "",
@@ -179,7 +182,7 @@ const CrearMedicionPorristas = () => {
       {loading && <Alert variant="info">Cargando datos...</Alert>}
       {error && <Alert variant="danger">{error}</Alert>}
       {success && <Alert variant="success">{success}</Alert>}
-      {!loading && (
+      {!loading && entrenadores.length > 0 && (
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
             <Form.Label>Deportista (Cliente)</Form.Label>
