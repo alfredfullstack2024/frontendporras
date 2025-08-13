@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { crearMedicionPorristas, obtenerMedicionesPorristas, editarMedicionPorristas, obtenerEntrenadores, obtenerClientes } from "../../api/axios";
 import { useNavigate } from "react-router-dom";
-import { Container, Form, Button, Table, Alert, Row, Col, InputGroup } from "react-bootstrap";
+import { Container, Form, Button, Table, Alert, Row, Col } from "react-bootstrap";
 
 const CrearMedicionPorristas = () => {
   const [formData, setFormData] = useState({
     clienteId: "",
     entrenadorId: "",
-    equipo: "",
+    equipo: "", // Mantenido para el modelo, pero cargado como especialidad
     categoria: "",
     posicion: "",
     ejercicios: [],
@@ -67,18 +67,6 @@ const CrearMedicionPorristas = () => {
   useEffect(() => {
     fetchData();
   }, []);
-
-  // Actualizar equipo cuando cambie el entrenador
-  useEffect(() => {
-    if (formData.entrenadorId) {
-      const entrenador = entrenadores.find(e => e._id === formData.entrenadorId);
-      const equipos = entrenador?.especialidad || [];
-      console.log("Entrenador seleccionado:", entrenador?.nombre, "Especialidad:", equipos);
-      if (!Array.isArray(equipos) || equipos.length === 0) {
-        setFormData(prev => ({ ...prev, equipo: "" }));
-      }
-    }
-  }, [formData.entrenadorId, entrenadores]);
 
   const handleChange = (e) => {
     setFormData({
@@ -167,8 +155,7 @@ const CrearMedicionPorristas = () => {
     });
   };
 
-  const equiposPorEntrenador = entrenadores.find(e => e._id === formData.entrenadorId)?.especialidad || [];
-  console.log("Equipos disponibles:", equiposPorEntrenador);
+  const especialidadesPorEntrenador = entrenadores.find(e => e._id === formData.entrenadorId)?.especialidad || [];
 
   return (
     <Container className="mt-4">
@@ -213,7 +200,7 @@ const CrearMedicionPorristas = () => {
           </Form.Group>
 
           <Form.Group className="mb-3">
-            <Form.Label>Equipo</Form.Label>
+            <Form.Label>Especialidad</Form.Label>
             <Form.Select
               name="equipo"
               value={formData.equipo}
@@ -221,16 +208,12 @@ const CrearMedicionPorristas = () => {
               required
               disabled={!formData.entrenadorId}
             >
-              <option value="">Seleccione un equipo</option>
-              {Array.isArray(equiposPorEntrenador) && equiposPorEntrenador.length > 0 ? (
-                equiposPorEntrenador.map((equipo, index) => (
-                  <option key={index} value={equipo}>
-                    {equipo}
-                  </option>
-                ))
-              ) : (
-                <option value="" disabled>No hay equipos disponibles</option>
-              )}
+              <option value="">Seleccione una especialidad</option>
+              {especialidadesPorEntrenador.map((esp, index) => (
+                <option key={index} value={esp}>
+                  {esp}
+                </option>
+              ))}
             </Form.Select>
           </Form.Group>
 
@@ -375,7 +358,7 @@ const CrearMedicionPorristas = () => {
               <tr>
                 <th>Deportista</th>
                 <th>Entrenador</th>
-                <th>Equipo</th>
+                <th>Especialidad</th>
                 <th>Categoría</th>
                 <th>Posición</th>
                 <th>Ponderación</th>
