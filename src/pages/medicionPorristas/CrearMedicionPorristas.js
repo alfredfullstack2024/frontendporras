@@ -415,4 +415,3 @@ const CrearMedicionPorristas = () => {
 };
 
 export default CrearMedicionPorristas;
-</xaiArtifact>
