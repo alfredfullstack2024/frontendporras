@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { crearMedicionPorristas, obtenerMedicionesPorristas, editarMedicionPorristas, obtenerEntrenadores, obtenerClientes } from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 import { Container, Form, Button, Table, Alert, Row, Col } from "react-bootstrap";
@@ -45,22 +45,19 @@ const CrearMedicionPorristas = () => {
     }
   }, [navigate]);
 
-  // Cargar datos iniciales
+  // Cargar clientes, entrenadores y mediciones
   const fetchData = async () => {
     setLoading(true);
     try {
-      console.log("Iniciando carga de datos...");
       const [clientesResponse, entrenadoresResponse, medicionesResponse] = await Promise.all([
         obtenerClientes(),
         obtenerEntrenadores(),
         obtenerMedicionesPorristas()
       ]);
-      console.log("Entrenadores cargados:", entrenadoresResponse.data);
       setClientes(clientesResponse.data);
       setEntrenadores(entrenadoresResponse.data);
       setMediciones(medicionesResponse.data);
     } catch (err) {
-      console.error("Error al cargar datos:", err);
       setError("Error al cargar datos: " + err.message);
     } finally {
       setLoading(false);
@@ -102,10 +99,10 @@ const CrearMedicionPorristas = () => {
 
   const añadirEjercicio = () => {
     if (nuevoEjercicio.nombre && nuevoEjercicio.calificacion >= 1 && nuevoEjercicio.calificacion <= 10) {
-      setFormData({
-        ...formData,
-        ejercicios: [...formData.ejercicios, nuevoEjercicio],
-      });
+      setFormData(prev => ({
+        ...prev,
+        ejercicios: [...prev.ejercicios, nuevoEjercicio],
+      }));
       setNuevoEjercicio({ nombre: "", calificacion: "" });
     } else {
       setError("El ejercicio debe tener nombre y calificación entre 1 y 10.");
@@ -113,20 +110,19 @@ const CrearMedicionPorristas = () => {
   };
 
   const eliminarEjercicio = (index) => {
-    const ejerciciosActualizados = formData.ejercicios.filter((_, i) => i !== index);
-    setFormData({
-      ...formData,
-      ejercicios: ejerciciosActualizados,
-    });
+    setFormData(prev => ({
+      ...prev,
+      ejercicios: prev.ejercicios.filter((_, i) => i !== index),
+    }));
   };
 
-  const calcularPonderacion = () => {
+  const ponderacion = useMemo(() => {
     if (formData.ejercicios.length === 0) return 0;
     const sum = formData.ejercicios.reduce((acc, ej) => acc + ej.calificacion, 0);
     return (sum / formData.ejercicios.length).toFixed(2);
-  };
+  }, [formData.ejercicios]);
 
-  const pasaNivel = calcularPonderacion() >= 7;
+  const pasaNivel = ponderacion >= 7;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -182,7 +178,7 @@ const CrearMedicionPorristas = () => {
       {loading && <Alert variant="info">Cargando datos...</Alert>}
       {error && <Alert variant="danger">{error}</Alert>}
       {success && <Alert variant="success">{success}</Alert>}
-      {!loading && entrenadores.length > 0 && (
+      {!loading && (
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
             <Form.Label>Deportista (Cliente)</Form.Label>
@@ -228,15 +224,11 @@ const CrearMedicionPorristas = () => {
               disabled={!formData.entrenadorId}
             >
               <option value="">Seleccione una especialidad</option>
-              {Array.isArray(especialidadesPorEntrenador) && especialidadesPorEntrenador.length > 0 ? (
-                especialidadesPorEntrenador.map((esp, index) => (
-                  <option key={index} value={esp}>
-                    {esp}
-                  </option>
-                ))
-              ) : (
-                <option value="" disabled>No hay especialidades disponibles</option>
-              )}
+              {especialidadesPorEntrenador.map((esp, index) => (
+                <option key={index} value={esp}>
+                  {esp}
+                </option>
+              ))}
             </Form.Select>
           </Form.Group>
 
@@ -330,7 +322,7 @@ const CrearMedicionPorristas = () => {
           </Form.Group>
 
           <Alert variant="info">
-            Ponderación: {calcularPonderacion()} - {pasaNivel ? "Pasa Nivel" : "No Pasa Nivel"}
+            Ponderación: {ponderacion} - {pasaNivel ? "Pasa Nivel" : "No Pasa Nivel"}
           </Alert>
 
           <Form.Group className="mb-3">
@@ -423,3 +415,4 @@ const CrearMedicionPorristas = () => {
 };
 
 export default CrearMedicionPorristas;
+</xaiArtifact>
