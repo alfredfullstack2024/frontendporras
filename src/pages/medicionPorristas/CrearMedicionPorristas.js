@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from "react";
-import { crearMedicionPorristas, obtenerMedicionesPorristas, editarMedicionPorristas, eliminarMedicionPorristas, obtenerEntrenadores, obtenerClientes } from "../../api/axios";
+import { crearMedicionPorristas, obtenerMedicionesPorristas, editarMedicionPorristas, obtenerEntrenadores, obtenerClientes } from "../../api/axios";
 import { useNavigate } from "react-router-dom";
 import { Container, Form, Button, Table, Alert, Row, Col } from "react-bootstrap";
 
@@ -22,6 +22,7 @@ const CrearMedicionPorristas = () => {
   const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [nuevoEjercicio, setNuevoEjercicio] = useState({ nombre: "", calificacion: "" });
+  const [busqueda, setBusqueda] = useState(""); // Nuevo estado para la búsqueda
   const navigate = useNavigate();
 
   const categorias = [
@@ -164,18 +165,22 @@ const CrearMedicionPorristas = () => {
     });
   };
 
-  const eliminarMedicion = async (id) => {
-    try {
-      await eliminarMedicionPorristas(id);
-      setSuccess("Medición eliminada con éxito!");
-      fetchData(); // Recarga las mediciones
-    } catch (err) {
-      setError("Error al eliminar la medición: " + err.message);
-    }
-  };
-
   const especialidadesPorEntrenador = Array.isArray(entrenadores.find(e => e._id === formData.entrenadorId)?.especialidad) ? entrenadores.find(e => e._id === formData.entrenadorId)?.especialidad : [entrenadores.find(e => e._id === formData.entrenadorId)?.especialidad || "Sin especialidad"];
   console.log("Especialidades disponibles:", especialidadesPorEntrenador);
+
+  // Filtrar clientes según búsqueda
+  const clientesFiltrados = useMemo(() => {
+    return clientes.filter(cliente =>
+      (cliente.nombre + " " + cliente.apellido).toLowerCase().includes(busqueda.toLowerCase())
+    );
+  }, [clientes, busqueda]);
+
+  // Filtrar mediciones según búsqueda
+  const medicionesFiltradas = useMemo(() => {
+    return mediciones.filter(medicion =>
+      (medicion.clienteId?.nombre + " " + medicion.clienteId?.apellido).toLowerCase().includes(busqueda.toLowerCase())
+    );
+  }, [mediciones, busqueda]);
 
   return (
     <Container className="mt-4">
@@ -186,6 +191,16 @@ const CrearMedicionPorristas = () => {
       {!loading && (
         <Form onSubmit={handleSubmit}>
           <Form.Group className="mb-3">
+            <Form.Label>Buscar Deportista</Form.Label>
+            <Form.Control
+              type="text"
+              placeholder="Escribe nombre o apellido..."
+              value={busqueda}
+              onChange={(e) => setBusqueda(e.target.value)}
+            />
+          </Form.Group>
+
+          <Form.Group className="mb-3">
             <Form.Label>Deportista (Cliente)</Form.Label>
             <Form.Select
               name="clienteId"
@@ -194,7 +209,7 @@ const CrearMedicionPorristas = () => {
               required
             >
               <option value="">Seleccione un cliente</option>
-              {clientes.map((cliente) => (
+              {clientesFiltrados.map((cliente) => (
                 <option key={cliente._id} value={cliente._id}>
                   {cliente.nombre + " " + cliente.apellido}
                 </option>
@@ -377,54 +392,58 @@ const CrearMedicionPorristas = () => {
         {loading && <Alert variant="info">Cargando mediciones...</Alert>}
         {!loading && mediciones.length === 0 && <p>No hay mediciones creadas aún.</p>}
         {!loading && mediciones.length > 0 && (
-          <Table striped bordered hover>
-            <thead>
-              <tr>
-                <th>Deportista</th>
-                <th>Entrenador</th>
-                <th>Especialidad</th>
-                <th>Categoría</th>
-                <th>Posición</th>
-                <th>Ponderación</th>
-                <th>Pasa Nivel</th>
-                <th>Descripción</th>
-                <th>Creado Por</th>
-                <th>Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {mediciones.map((medicion) => (
-                <tr key={medicion._id}>
-                  <td>{medicion.clienteId?.nombre + " " + medicion.clienteId?.apellido || "Desconocido"}</td>
-                  <td>{medicion.entrenadorId?.nombre + " " + medicion.entrenadorId?.apellido || "Desconocido"}</td>
-                  <td>{medicion.equipo}</td>
-                  <td>{medicion.categoria}</td>
-                  <td>{medicion.posicion}</td>
-                  <td>{medicion.ponderacion}</td>
-                  <td>{medicion.pasaNivel ? "Sí" : "No"}</td>
-                  <td>{medicion.descripcion || "N/A"}</td>
-                  <td>{medicion.creadoPor?.nombre || "Desconocido"}</td>
-                  <td>
-                    <Button
-                      variant="warning"
-                      size="sm"
-                      onClick={() => handleEdit(medicion)}
-                      className="me-2"
-                    >
-                      Editar
-                    </Button>
-                    <Button
-                      variant="danger"
-                      size="sm"
-                      onClick={() => eliminarMedicion(medicion._id)}
-                    >
-                      Eliminar
-                    </Button>
-                  </td>
+          <div>
+            <Form.Group className="mb-3">
+              <Form.Label>Buscar Deportista</Form.Label>
+              <Form.Control
+                type="text"
+                placeholder="Escribe nombre o apellido..."
+                value={busqueda}
+                onChange={(e) => setBusqueda(e.target.value)}
+              />
+            </Form.Group>
+            <Table striped bordered hover>
+              <thead>
+                <tr>
+                  <th>Deportista</th>
+                  <th>Entrenador</th>
+                  <th>Especialidad</th>
+                  <th>Categoría</th>
+                  <th>Posición</th>
+                  <th>Ponderación</th>
+                  <th>Pasa Nivel</th>
+                  <th>Descripción</th>
+                  <th>Creado Por</th>
+                  <th>Acciones</th>
                 </tr>
-              ))}
-            </tbody>
-          </Table>
+              </thead>
+              <tbody>
+                {medicionesFiltradas.map((medicion) => (
+                  <tr key={medicion._id}>
+                    <td>{medicion.clienteId?.nombre + " " + medicion.clienteId?.apellido || "Desconocido"}</td>
+                    <td>{medicion.entrenadorId?.nombre + " " + medicion.entrenadorId?.apellido || "Desconocido"}</td>
+                    <td>{medicion.equipo}</td>
+                    <td>{medicion.categoria}</td>
+                    <td>{medicion.posicion}</td>
+                    <td>{medicion.ponderacion}</td>
+                    <td>{medicion.pasaNivel ? "Sí" : "No"}</td>
+                    <td>{medicion.descripcion || "N/A"}</td>
+                    <td>{medicion.creadoPor?.nombre || "Desconocido"}</td>
+                    <td>
+                      <Button
+                        variant="warning"
+                        size="sm"
+                        onClick={() => handleEdit(medicion)}
+                        className="me-2"
+                      >
+                        Editar
+                      </Button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          </div>
         )}
       </div>
     </Container>
