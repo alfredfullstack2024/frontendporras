@@ -1,218 +1,131 @@
 import React, { useState } from "react";
-import { Container, Button, Row, Col, Card } from "react-bootstrap";
-import { useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
 
-// Fuente Baloo 2 de Google Fonts
-const fontLink = document.createElement("link");
-fontLink.href = "https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;700&display=swap";
-fontLink.rel = "stylesheet";
-document.head.appendChild(fontLink);
-
-const VideosEntrenamiento = () => {
-  const [videoUrl, setVideoUrl] = useState(
-    "https://www.youtube.com/embed/TXSxN_WY208?list=PLfoM3A_rQ0tUBh7d8-24lTLin6v29s3N3"
-  );
-  const navigate = useNavigate();
-
-  // Categorías con emojis
+export default function VideosEntrenamiento() {
   const ejerciciosPorGrupo = {
     "🎯 Acrobacias Básicas": [
-      "🤸 ACROBACIAS BÁSICAS - EL MACACO",
-      "🎥 Curso Básico de Acrobacias",
-      "✨ Acrobacias Fáciles - Stunts",
-      "🙆‍♂️ Parada de manos con rodada",
-      "🦵 Flexibilidad para SPLIT",
-      "🖐️ Parada de manos paso a paso",
-      "↗ KIP UP tutorial",
-      "🌉 PINO PUENTE",
-      "🧍‍♂️ Vertical de cabeza",
-      "💃 3 Acrobacias para baile",
-      "🕊️ Paloma a una mano",
-      "🐌 Slow-roll - Gimnasia acrobática",
-      "🔄 Rueda paso a paso",
-      "🚫 Rueda sin manos"
+      "ACROBACIAS BÁSICAS desde el suelo - EL MACACO",
+      "Curso Básico de Acrobacias (Compilación)",
+      "Acrobacias Fáciles - Stunts Básicos",
+      "Parada de manos con rodada adelante (Paso a paso)",
+      "Gana flexibilidad en las piernas para el split",
+      "Cómo hacer una parada de manos (Paso a paso)",
+      "KIP UP en español - Paso a paso",
+      "PINO PUENTE en gimnasia rítmica",
+      "La vertical de cabeza - Gimnasia artística",
+      "3 acrobacias para baile - Mejora tus acrobacias",
+      "La paloma con una mano - Tutorial",
+      "Cómo hacer Slow-Roll - Gimnasia acrobática",
+      "La rueda - Paso a paso",
+      "Rueda sin manos - Paso a paso"
     ],
-    "🧘 Flexibilidad": [
-      "🦵 Ejercicios para flexibilidad de piernas"
+    "🧘 Flexibilidad y Estiramientos": [
+      "Ejercicios para ganar flexibilidad en las piernas",
     ],
     "🤝 Acrobacias en Pareja": [
-      "👯‍♀️ Acrobacia en pareja principiantes",
-      "💫 Acrobacias sencillas en pareja",
-      "🎶 Acrobacias TikTok en pareja",
-      "😊 Acrobacia fácil en pareja",
-      "🔝 Acrobacias intermedias en pareja",
-      "⚡ Acrobacias avanzadas en pareja"
+      "Acrobacia en pareja para principiantes",
+      "Acrobacias sencillas en pareja",
+      "Acrobacias en pareja estilo TikTok",
+      "Acrobacia fácil en pareja",
+      "Acrobacias intermedias en pareja",
+      "Acrobacias avanzadas en pareja",
     ],
     "⚡ Avanzadas": [
-      "💥 Mortal lateral - Side Flip",
-      "🌀 Flic-Flac con rueda",
-      "🏅 Rueda y flic-flac",
-      "📏 Salto carpado",
-      "⭐ Round-off principiantes"
+      "Mortal lateral - Tutorial acrobacias",
+      "Flic-flac con rondada",
+      "Curso básico de acrobacias (compilación)",
+      "Cómo hacer rueda y flic-flac avanzado",
+      "Acrobacia en pareja para principiantes (baile)",
+      "Salto carpado paso a paso",
+      "Round-off para principiantes"
     ],
     "📺 Playlist Porras": [
-      "🎉 Ver Playlist Porras"
+      "Ver Playlist Porras"
     ]
   };
 
   const videoMap = {
-    "🤸 ACROBACIAS BÁSICAS - EL MACACO": "https://www.youtube.com/embed/NIjo70Dq9wo",
-    "🎥 Curso Básico de Acrobacias": "https://www.youtube.com/embed/opC4bv1pbK8",
-    "✨ Acrobacias Fáciles - Stunts": "https://www.youtube.com/embed/cFlkFakT7FY",
-    "🙆‍♂️ Parada de manos con rodada": "https://www.youtube.com/embed/4HUJ-zKmkmM",
-    "🦵 Flexibilidad para SPLIT": "https://www.youtube.com/embed/kP2oztmC93o",
-    "🖐️ Parada de manos paso a paso": "https://www.youtube.com/embed/8djVh2Df6ew",
-    "↗ KIP UP tutorial": "https://www.youtube.com/embed/gbsYQq_ANMY",
-    "🌉 PINO PUENTE": "https://www.youtube.com/embed/VnWzN5WxbFM",
-    "🧍‍♂️ Vertical de cabeza": "https://www.youtube.com/embed/LaxBQQJTf4w",
-    "💃 3 Acrobacias para baile": "https://www.youtube.com/embed/4JSmTbeIGzg",
-    "🕊️ Paloma a una mano": "https://www.youtube.com/embed/LtaEUc-9pek",
-    "🐌 Slow-roll - Gimnasia acrobática": "https://www.youtube.com/embed/WmPaDnjUJJM",
-    "🔄 Rueda paso a paso": "https://www.youtube.com/embed/jKMOOqU6Ai0",
-    "🚫 Rueda sin manos": "https://www.youtube.com/embed/rwydmiABAoA",
-    "💥 Mortal lateral - Side Flip": "https://www.youtube.com/embed/9aFTTS-cJQA",
-    "🌀 Flic-Flac con rueda": "https://www.youtube.com/embed/xoywXLojb-o",
-    "🦵 Ejercicios para flexibilidad de piernas": "https://www.youtube.com/embed/ubp4VtL8PzQ",
-    "🏅 Rueda y flic-flac": "https://www.youtube.com/embed/Gv3tdKpANdY",
-    "👯‍♀️ Acrobacia en pareja principiantes": "https://www.youtube.com/embed/1FUSmHJMN44",
-    "💫 Acrobacias sencillas en pareja": "https://www.youtube.com/embed/J2ZDz_7cwcA",
-    "🎶 Acrobacias TikTok en pareja": "https://www.youtube.com/embed/5vi1_iutCRE",
-    "😊 Acrobacia fácil en pareja": "https://www.youtube.com/embed/s-Od8cuBvuQ",
-    "🔝 Acrobacias intermedias en pareja": "https://www.youtube.com/embed/ahW8kMjt-dU",
-    "⚡ Acrobacias avanzadas en pareja": "https://www.youtube.com/embed/TEv6g3LWUfM",
-    "📏 Salto carpado": "https://www.youtube.com/embed/w6U4QiUBd84",
-    "⭐ Round-off principiantes": "https://www.youtube.com/embed/m5gZWEP4XSA",
-    "🎉 Ver Playlist Porras": "https://www.youtube.com/embed/videoseries?list=PLJ5zQoDXumRB9ab9LZIax1qCSOv5nUtqN"
+    // Acrobacias Básicas
+    "ACROBACIAS BÁSICAS desde el suelo - EL MACACO": "https://www.youtube.com/embed/NIjo70Dq9wo",
+    "Curso Básico de Acrobacias (Compilación)": "https://www.youtube.com/embed/opC4bv1pbK8",
+    "Acrobacias Fáciles - Stunts Básicos": "https://www.youtube.com/embed/cFlkFakT7FY",
+    "Parada de manos con rodada adelante (Paso a paso)": "https://www.youtube.com/embed/4HUJ-zKmkmM",
+    "Gana flexibilidad en las piernas para el split": "https://www.youtube.com/embed/kP2oztmC93o",
+    "Cómo hacer una parada de manos (Paso a paso)": "https://www.youtube.com/embed/8djVh2Df6ew",
+    "KIP UP en español - Paso a paso": "https://www.youtube.com/embed/gbsYQq_ANMY",
+    "PINO PUENTE en gimnasia rítmica": "https://www.youtube.com/embed/VnWzN5WxbFM",
+    "La vertical de cabeza - Gimnasia artística": "https://www.youtube.com/embed/LaxBQQJTf4w",
+    "3 acrobacias para baile - Mejora tus acrobacias": "https://www.youtube.com/embed/4JSmTbeIGzg",
+    "La paloma con una mano - Tutorial": "https://www.youtube.com/embed/LtaEUc-9pek",
+    "Cómo hacer Slow-Roll - Gimnasia acrobática": "https://www.youtube.com/embed/WmPaDnjUJJM",
+    "La rueda - Paso a paso": "https://www.youtube.com/embed/jKMOOqU6Ai0",
+    "Rueda sin manos - Paso a paso": "https://www.youtube.com/embed/rwydmiABAoA",
+
+    // Flexibilidad
+    "Ejercicios para ganar flexibilidad en las piernas": "https://www.youtube.com/embed/ubp4VtL8PzQ",
+
+    // Acrobacias en Pareja
+    "Acrobacia en pareja para principiantes": "https://www.youtube.com/embed/Gv3tdKpANdY",
+    "Acrobacias sencillas en pareja": "https://www.youtube.com/embed/1FUSmHJMN44",
+    "Acrobacias en pareja estilo TikTok": "https://www.youtube.com/embed/J2ZDz_7cwcA",
+    "Acrobacia fácil en pareja": "https://www.youtube.com/embed/5vi1_iutCRE",
+    "Acrobacias intermedias en pareja": "https://www.youtube.com/embed/s-Od8cuBvuQ",
+    "Acrobacias avanzadas en pareja": "https://www.youtube.com/embed/ahW8kMjt-dU",
+
+    // Avanzadas
+    "Mortal lateral - Tutorial acrobacias": "https://www.youtube.com/embed/9aFTTS-cJQA",
+    "Flic-flac con rondada": "https://www.youtube.com/embed/xoywXLojb-o",
+    "Cómo hacer rueda y flic-flac avanzado": "https://www.youtube.com/embed/ubp4VtL8PzQ",
+    "Acrobacia en pareja para principiantes (baile)": "https://www.youtube.com/embed/Gv3tdKpANdY",
+    "Salto carpado paso a paso": "https://www.youtube.com/embed/TEv6g3LWUfM",
+    "Round-off para principiantes": "https://www.youtube.com/embed/w6U4QiUBd84",
+
+    // Playlist Porras
+    "Ver Playlist Porras": "https://www.youtube.com/embed/videoseries?list=PLJ5zQoDXumRB9ab9LZIax1qCSOv5nUtqN"
   };
 
-  const loadVideo = (ejercicio) => {
-    const url = videoMap[ejercicio] || videoUrl;
-    setVideoUrl(url);
-  };
+  const [videoSeleccionado, setVideoSeleccionado] = useState("https://www.youtube.com/embed/TXSxN_WY208?list=PLfoM3A_rQ0tUBh7d8-24lTLin6v29s3N3");
 
   return (
-    <Container className="mt-4 mb-5" style={{ fontFamily: "'Baloo 2', cursive" }}>
-      <motion.h2
-        className="text-center mb-4"
-        style={{ color: "#ff4081", fontWeight: "bold", fontSize: "2.5rem" }}
-        initial={{ opacity: 0, y: -40 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7 }}
-      >
-        🎬 Videos de Entrenamiento Acrobático
-      </motion.h2>
-
-      <div className="text-start mb-4">
-        <motion.div initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}>
-          <Button
-            onClick={() => navigate("/dashboard")}
-            style={{
-              background: "linear-gradient(45deg, #ff4081, #ff80ab)",
-              border: "none",
-              borderRadius: "25px",
-              padding: "10px 25px",
-              fontWeight: "bold",
-              fontSize: "1.1rem",
-              color: "#fff",
-              boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
-              transition: "all 0.3s ease"
-            }}
-            onMouseEnter={(e) => e.target.style.transform = "scale(1.05)"}
-            onMouseLeave={(e) => e.target.style.transform = "scale(1)"}
-          >
-            ⬅ Volver al Inicio
-          </Button>
-        </motion.div>
-      </div>
-
-      <motion.div
-        className="mb-5"
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
-        transition={{ duration: 0.7 }}
-      >
-        <Card style={{
-          border: "none",
-          boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
-          borderRadius: "15px",
-          overflow: "hidden"
-        }}>
-          <Card.Body className="p-0">
-            <iframe
-              width="100%"
-              height="450"
-              src={videoUrl}
-              title="Video de entrenamiento"
-              frameBorder="0"
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-              allowFullScreen
-              style={{ borderRadius: "15px 15px 0 0" }}
-            ></iframe>
-          </Card.Body>
-        </Card>
-      </motion.div>
-
-      {Object.keys(ejerciciosPorGrupo).map((grupo, gIndex) => (
-        <motion.div
-          key={grupo}
-          className="mb-5"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 * gIndex, duration: 0.6 }}
-        >
-          <h3
-            style={{
-              color: "#ff4081",
-              fontWeight: "bold",
-              borderBottom: "2px solid #ff80ab",
-              paddingBottom: "8px",
-              fontSize: "1.6rem"
-            }}
-          >
-            {grupo}
-          </h3>
-          <Row>
-            {ejerciciosPorGrupo[grupo].map((ejercicio, index) => (
-              <Col key={ejercicio} xs={6} md={4} lg={3} className="mb-3">
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.05 * index, duration: 0.4 }}
-                >
-                  <Button
-                    onClick={() => loadVideo(ejercicio)}
+    <div style={{ padding: "20px", fontFamily: "Arial, sans-serif", background: "#f0f8ff" }}>
+      <h1 style={{ textAlign: "center", color: "#ff4081" }}>🎬 Videos de Entrenamiento</h1>
+      <div style={{ display: "flex", gap: "20px" }}>
+        <div style={{ flex: 1 }}>
+          {Object.keys(ejerciciosPorGrupo).map((categoria) => (
+            <div key={categoria} style={{ marginBottom: "20px" }}>
+              <h2 style={{ color: "#3f51b5" }}>{categoria}</h2>
+              <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
+                {ejerciciosPorGrupo[categoria].map((ejercicio) => (
+                  <button
+                    key={ejercicio}
                     style={{
-                      width: "100%",
-                      background: "linear-gradient(45deg, #ff4081, #ff80ab)",
+                      background: "linear-gradient(45deg, #ff4081, #ff9800)",
+                      color: "white",
                       border: "none",
-                      borderRadius: "15px",
-                      padding: "12px",
-                      fontWeight: "500",
-                      fontSize: "1rem",
-                      boxShadow: "0 4px 10px rgba(255, 64, 129, 0.4)",
-                      color: "#fff",
-                      transition: "transform 0.2s ease, box-shadow 0.2s ease"
+                      padding: "10px",
+                      borderRadius: "10px",
+                      cursor: "pointer",
+                      flex: "1 0 45%"
                     }}
-                    onMouseEnter={(e) => {
-                      e.target.style.transform = "scale(1.07)";
-                      e.target.style.boxShadow = "0 6px 14px rgba(255, 64, 129, 0.6)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.target.style.transform = "scale(1)";
-                      e.target.style.boxShadow = "0 4px 10px rgba(255, 64, 129, 0.4)";
-                    }}
+                    onClick={() => setVideoSeleccionado(videoMap[ejercicio])}
                   >
                     {ejercicio}
-                  </Button>
-                </motion.div>
-              </Col>
-            ))}
-          </Row>
-        </motion.div>
-      ))}
-    </Container>
+                  </button>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={{ flex: 1 }}>
+          <iframe
+            width="100%"
+            height="500px"
+            src={videoSeleccionado}
+            title="Video de entrenamiento"
+            frameBorder="0"
+            allowFullScreen
+          ></iframe>
+        </div>
+      </div>
+    </div>
   );
-};
-
-export default VideosEntrenamiento;
+}
