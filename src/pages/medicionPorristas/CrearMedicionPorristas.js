@@ -131,7 +131,6 @@ const CrearMedicionPorristas = () => {
         setSuccess("Medición actualizada con éxito!");
         setEditMode(false);
         setEditId(null);
-        // Recargar mediciones tras la edición
         const updatedMediciones = await obtenerMedicionesPorristas();
         setMediciones(updatedMediciones.data);
       } else {
@@ -182,6 +181,15 @@ const CrearMedicionPorristas = () => {
       (medicion.clienteId?.nombre + " " + medicion.clienteId?.apellido).toLowerCase().includes(busqueda.toLowerCase())
     );
   }, [mediciones, busqueda]);
+
+  // Función para calcular ponderado con manejo de errores
+  const calcularPonderacion = (ejercicios) => {
+    if (!Array.isArray(ejercicios) || ejercicios.length === 0) return "0.00";
+    const validEjercicios = ejercicios.filter(ej => ej.calificacion && !isNaN(ej.calificacion));
+    if (validEjercicios.length === 0) return "0.00";
+    const sum = validEjercicios.reduce((acc, ej) => acc + Number(ej.calificacion), 0);
+    return (sum / validEjercicios.length).toFixed(2);
+  };
 
   return (
     <Container className="mt-4">
@@ -426,8 +434,8 @@ const CrearMedicionPorristas = () => {
                     <td>{medicion.equipo}</td>
                     <td>{medicion.categoria}</td>
                     <td>{medicion.posicion}</td>
-                    <td>{medicion.ejercicios.length > 0 ? (medicion.ejercicios.reduce((acc, ej) => acc + ej.calificacion, 0) / medicion.ejercicios.length).toFixed(2) : "0.00"}</td>
-                    <td>{medicion.ejercicios.length > 0 && (medicion.ejercicios.reduce((acc, ej) => acc + ej.calificacion, 0) / medicion.ejercicios.length) >= 7 ? "Sí" : "No"}</td>
+                    <td>{calcularPonderacion(medicion.ejercicios)}</td>
+                    <td>{Number(calcularPonderacion(medicion.ejercicios)) >= 7 ? "Sí" : "No"}</td>
                     <td>{medicion.descripcion || "N/A"}</td>
                     <td>{medicion.creadoPor?.nombre || "Desconocido"}</td>
                     <td>
