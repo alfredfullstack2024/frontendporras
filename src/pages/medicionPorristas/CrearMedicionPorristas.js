@@ -22,7 +22,7 @@ const CrearMedicionPorristas = () => {
   const [editId, setEditId] = useState(null);
   const [loading, setLoading] = useState(true);
   const [nuevoEjercicio, setNuevoEjercicio] = useState({ nombre: "", calificacion: "" });
-  const [busqueda, setBusqueda] = useState(""); // Nuevo estado para la búsqueda
+  const [busqueda, setBusqueda] = useState("");
   const navigate = useNavigate();
 
   const categorias = [
@@ -131,9 +131,13 @@ const CrearMedicionPorristas = () => {
         setSuccess("Medición actualizada con éxito!");
         setEditMode(false);
         setEditId(null);
+        // Recargar mediciones tras la edición
+        const updatedMediciones = await obtenerMedicionesPorristas();
+        setMediciones(updatedMediciones.data);
       } else {
         response = await crearMedicionPorristas(formData);
         setSuccess("Medición creada con éxito!");
+        fetchData();
       }
 
       setFormData({
@@ -145,7 +149,6 @@ const CrearMedicionPorristas = () => {
         ejercicios: [],
         descripcion: "",
       });
-      fetchData();
     } catch (err) {
       setError(err.response?.data?.mensaje || "Error al procesar la medición.");
     }
@@ -168,14 +171,12 @@ const CrearMedicionPorristas = () => {
   const especialidadesPorEntrenador = Array.isArray(entrenadores.find(e => e._id === formData.entrenadorId)?.especialidad) ? entrenadores.find(e => e._id === formData.entrenadorId)?.especialidad : [entrenadores.find(e => e._id === formData.entrenadorId)?.especialidad || "Sin especialidad"];
   console.log("Especialidades disponibles:", especialidadesPorEntrenador);
 
-  // Filtrar clientes según búsqueda
   const clientesFiltrados = useMemo(() => {
     return clientes.filter(cliente =>
       (cliente.nombre + " " + cliente.apellido).toLowerCase().includes(busqueda.toLowerCase())
     );
   }, [clientes, busqueda]);
 
-  // Filtrar mediciones según búsqueda
   const medicionesFiltradas = useMemo(() => {
     return mediciones.filter(medicion =>
       (medicion.clienteId?.nombre + " " + medicion.clienteId?.apellido).toLowerCase().includes(busqueda.toLowerCase())
@@ -425,8 +426,8 @@ const CrearMedicionPorristas = () => {
                     <td>{medicion.equipo}</td>
                     <td>{medicion.categoria}</td>
                     <td>{medicion.posicion}</td>
-                    <td>{medicion.ponderacion}</td>
-                    <td>{medicion.pasaNivel ? "Sí" : "No"}</td>
+                    <td>{medicion.ejercicios.length > 0 ? (medicion.ejercicios.reduce((acc, ej) => acc + ej.calificacion, 0) / medicion.ejercicios.length).toFixed(2) : "0.00"}</td>
+                    <td>{medicion.ejercicios.length > 0 && (medicion.ejercicios.reduce((acc, ej) => acc + ej.calificacion, 0) / medicion.ejercicios.length) >= 7 ? "Sí" : "No"}</td>
                     <td>{medicion.descripcion || "N/A"}</td>
                     <td>{medicion.creadoPor?.nombre || "Desconocido"}</td>
                     <td>
