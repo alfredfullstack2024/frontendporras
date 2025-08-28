@@ -1,4 +1,3 @@
-// src/pages/Login.js
 import React, { useState } from "react";
 import { Form, Button, Alert, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
@@ -21,7 +20,6 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-
     try {
       await login(formData.email, formData.password);
     } catch (err) {
@@ -33,9 +31,7 @@ const Login = () => {
   return (
     <div className="container mt-5">
       <h2>Iniciar Sesión</h2>
-
       {error && <Alert variant="danger">{error}</Alert>}
-
       <Card style={{ maxWidth: "400px", margin: "0 auto" }}>
         <Card.Body>
           <Form onSubmit={handleSubmit}>
@@ -49,7 +45,6 @@ const Login = () => {
                 required
               />
             </Form.Group>
-
             <Form.Group className="mb-3" controlId="password">
               <Form.Label>Contraseña</Form.Label>
               <Form.Control
@@ -60,18 +55,14 @@ const Login = () => {
                 required
               />
             </Form.Group>
-
             <Button variant="primary" type="submit" className="w-100">
               Iniciar Sesión
             </Button>
           </Form>
         </Card.Body>
       </Card>
-
-      <div className="text-center mt-3">
-        <Button variant="link" onClick={() => navigate("/register")}>
-          ¿No tienes una cuenta? Regístrate
-        </Button> 
+      <div className="text-center mt-3" style={{ fontStyle: "italic", color: "#666" }}>
+        Bienvenido a nuestro software. Por protocolos de seguridad de bases de datos, tras un período de inactividad, puede requerirse varios intentos de ingreso para reactivar los servidores, optimizando su rendimiento. Gracias por su paciencia.
       </div>
     </div>
   );
