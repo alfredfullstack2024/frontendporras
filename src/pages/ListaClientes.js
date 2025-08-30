@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Table, Button, Alert, Spinner } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import axios from "../api/axios";
+import * as XLSX from "xlsx";
 
 const ListaClientes = () => {
   const [clientes, setClientes] = useState([]);
@@ -16,7 +17,7 @@ const ListaClientes = () => {
           headers: { Authorization: `Bearer ${token}` },
         });
         const clientesData = Array.isArray(response.data) ? response.data : [];
-        console.log("Datos de clientes recibidos:", clientesData); // Depuración
+        console.log("Datos de clientes recibidos:", clientesData);
         setClientes(clientesData);
       } catch (err) {
         setError(`❌ Error al cargar los clientes: ${err.message}`);
@@ -41,6 +42,13 @@ const ListaClientes = () => {
     }
   };
 
+  const handleExportExcel = () => {
+    const worksheet = XLSX.utils.json_to_sheet(clientes);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Clientes");
+    XLSX.writeFile(workbook, "clientes_completos.xlsx");
+  };
+
   if (cargando) {
     return <Spinner animation="border" variant="primary" />;
   }
@@ -49,11 +57,16 @@ const ListaClientes = () => {
     <div>
       <h2>Lista de clientes</h2>
       {error && <Alert variant="danger">{error}</Alert>}
-      <Link to="/clientes/crear">
-        <Button variant="primary" className="mb-3">
-          Agregar cliente
+      <div className="mb-3">
+        <Link to="/clientes/crear">
+          <Button variant="primary" className="me-2">
+            Agregar cliente
+          </Button>
+        </Link>
+        <Button variant="success" onClick={handleExportExcel}>
+          Descargar Excel
         </Button>
-      </Link>
+      </div>
       <Table striped bordered hover responsive>
         <thead>
           <tr>
