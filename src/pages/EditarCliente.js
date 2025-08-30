@@ -10,7 +10,7 @@ const EditarCliente = () => {
     apellido: "",
     email: "",
     telefono: "",
-    direccion: "",
+    direccion: "", // Aseguramos que esté inicializado
     estado: "activo",
     numeroIdentificacion: "",
     fechaNacimiento: "",
@@ -39,7 +39,7 @@ const EditarCliente = () => {
           apellido: response.data.apellido || "",
           email: response.data.email || "",
           telefono: response.data.telefono || "",
-          direccion: response.data.direccion || "",
+          direccion: response.data.direccion || "", // Aseguramos que se cargue
           estado: response.data.estado || "activo",
           numeroIdentificacion: response.data.numeroIdentificacion || "",
           fechaNacimiento: response.data.fechaNacimiento || "",
@@ -140,6 +140,7 @@ const EditarCliente = () => {
             name="direccion"
             value={formData.direccion}
             onChange={handleChange}
+            required
           />
         </Form.Group>
 
