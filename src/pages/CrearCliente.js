@@ -10,7 +10,7 @@ const CrearCliente = () => {
     apellido: "",
     email: "",
     telefono: "",
-    direccion: "",
+    direccion: "", // Aseguramos que esté inicializado
     estado: "activo",
     numeroIdentificacion: "",
     fechaNacimiento: "",
@@ -52,7 +52,7 @@ const CrearCliente = () => {
       setError("El teléfono debe tener 10 dígitos numéricos.");
       return;
     }
-    if (!formData.direccion.trim()) {
+    if (!formData.direccion.trim()) { // Validación para dirección
       setError("La dirección es obligatoria.");
       return;
     }
@@ -87,7 +87,7 @@ const CrearCliente = () => {
         apellido: "",
         email: "",
         telefono: "",
-        direccion: "",
+        direccion: "", // Resetear dirección
         estado: "activo",
         numeroIdentificacion: "",
         fechaNacimiento: "",
