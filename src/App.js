@@ -3,100 +3,77 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
 import DashboardLayout from "./layouts/DashboardLayout";
 import PrivateRoute from "./components/PrivateRoute";
-
 // Páginas Públicas
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import NotFound from "./pages/NotFound";
 import ConsultaUsuario from "./pages/ConsultaUsuario";
-
 // Páginas Protegidas
 import Dashboard from "./pages/Dashboard";
 import Suscripcion from "./pages/Suscripcion";
-
 // Clientes
 import ListaClientes from "./pages/ListaClientes";
 import CrearCliente from "./pages/CrearCliente";
 import EditarCliente from "./pages/EditarCliente";
-
 // Membresías
 import Membresias from "./pages/Membresias";
 import CrearMembresia from "./pages/CrearMembresia";
 import EditarMembresia from "./pages/EditarMembresia";
-
 // Entrenadores
 import Entrenadores from "./pages/Entrenadores";
 import CrearEntrenador from "./pages/CrearEntrenador";
 import EditarEntrenador from "./pages/EditarEntrenador";
-
 // Productos
 import Productos from "./pages/Productos";
 import CrearProducto from "./pages/CrearProducto";
 import EditarProducto from "./pages/EditarProducto";
-
 // Pagos
 import Pagos from "./pages/pagos/Pagos";
 import CrearPago from "./pages/pagos/CrearPago";
 import EditarPago from "./pages/pagos/EditarPago";
-
 // Contabilidad
 import Contabilidad from "./pages/contabilidad/Contabilidad";
 import CrearTransaccion from "./pages/contabilidad/CrearTransaccion";
 import EditarTransaccion from "./pages/contabilidad/EditarTransaccion";
-
 // Clases
 import ListaClases from "./pages/sesiones/ListaClases";
-
 // Usuarios
 import Usuarios from "./pages/Usuarios";
 import CrearUsuario from "./pages/usuarios/CrearUsuario";
 import EditarUsuario from "./pages/usuarios/EditarUsuario";
-
 // Asistencias
 import Asistencias from "./pages/asistencias/Asistencias";
 import RegistrarAsistencia from "./pages/asistencias/RegistrarAsistencia";
-
 // Rutinas
 import ConsultarRutina from "./pages/ConsultarRutina";
 import CrearRutina from "./pages/rutinas/CrearRutina";
 import AsignarRutina from "./pages/rutinas/AsignarRutina";
 import EditarAsignacionRutina from "./pages/rutinas/EditarAsignacionRutina";
-
 // Composición Corporal
 import ConsultarComposicionCorporal from "./pages/ConsultarComposicionCorporal";
 import ComposicionCorporal from "./pages/ComposicionCorporal";
-
 // Indicadores
 import Indicadores from "./pages/Indicadores";
-
 // Videos
 import VideosEntrenamiento from "./pages/videos/VideosEntrenamiento";
-
 // Nueva página
 import AdminInscripciones from "./pages/admin/AdminInscripciones";
-
 // Medición Porristas
 import CrearMedicionPorristas from "./pages/medicionPorristas/CrearMedicionPorristas";
-
 // Componente para proteger rutas basadas en roles
 const RoleBasedRoute = ({ element, allowedRoles }) => {
   const { user } = useAuth();
-
   if (!user || !user.rol) {
     return <Navigate to="/login" replace />;
   }
-
   if (allowedRoles.includes("admin") && user.rol === "admin") {
     return element;
   }
-
   if (!allowedRoles.includes(user.rol)) {
     return <Navigate to="/dashboard" replace />;
   }
-
   return element;
 };
-
 const App = () => {
   return (
     <Routes>
@@ -113,13 +90,11 @@ const App = () => {
           />
         }
       />
-
       {/* Rutas Protegidas dentro del DashboardLayout */}
       <Route element={<PrivateRoute />}>
         <Route element={<DashboardLayout />}>
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/suscripcion" element={<Suscripcion />} />
-
           {/* Rutas para Recepcionistas y Admins */}
           <Route
             path="/clientes"
@@ -283,7 +258,6 @@ const App = () => {
               />
             }
           />
-
           {/* Rutas para Entrenadores y Admins */}
           <Route
             path="/rutinas/crear"
@@ -330,7 +304,6 @@ const App = () => {
               />
             }
           />
-
           {/* Rutas para Usuarios */}
           <Route
             path="/rutinas/consultar"
@@ -359,7 +332,6 @@ const App = () => {
               />
             }
           />
-
           {/* Rutas Solo para Admins */}
           <Route
             path="/contabilidad"
@@ -440,5 +412,4 @@ const App = () => {
     </Routes>
   );
 };
-
 export default App;
