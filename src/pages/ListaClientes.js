@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Table, Button, Alert, Spinner } from "react-bootstrap";
+import { Table, Button, Alert, Spinner, Form } from "react-bootstrap";
 import { Link } from "react-router-dom";
 import axios from "../api/axios";
 import * as XLSX from "xlsx";
@@ -8,6 +8,7 @@ const ListaClientes = () => {
   const [clientes, setClientes] = useState([]);
   const [error, setError] = useState("");
   const [cargando, setCargando] = useState(true);
+  const [busqueda, setBusqueda] = useState("");
 
   useEffect(() => {
     const fetchClientes = async () => {
@@ -49,6 +50,15 @@ const ListaClientes = () => {
     XLSX.writeFile(workbook, "clientes_completos.xlsx");
   };
 
+  const filtrarClientes = () => {
+    return clientes.filter(
+      (cliente) =>
+        cliente.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+        cliente.apellido.toLowerCase().includes(busqueda.toLowerCase()) ||
+        cliente.numeroIdentificacion.toLowerCase().includes(busqueda.toLowerCase())
+    );
+  };
+
   if (cargando) {
     return <Spinner animation="border" variant="primary" />;
   }
@@ -58,14 +68,24 @@ const ListaClientes = () => {
       <h2>Lista de Clientes</h2>
       {error && <Alert variant="danger">{error}</Alert>}
       <div className="mb-3">
-        <Link to="/clientes/crear">
-          <Button variant="primary" className="me-2">
-            Agregar Cliente
+        <Form.Control
+          type="text"
+          placeholder="Buscar por nombre, apellido o número de ID..."
+          value={busqueda}
+          onChange={(e) => setBusqueda(e.target.value)}
+          className="mb-2"
+          style={{ maxWidth: "300px" }}
+        />
+        <div>
+          <Link to="/clientes/crear">
+            <Button variant="primary" className="me-2">
+              Agregar Cliente
+            </Button>
+          </Link>
+          <Button variant="success" onClick={handleExportExcel}>
+            Descargar Excel
           </Button>
-        </Link>
-        <Button variant="success" onClick={handleExportExcel}>
-          Descargar Excel
-        </Button>
+        </div>
       </div>
       <Table striped bordered hover responsive>
         <thead>
@@ -89,8 +109,8 @@ const ListaClientes = () => {
           </tr>
         </thead>
         <tbody>
-          {clientes.length > 0 ? (
-            clientes.map((cliente) => (
+          {filtrarClientes().length > 0 ? (
+            filtrarClientes().map((cliente) => (
               <tr key={cliente._id}>
                 <td>{cliente.nombre || "No especificado"}</td>
                 <td>{cliente.apellido || "No especificado"}</td>
@@ -125,7 +145,7 @@ const ListaClientes = () => {
           ) : (
             <tr>
               <td colSpan="16" className="text-center">
-                No hay clientes registrados
+                No hay clientes que coincidan con la búsqueda
               </td>
             </tr>
           )}
