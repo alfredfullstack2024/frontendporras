@@ -54,13 +54,13 @@ const ListaClientes = () => {
   }
 
   return (
-    <div>
-      <h2>Lista de clientes</h2>
+    <div className="container mt-4">
+      <h2>Lista de Clientes</h2>
       {error && <Alert variant="danger">{error}</Alert>}
       <div className="mb-3">
         <Link to="/clientes/crear">
           <Button variant="primary" className="me-2">
-            Agregar cliente
+            Agregar Cliente
           </Button>
         </Link>
         <Button variant="success" onClick={handleExportExcel}>
@@ -72,11 +72,19 @@ const ListaClientes = () => {
           <tr>
             <th>Nombre</th>
             <th>Apellido</th>
-            <th>Correo electrónico</th>
+            <th>Correo</th>
             <th>Teléfono</th>
             <th>Dirección</th>
             <th>Estado</th>
-            <th>Número de Cédula</th>
+            <th>Número ID</th>
+            <th>Fecha Nacimiento</th>
+            <th>Edad</th>
+            <th>Tipo Documento</th>
+            <th>RH</th>
+            <th>EPS</th>
+            <th>Talla Superior</th>
+            <th>Talla Inferior</th>
+            <th>Responsable</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -91,6 +99,14 @@ const ListaClientes = () => {
                 <td>{cliente.direccion || "No especificado"}</td>
                 <td>{cliente.estado || "No especificado"}</td>
                 <td>{cliente.numeroIdentificacion || "No especificado"}</td>
+                <td>{cliente.fechaNacimiento || "No especificado"}</td>
+                <td>{cliente.edad || "No especificado"}</td>
+                <td>{cliente.tipoDocumento || "No especificado"}</td>
+                <td>{cliente.rh || "No especificado"}</td>
+                <td>{cliente.eps || "No especificado"}</td>
+                <td>{cliente.tallaTrenSuperior || "No especificado"}</td>
+                <td>{cliente.tallaTrenInferior || "No especificado"}</td>
+                <td>{cliente.nombreResponsable || "No especificado"}</td>
                 <td>
                   <Link to={`/clientes/editar/${cliente._id}`}>
                     <Button variant="warning" className="me-2">
@@ -108,7 +124,7 @@ const ListaClientes = () => {
             ))
           ) : (
             <tr>
-              <td colSpan="8" className="text-center">
+              <td colSpan="16" className="text-center">
                 No hay clientes registrados
               </td>
             </tr>
