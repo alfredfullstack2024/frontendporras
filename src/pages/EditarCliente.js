@@ -12,7 +12,15 @@ const EditarCliente = () => {
     telefono: "",
     direccion: "",
     estado: "activo",
-    numeroIdentificacion: "", // Añadido: campo obligatorio
+    numeroIdentificacion: "",
+    fechaNacimiento: "",
+    edad: "",
+    tipoDocumento: "C.C",
+    rh: "",
+    eps: "",
+    tallaTrenSuperior: "",
+    tallaTrenInferior: "",
+    nombreResponsable: "",
   });
   const [error, setError] = useState("");
   const [cargando, setCargando] = useState(true);
@@ -25,7 +33,7 @@ const EditarCliente = () => {
         const response = await axios.get(`/clientes/${id}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
-        console.log("Datos recibidos del cliente:", response.data); // Depuración
+        console.log("Datos recibidos del cliente:", response.data);
         setFormData({
           nombre: response.data.nombre || "",
           apellido: response.data.apellido || "",
@@ -33,7 +41,15 @@ const EditarCliente = () => {
           telefono: response.data.telefono || "",
           direccion: response.data.direccion || "",
           estado: response.data.estado || "activo",
-          numeroIdentificacion: response.data.numeroIdentificacion || "", // Añadido
+          numeroIdentificacion: response.data.numeroIdentificacion || "",
+          fechaNacimiento: response.data.fechaNacimiento || "",
+          edad: response.data.edad || "",
+          tipoDocumento: response.data.tipoDocumento || "C.C",
+          rh: response.data.rh || "",
+          eps: response.data.eps || "",
+          tallaTrenSuperior: response.data.tallaTrenSuperior || "",
+          tallaTrenInferior: response.data.tallaTrenInferior || "",
+          nombreResponsable: response.data.nombreResponsable || "",
         });
       } catch (err) {
         setError(`❌ Error al cargar el cliente: ${err.message}`);
@@ -46,13 +62,13 @@ const EditarCliente = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    console.log(`Campo ${name} cambiado a: ${value}`); // Depuración
+    console.log(`Campo ${name} cambiado a: ${value}`);
     setFormData({ ...formData, [name]: value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Datos enviados al backend:", formData); // Depuración
+    console.log("Datos enviados al backend:", formData);
     try {
       const token = localStorage.getItem("token");
       await axios.put(`/clientes/${id}`, formData, {
@@ -62,7 +78,7 @@ const EditarCliente = () => {
     } catch (err) {
       const errorMessage = err.response?.data?.message || err.message;
       setError(`❌ Error al actualizar el cliente: ${errorMessage}`);
-      console.error("Detalles del error:", err.response?.data); // Depuración
+      console.error("Detalles del error:", err.response?.data);
     }
   };
 
@@ -149,6 +165,99 @@ const EditarCliente = () => {
             value={formData.numeroIdentificacion}
             onChange={handleChange}
             required
+          />
+        </Form.Group>
+
+        <Form.Group className="mb-3" controlId="fechaNacimiento">
+          <Form.Label>Fecha de Nacimiento</Form.Label>
+          <Form.Control
+            type="date"
+            name="fechaNacimiento"
+            value={formData.fechaNacimiento}
+            onChange={handleChange}
+            required
+          />
+        </Form.Group>
+
+        <Form.Group className="mb-3" controlId="edad">
+          <Form.Label>Edad</Form.Label>
+          <Form.Control
+            type="number"
+            name="edad"
+            value={formData.edad}
+            onChange={handleChange}
+            required
+          />
+        </Form.Group>
+
+        <Form.Group className="mb-3" controlId="tipoDocumento">
+          <Form.Label>Tipo de Documento</Form.Label>
+          <Form.Control
+            as="select"
+            name="tipoDocumento"
+            value={formData.tipoDocumento}
+            onChange={handleChange}
+            required
+          >
+            <option value="C.C">C.C</option>
+            <option value="T.I">T.I</option>
+            <option value="RC">RC</option>
+            <option value="PPT">PPT</option>
+          </Form.Control>
+        </Form.Group>
+
+        <Form.Group className="mb-3" controlId="rh">
+          <Form.Label>RH</Form.Label>
+          <Form.Control
+            type="text"
+            name="rh"
+            value={formData.rh}
+            onChange={handleChange}
+            placeholder="Ej. A+, O-"
+          />
+        </Form.Group>
+
+        <Form.Group className="mb-3" controlId="eps">
+          <Form.Label>EPS</Form.Label>
+          <Form.Control
+            type="text"
+            name="eps"
+            value={formData.eps}
+            onChange={handleChange}
+            placeholder="Ingresa la EPS"
+          />
+        </Form.Group>
+
+        <Form.Group className="mb-3" controlId="tallaTrenSuperior">
+          <Form.Label>Talla Tren Superior</Form.Label>
+          <Form.Control
+            type="text"
+            name="tallaTrenSuperior"
+            value={formData.tallaTrenSuperior}
+            onChange={handleChange}
+            placeholder="Ej. S, M, L"
+          />
+        </Form.Group>
+
+        <Form.Group className="mb-3" controlId="tallaTrenInferior">
+          <Form.Label>Talla Tren Inferior</Form.Label>
+          <Form.Control
+            type="text"
+            name="tallaTrenInferior"
+            value={formData.tallaTrenInferior}
+            onChange={handleChange}
+            placeholder="Ej. S, M, L"
+          />
+        </Form.Group>
+
+        <Form.Group className="mb-3" controlId="nombreResponsable">
+          <Form.Label>Nombre Responsable</Form.Label>
+          <Form.Control
+            type="text"
+            name="nombreResponsable"
+            value={formData.nombreResponsable}
+            onChange={handleChange}
+            placeholder="Ingresa el nombre del responsable"
           />
         </Form.Group>
 
