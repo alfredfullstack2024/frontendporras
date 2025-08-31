@@ -62,7 +62,10 @@ const ListaClientes = () => {
       );
     }
     if (filtroEstado) {
-      filtered = filtered.filter((cliente) => cliente.estado === filtroEstado);
+      filtered = filtered.filter((cliente) => {
+        const estado = cliente.estado ? cliente.estado.toString().toLowerCase() : "";
+        return estado === filtroEstado.toLowerCase();
+      });
     }
     return filtered;
   };
@@ -91,8 +94,8 @@ const ListaClientes = () => {
           style={{ maxWidth: "200px", display: "inline-block", marginLeft: "10px" }}
         >
           <option value="">Todos los estados</option>
-          <option value="Activo">Activos</option>
-          <option value="Inactivo">Inactivos</option>
+          <option value="activo">Activos</option>
+          <option value="inactivo">Inactivos</option>
         </Form.Select>
         <div>
           <Link to="/clientes/crear">
