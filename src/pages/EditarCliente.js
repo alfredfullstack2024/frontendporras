@@ -10,7 +10,7 @@ const EditarCliente = () => {
     apellido: "",
     email: "",
     telefono: "",
-    direccion: "", // Aseguramos que esté inicializado
+    direccion: "",
     estado: "activo",
     numeroIdentificacion: "",
     fechaNacimiento: "",
@@ -39,10 +39,12 @@ const EditarCliente = () => {
           apellido: response.data.apellido || "",
           email: response.data.email || "",
           telefono: response.data.telefono || "",
-          direccion: response.data.direccion || "", // Aseguramos que se cargue
+          direccion: response.data.direccion || "",
           estado: response.data.estado || "activo",
           numeroIdentificacion: response.data.numeroIdentificacion || "",
-          fechaNacimiento: response.data.fechaNacimiento || "",
+          fechaNacimiento: response.data.fechaNacimiento
+            ? new Date(response.data.fechaNacimiento).toISOString().split("T")[0]
+            : "",
           edad: response.data.edad || "",
           tipoDocumento: response.data.tipoDocumento || "C.C",
           rh: response.data.rh || "",
@@ -236,7 +238,7 @@ const EditarCliente = () => {
             name="tallaTrenSuperior"
             value={formData.tallaTrenSuperior}
             onChange={handleChange}
-            placeholder="Ej. S, M, L"
+            placeholder="Ingresa la talla (ej. S, M, L)"
           />
         </Form.Group>
 
@@ -247,7 +249,7 @@ const EditarCliente = () => {
             name="tallaTrenInferior"
             value={formData.tallaTrenInferior}
             onChange={handleChange}
-            placeholder="Ej. S, M, L"
+            placeholder="Ingresa la talla (ej. S, M, L)"
           />
         </Form.Group>
 
