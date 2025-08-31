@@ -9,6 +9,7 @@ const ListaClientes = () => {
   const [error, setError] = useState("");
   const [cargando, setCargando] = useState(true);
   const [busqueda, setBusqueda] = useState("");
+  const [filtroEstado, setFiltroEstado] = useState("");
 
   useEffect(() => {
     const fetchClientes = async () => {
@@ -44,19 +45,26 @@ const ListaClientes = () => {
   };
 
   const handleExportExcel = () => {
-    const worksheet = XLSX.utils.json_to_sheet(clientes);
+    const worksheet = XLSX.utils.json_to_sheet(filtrarClientes());
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Clientes");
     XLSX.writeFile(workbook, "clientes_completos.xlsx");
   };
 
   const filtrarClientes = () => {
-    return clientes.filter(
-      (cliente) =>
-        cliente.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
-        cliente.apellido.toLowerCase().includes(busqueda.toLowerCase()) ||
-        cliente.numeroIdentificacion.toLowerCase().includes(busqueda.toLowerCase())
-    );
+    let filtered = [...clientes];
+    if (busqueda) {
+      filtered = filtered.filter(
+        (cliente) =>
+          cliente.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
+          cliente.apellido.toLowerCase().includes(busqueda.toLowerCase()) ||
+          cliente.numeroIdentificacion.toLowerCase().includes(busqueda.toLowerCase())
+      );
+    }
+    if (filtroEstado) {
+      filtered = filtered.filter((cliente) => cliente.estado === filtroEstado);
+    }
+    return filtered;
   };
 
   if (cargando) {
@@ -76,6 +84,16 @@ const ListaClientes = () => {
           className="mb-2"
           style={{ maxWidth: "300px" }}
         />
+        <Form.Select
+          value={filtroEstado}
+          onChange={(e) => setFiltroEstado(e.target.value)}
+          className="mb-2"
+          style={{ maxWidth: "200px", display: "inline-block", marginLeft: "10px" }}
+        >
+          <option value="">Todos los estados</option>
+          <option value="Activo">Activos</option>
+          <option value="Inactivo">Inactivos</option>
+        </Form.Select>
         <div>
           <Link to="/clientes/crear">
             <Button variant="primary" className="me-2">
