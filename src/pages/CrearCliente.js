@@ -1,7 +1,7 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Button, Alert } from "react-bootstrap";
-import { crearCliente } from "../api/axios";
+import { crearCliente, obtenerEntrenadores } from "../api/axios"; // Añadimos obtenerEntrenadores
 import { AuthContext } from "../context/AuthContext";
 
 const CrearCliente = () => {
@@ -21,11 +21,29 @@ const CrearCliente = () => {
     tallaTrenSuperior: "",
     tallaTrenInferior: "",
     nombreResponsable: "",
+    equipo: "", // Nuevo campo para el equipo
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [equipos, setEquipos] = useState([]); // Estado para almacenar los equipos
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
+
+  useEffect(() => {
+    const fetchEquipos = async () => {
+      try {
+        const response = await obtenerEntrenadores(); // Obtener todos los entrenadores
+        // Extraer las especialidades (equipos) únicas
+        const equiposUnicos = [...new Set(response.data.flatMap(entrenador => 
+          Array.isArray(entrenador.especialidad) ? entrenador.especialidad : [entrenador.especialidad]
+        ).filter(especialidad => especialidad))]; // Filtra valores vacíos o nulos
+        setEquipos(equiposUnicos);
+      } catch (err) {
+        setError("Error al cargar equipos: " + err.message);
+      }
+    };
+    fetchEquipos();
+  }, []);
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -35,7 +53,6 @@ const CrearCliente = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
-
     if (!formData.nombre.trim()) {
       setError("El nombre es obligatorio.");
       return;
@@ -68,12 +85,10 @@ const CrearCliente = () => {
       setError("La edad debe ser un número positivo.");
       return;
     }
-
     if (!user || !user.token) {
       setError("Debes iniciar sesión para crear un cliente.");
       return;
     }
-
     try {
       const config = {
         headers: { Authorization: `Bearer ${user.token}` },
@@ -98,13 +113,14 @@ const CrearCliente = () => {
         tallaTrenSuperior: "",
         tallaTrenInferior: "",
         nombreResponsable: "",
+        equipo: "",
       });
       setTimeout(() => navigate("/clientes"), 2000);
     } catch (err) {
       console.error("Error al crear cliente:", err);
       setError(
         "Error al crear el cliente: " +
-          (err.response?.data?.message || "Error desconocido")
+        (err.response?.data?.message || "Error desconocido")
       );
     }
   };
@@ -267,6 +283,20 @@ const CrearCliente = () => {
             onChange={handleChange}
             placeholder="Ingresa el nombre del responsable"
           />
+        </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Equipo</Form.Label>
+          <Form.Select
+            name="equipo"
+            value={formData.equipo}
+            onChange={handleChange}
+            required
+          >
+            <option value="">Seleccione un equipo</option>
+            {equipos.map((equipo, index) => (
+              <option key={index} value={equipo}>{equipo}</option>
+            ))}
+          </Form.Select>
         </Form.Group>
         <Form.Group className="mb-3">
           <Form.Label>Estado</Form.Label>
