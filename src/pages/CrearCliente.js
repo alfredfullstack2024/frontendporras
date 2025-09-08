@@ -13,8 +13,8 @@ const CrearCliente = () => {
     direccion: "",
     estado: "activo",
     numeroIdentificacion: "",
-    fechaNacimiento: "", // Asegurado como obligatorio
-    edad: "", // Asegurado como obligatorio
+    fechaNacimiento: "", // Inicialmente vacío, pero obligatorio
+    edad: "", // Inicialmente vacío, pero obligatorio
     tipoDocumento: "C.C",
     rh: "",
     eps: "",
@@ -45,7 +45,11 @@ const CrearCliente = () => {
   }, []);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: name === "edad" ? (value === "" ? "" : parseInt(value)) : value,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -91,12 +95,19 @@ const CrearCliente = () => {
       return;
     }
 
+    // Preparar datos para el backend
+    const dataToSend = {
+      ...formData,
+      edad: parseInt(formData.edad), // Asegura que edad sea un número
+      fechaNacimiento: formData.fechaNacimiento ? new Date(formData.fechaNacimiento) : null, // Convierte a Date
+    };
+
     try {
       const config = {
         headers: { Authorization: `Bearer ${user.token}` },
       };
-      console.log("Datos enviados:", formData);
-      const response = await crearCliente(formData, config);
+      console.log("Datos enviados al backend:", dataToSend); // Depuración
+      const response = await crearCliente(dataToSend, config);
       console.log("Respuesta del backend:", response.data);
       setSuccess("Cliente creado con éxito!");
       setFormData({
@@ -119,7 +130,7 @@ const CrearCliente = () => {
       });
       setTimeout(() => navigate("/clientes"), 2000);
     } catch (err) {
-      console.error("Error al crear cliente:", err);
+      console.error("Error al crear cliente:", err.response?.data || err);
       setError(
         "Error al crear el cliente: " +
         (err.response?.data?.message || "Error desconocido")
