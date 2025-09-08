@@ -1,8 +1,5 @@
-import React, { useState, useEffect, useContext } from "react";
-import { useNavigate } from "react-router-dom";
-import { Form, Button, Alert } from "react-bootstrap";
-import { crearCliente, obtenerEntrenadores } from "../api/axios";
-import { AuthContext } from "../context/AuthContext";
+// frontend/src/pages/CrearCliente.js
+import React, { useState } from "react";
 
 const CrearCliente = () => {
   const [formData, setFormData] = useState({
@@ -13,103 +10,47 @@ const CrearCliente = () => {
     direccion: "",
     estado: "activo",
     numeroIdentificacion: "",
-    fechaNacimiento: "", // Inicialmente vacío, pero obligatorio
-    edad: "", // Inicialmente vacío, pero obligatorio
+    fechaNacimiento: "",
+    edad: "",
     tipoDocumento: "C.C",
-    rh: "",
-    eps: "",
-    tallaTrenSuperior: "",
-    tallaTrenInferior: "",
-    nombreResponsable: "",
-    equipo: "",
   });
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [equipos, setEquipos] = useState([]);
-  const navigate = useNavigate();
-  const { user } = useContext(AuthContext);
-
-  useEffect(() => {
-    const fetchEquipos = async () => {
-      try {
-        const response = await obtenerEntrenadores();
-        const equiposUnicos = [...new Set(response.data.flatMap(entrenador => 
-          Array.isArray(entrenador.especialidad) ? entrenador.especialidad : [entrenador.especialidad]
-        ).filter(especialidad => especialidad))];
-        setEquipos(equiposUnicos);
-      } catch (err) {
-        setError("Error al cargar equipos: " + err.message);
-      }
-    };
-    fetchEquipos();
-  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: name === "edad" ? (value === "" ? "" : parseInt(value)) : value,
+      [name]: name === "edad" ? (value ? Number(value) : "") : value,
     }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
 
-    // Validaciones mejoradas
-    if (!formData.nombre.trim()) {
-      setError("El nombre es obligatorio.");
-      return;
-    }
-    if (!formData.apellido.trim()) {
-      setError("El apellido es obligatorio.");
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setError("Correo electrónico inválido.");
-      return;
-    }
-    if (!/^\d{10}$/.test(formData.telefono)) {
-      setError("El teléfono debe tener 10 dígitos numéricos.");
-      return;
-    }
-    if (!formData.direccion.trim()) {
-      setError("La dirección es obligatoria.");
-      return;
-    }
-    if (!formData.numeroIdentificacion.trim()) {
-      setError("El número de identificación es obligatorio.");
-      return;
-    }
-    if (!formData.fechaNacimiento) {
-      setError("La fecha de nacimiento es obligatoria.");
-      return;
-    }
-    if (!formData.edad || isNaN(formData.edad) || parseInt(formData.edad) <= 0) {
-      setError("La edad debe ser un número positivo.");
-      return;
-    }
-    if (!user || !user.token) {
-      setError("Debes iniciar sesión para crear un cliente.");
-      return;
-    }
-
-    // Preparar datos para el backend
     const dataToSend = {
       ...formData,
-      edad: parseInt(formData.edad), // Asegura que edad sea un número
-      fechaNacimiento: formData.fechaNacimiento ? new Date(formData.fechaNacimiento) : null, // Convierte a Date
+      edad: Number(formData.edad),
+      fechaNacimiento: formData.fechaNacimiento, // string YYYY-MM-DD
     };
 
+    console.log("Datos listos para enviar:", dataToSend);
+
     try {
-      const config = {
-        headers: { Authorization: `Bearer ${user.token}` },
-      };
-      console.log("Datos enviados al backend:", dataToSend); // Depuración
-      const response = await crearCliente(dataToSend, config);
-      console.log("Respuesta del backend:", response.data);
-      setSuccess("Cliente creado con éxito!");
+      const response = await fetch("http://localhost:5000/api/clientes", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(dataToSend),
+      });
+
+      if (!response.ok) {
+        throw new Error("Error al crear cliente");
+      }
+
+      const result = await response.json();
+      alert("Cliente creado con éxito");
+      console.log(result);
+
       setFormData({
         nombre: "",
         apellido: "",
@@ -121,212 +62,147 @@ const CrearCliente = () => {
         fechaNacimiento: "",
         edad: "",
         tipoDocumento: "C.C",
-        rh: "",
-        eps: "",
-        tallaTrenSuperior: "",
-        tallaTrenInferior: "",
-        nombreResponsable: "",
-        equipo: "",
       });
-      setTimeout(() => navigate("/clientes"), 2000);
-    } catch (err) {
-      console.error("Error al crear cliente:", err.response?.data || err);
-      setError(
-        "Error al crear el cliente: " +
-        (err.response?.data?.message || "Error desconocido")
-      );
+    } catch (error) {
+      console.error(error);
+      alert("Hubo un error al crear el cliente");
     }
   };
 
   return (
     <div className="container mt-4">
       <h2>Crear Cliente</h2>
-      {error && <Alert variant="danger">{error}</Alert>}
-      {success && <Alert variant="success">{success}</Alert>}
-      <Form onSubmit={handleSubmit}>
-        <Form.Group className="mb-3">
-          <Form.Label>Nombre</Form.Label>
-          <Form.Control
-            type="text"
-            name="nombre"
-            value={formData.nombre}
-            onChange={handleChange}
-            placeholder="Ingresa el nombre"
-            required
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Apellido</Form.Label>
-          <Form.Control
-            type="text"
-            name="apellido"
-            value={formData.apellido}
-            onChange={handleChange}
-            placeholder="Ingresa el apellido"
-            required
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Correo electrónico</Form.Label>
-          <Form.Control
-            type="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            placeholder="Ingresa el correo"
-            required
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Teléfono</Form.Label>
-          <Form.Control
-            type="tel"
-            name="telefono"
-            value={formData.telefono}
-            onChange={handleChange}
-            placeholder="Ingresa el teléfono (10 dígitos)"
-            required
-            pattern="\d{10}"
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Dirección</Form.Label>
-          <Form.Control
-            type="text"
-            name="direccion"
-            value={formData.direccion}
-            onChange={handleChange}
-            placeholder="Ingresa la dirección"
-            required
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Número de Identificación</Form.Label>
-          <Form.Control
-            type="text"
-            name="numeroIdentificacion"
-            value={formData.numeroIdentificacion}
-            onChange={handleChange}
-            placeholder="Ingresa el número de identificación"
-            required
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Fecha de Nacimiento</Form.Label>
-          <Form.Control
-            type="date"
-            name="fechaNacimiento"
-            value={formData.fechaNacimiento}
-            onChange={handleChange}
-            required
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Edad</Form.Label>
-          <Form.Control
-            type="number"
-            name="edad"
-            value={formData.edad}
-            onChange={handleChange}
-            placeholder="Ingresa la edad"
-            required
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Tipo de Documento</Form.Label>
-          <Form.Control
-            as="select"
-            name="tipoDocumento"
-            value={formData.tipoDocumento}
-            onChange={handleChange}
-            required
-          >
-            <option value="C.C">C.C</option>
-            <option value="T.I">T.I</option>
-            <option value="RC">RC</option>
-            <option value="PPT">PPT</option>
-          </Form.Control>
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>RH</Form.Label>
-          <Form.Control
-            type="text"
-            name="rh"
-            value={formData.rh}
-            onChange={handleChange}
-            placeholder="Ingresa el RH (ej. A+, O-)"
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>EPS</Form.Label>
-          <Form.Control
-            type="text"
-            name="eps"
-            value={formData.eps}
-            onChange={handleChange}
-            placeholder="Ingresa la EPS"
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Talla Tren Superior</Form.Label>
-          <Form.Control
-            type="text"
-            name="tallaTrenSuperior"
-            value={formData.tallaTrenSuperior}
-            onChange={handleChange}
-            placeholder="Ingresa la talla (ej. S, M, L)"
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Talla Tren Inferior</Form.Label>
-          <Form.Control
-            type="text"
-            name="tallaTrenInferior"
-            value={formData.tallaTrenInferior}
-            onChange={handleChange}
-            placeholder="Ingresa la talla (ej. S, M, L)"
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Nombre Responsable</Form.Label>
-          <Form.Control
-            type="text"
-            name="nombreResponsable"
-            value={formData.nombreResponsable}
-            onChange={handleChange}
-            placeholder="Ingresa el nombre del responsable"
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Equipo</Form.Label>
-          <Form.Select
-            name="equipo"
-            value={formData.equipo}
-            onChange={handleChange}
-            required
-          >
-            <option value="">Seleccione un equipo</option>
-            {equipos.map((equipo, index) => (
-              <option key={index} value={equipo}>{equipo}</option>
-            ))}
-          </Form.Select>
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Estado</Form.Label>
-          <Form.Select
-            name="estado"
-            value={formData.estado}
-            onChange={handleChange}
-            required
-          >
-            <option value="activo">Activo</option>
-            <option value="inactivo">Inactivo</option>
-          </Form.Select>
-        </Form.Group>
-        <Button variant="primary" type="submit">
+      <form onSubmit={handleSubmit} className="card p-4">
+        <div className="row">
+          <div className="col-md-6 mb-3">
+            <label>Nombre</label>
+            <input
+              type="text"
+              className="form-control"
+              name="nombre"
+              value={formData.nombre}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="col-md-6 mb-3">
+            <label>Apellido</label>
+            <input
+              type="text"
+              className="form-control"
+              name="apellido"
+              value={formData.apellido}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="col-md-6 mb-3">
+            <label>Email</label>
+            <input
+              type="email"
+              className="form-control"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="col-md-6 mb-3">
+            <label>Teléfono</label>
+            <input
+              type="text"
+              className="form-control"
+              name="telefono"
+              value={formData.telefono}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="col-md-6 mb-3">
+            <label>Dirección</label>
+            <input
+              type="text"
+              className="form-control"
+              name="direccion"
+              value={formData.direccion}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="col-md-6 mb-3">
+            <label>Estado</label>
+            <select
+              className="form-control"
+              name="estado"
+              value={formData.estado}
+              onChange={handleChange}
+            >
+              <option value="activo">Activo</option>
+              <option value="inactivo">Inactivo</option>
+            </select>
+          </div>
+
+          <div className="col-md-6 mb-3">
+            <label>Número de Identificación</label>
+            <input
+              type="text"
+              className="form-control"
+              name="numeroIdentificacion"
+              value={formData.numeroIdentificacion}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="col-md-6 mb-3">
+            <label>Tipo de Documento</label>
+            <select
+              className="form-control"
+              name="tipoDocumento"
+              value={formData.tipoDocumento}
+              onChange={handleChange}
+            >
+              <option value="C.C">C.C</option>
+              <option value="T.I">T.I</option>
+              <option value="C.E">C.E</option>
+              <option value="P.A">P.A</option>
+            </select>
+          </div>
+
+          <div className="col-md-6 mb-3">
+            <label>Fecha de Nacimiento</label>
+            <input
+              type="date"
+              className="form-control"
+              name="fechaNacimiento"
+              value={formData.fechaNacimiento}
+              onChange={handleChange}
+              required
+            />
+          </div>
+
+          <div className="col-md-6 mb-3">
+            <label>Edad</label>
+            <input
+              type="number"
+              className="form-control"
+              name="edad"
+              value={formData.edad}
+              onChange={handleChange}
+              required
+            />
+          </div>
+        </div>
+
+        <button type="submit" className="btn btn-primary">
           Crear Cliente
-        </Button>
-      </Form>
+        </button>
+      </form>
     </div>
   );
 };
