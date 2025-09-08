@@ -1,4 +1,3 @@
-// src/pages/CrearCliente.js
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Button, Alert } from "react-bootstrap";
@@ -15,7 +14,6 @@ const CrearCliente = () => {
     estado: "activo",
     numeroIdentificacion: "",
     fechaNacimiento: "",
-    edad: "",
     tipoDocumento: "C.C",
     rh: "",
     eps: "",
@@ -24,12 +22,24 @@ const CrearCliente = () => {
     nombreResponsable: "",
     equipo: "",
   });
-
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [equipos, setEquipos] = useState([]);
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
+
+  // Función para calcular edad a partir de la fecha de nacimiento
+  const calcularEdad = (fecha) => {
+    if (!fecha) return null;
+    const hoy = new Date();
+    const nacimiento = new Date(fecha);
+    let edad = hoy.getFullYear() - nacimiento.getFullYear();
+    const mes = hoy.getMonth() - nacimiento.getMonth();
+    if (mes < 0 || (mes === 0 && hoy.getDate() < nacimiento.getDate())) {
+      edad--;
+    }
+    return edad;
+  };
 
   useEffect(() => {
     const fetchEquipos = async () => {
@@ -37,13 +47,11 @@ const CrearCliente = () => {
         const response = await obtenerEntrenadores();
         const equiposUnicos = [
           ...new Set(
-            response.data
-              .flatMap((entrenador) =>
-                Array.isArray(entrenador.especialidad)
-                  ? entrenador.especialidad
-                  : [entrenador.especialidad]
-              )
-              .filter((especialidad) => especialidad)
+            response.data.flatMap((entrenador) =>
+              Array.isArray(entrenador.especialidad)
+                ? entrenador.especialidad
+                : [entrenador.especialidad]
+            ).filter((especialidad) => especialidad)
           ),
         ];
         setEquipos(equiposUnicos);
@@ -55,7 +63,11 @@ const CrearCliente = () => {
   }, []);
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
   };
 
   const handleSubmit = async (e) => {
@@ -63,55 +75,32 @@ const CrearCliente = () => {
     setError("");
     setSuccess("");
 
-    if (!formData.nombre.trim()) {
-      setError("El nombre es obligatorio.");
-      return;
-    }
-    if (!formData.apellido.trim()) {
-      setError("El apellido es obligatorio.");
-      return;
-    }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-      setError("Correo electrónico inválido.");
-      return;
-    }
-    if (!/^\d{10}$/.test(formData.telefono)) {
-      setError("El teléfono debe tener 10 dígitos numéricos.");
-      return;
-    }
-    if (!formData.direccion.trim()) {
-      setError("La dirección es obligatoria.");
-      return;
-    }
-    if (!formData.numeroIdentificacion.trim()) {
-      setError("El número de identificación es obligatorio.");
-      return;
-    }
-    if (!formData.fechaNacimiento) {
-      setError("La fecha de nacimiento es obligatoria.");
-      return;
-    }
-    if (!formData.edad || isNaN(formData.edad) || formData.edad <= 0) {
-      setError("La edad debe ser un número positivo.");
-      return;
-    }
-    if (!formData.equipo) {
-      setError("El equipo es obligatorio.");
-      return;
-    }
+    // Validaciones mínimas
+    if (!formData.nombre.trim()) return setError("El nombre es obligatorio.");
+    if (!formData.apellido.trim()) return setError("El apellido es obligatorio.");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) return setError("Correo electrónico inválido.");
+    if (!/^\d{10}$/.test(formData.telefono)) return setError("El teléfono debe tener 10 dígitos numéricos.");
+    if (!formData.direccion.trim()) return setError("La dirección es obligatoria.");
+    if (!formData.numeroIdentificacion.trim()) return setError("El número de identificación es obligatorio.");
+    if (!formData.fechaNacimiento) return setError("La fecha de nacimiento es obligatoria.");
 
-    if (!user || !user.token) {
-      setError("Debes iniciar sesión para crear un cliente.");
-      return;
-    }
+    const edadCalculada = calcularEdad(formData.fechaNacimiento);
+    if (!edadCalculada || edadCalculada <= 0) return setError("Fecha de nacimiento inválida.");
+
+    if (!user || !user.token) return setError("Debes iniciar sesión para crear un cliente.");
+
+    // Prepara datos
+    const dataToSend = {
+      ...formData,
+      edad: edadCalculada,
+      fechaNacimiento: new Date(formData.fechaNacimiento),
+    };
 
     try {
       const config = {
         headers: { Authorization: `Bearer ${user.token}` },
       };
-      console.log("Datos enviados:", formData);
-      const response = await crearCliente(formData, config);
-      console.log("Respuesta del backend:", response.data);
+      const response = await crearCliente(dataToSend, config);
       setSuccess("Cliente creado con éxito!");
       setFormData({
         nombre: "",
@@ -122,7 +111,6 @@ const CrearCliente = () => {
         estado: "activo",
         numeroIdentificacion: "",
         fechaNacimiento: "",
-        edad: "",
         tipoDocumento: "C.C",
         rh: "",
         eps: "",
@@ -133,11 +121,7 @@ const CrearCliente = () => {
       });
       setTimeout(() => navigate("/clientes"), 2000);
     } catch (err) {
-      console.error("Error al crear cliente:", err);
-      setError(
-        "Error al crear el cliente: " +
-          (err.response?.data?.message || "Error desconocido")
-      );
+      setError("Error al crear el cliente: " + (err.response?.data?.message || "Error desconocido"));
     }
   };
 
@@ -158,6 +142,7 @@ const CrearCliente = () => {
             required
           />
         </Form.Group>
+
         <Form.Group className="mb-3">
           <Form.Label>Apellido</Form.Label>
           <Form.Control
@@ -169,6 +154,7 @@ const CrearCliente = () => {
             required
           />
         </Form.Group>
+
         <Form.Group className="mb-3">
           <Form.Label>Correo electrónico</Form.Label>
           <Form.Control
@@ -180,6 +166,7 @@ const CrearCliente = () => {
             required
           />
         </Form.Group>
+
         <Form.Group className="mb-3">
           <Form.Label>Teléfono</Form.Label>
           <Form.Control
@@ -192,6 +179,7 @@ const CrearCliente = () => {
             pattern="\d{10}"
           />
         </Form.Group>
+
         <Form.Group className="mb-3">
           <Form.Label>Dirección</Form.Label>
           <Form.Control
@@ -203,6 +191,7 @@ const CrearCliente = () => {
             required
           />
         </Form.Group>
+
         <Form.Group className="mb-3">
           <Form.Label>Número de Identificación</Form.Label>
           <Form.Control
@@ -214,6 +203,7 @@ const CrearCliente = () => {
             required
           />
         </Form.Group>
+
         <Form.Group className="mb-3">
           <Form.Label>Fecha de Nacimiento</Form.Label>
           <Form.Control
@@ -224,21 +214,12 @@ const CrearCliente = () => {
             required
           />
         </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Edad</Form.Label>
-          <Form.Control
-            type="number"
-            name="edad"
-            value={formData.edad}
-            onChange={handleChange}
-            placeholder="Ingresa la edad"
-            required
-          />
-        </Form.Group>
+
+        {/* Eliminamos campo de edad manual, ya se calcula */}
+
         <Form.Group className="mb-3">
           <Form.Label>Tipo de Documento</Form.Label>
-          <Form.Control
-            as="select"
+          <Form.Select
             name="tipoDocumento"
             value={formData.tipoDocumento}
             onChange={handleChange}
@@ -248,8 +229,9 @@ const CrearCliente = () => {
             <option value="T.I">T.I</option>
             <option value="RC">RC</option>
             <option value="PPT">PPT</option>
-          </Form.Control>
+          </Form.Select>
         </Form.Group>
+
         <Form.Group className="mb-3">
           <Form.Label>RH</Form.Label>
           <Form.Control
@@ -260,6 +242,7 @@ const CrearCliente = () => {
             placeholder="Ingresa el RH (ej. A+, O-)"
           />
         </Form.Group>
+
         <Form.Group className="mb-3">
           <Form.Label>EPS</Form.Label>
           <Form.Control
@@ -270,6 +253,7 @@ const CrearCliente = () => {
             placeholder="Ingresa la EPS"
           />
         </Form.Group>
+
         <Form.Group className="mb-3">
           <Form.Label>Talla Tren Superior</Form.Label>
           <Form.Control
@@ -280,6 +264,7 @@ const CrearCliente = () => {
             placeholder="Ingresa la talla (ej. S, M, L)"
           />
         </Form.Group>
+
         <Form.Group className="mb-3">
           <Form.Label>Talla Tren Inferior</Form.Label>
           <Form.Control
@@ -290,6 +275,7 @@ const CrearCliente = () => {
             placeholder="Ingresa la talla (ej. S, M, L)"
           />
         </Form.Group>
+
         <Form.Group className="mb-3">
           <Form.Label>Nombre Responsable</Form.Label>
           <Form.Control
@@ -300,6 +286,7 @@ const CrearCliente = () => {
             placeholder="Ingresa el nombre del responsable"
           />
         </Form.Group>
+
         <Form.Group className="mb-3">
           <Form.Label>Equipo</Form.Label>
           <Form.Select
@@ -316,6 +303,7 @@ const CrearCliente = () => {
             ))}
           </Form.Select>
         </Form.Group>
+
         <Form.Group className="mb-3">
           <Form.Label>Estado</Form.Label>
           <Form.Select
@@ -328,6 +316,7 @@ const CrearCliente = () => {
             <option value="inactivo">Inactivo</option>
           </Form.Select>
         </Form.Group>
+
         <Button variant="primary" type="submit">
           Crear Cliente
         </Button>
