@@ -10,7 +10,7 @@ const CrearEntrenador = () => {
     apellido: "",
     correo: "",
     telefono: "",
-    equipo: "",
+    especialidad: "", // Mantenemos el nombre del campo como 'especialidad'
     clases: [{ nombreClase: "Entrenamiento General", dias: [], capacidadMaxima: 10 }],
   });
   const [error, setError] = useState(null);
@@ -95,7 +95,7 @@ const CrearEntrenador = () => {
           />
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Especialidad</Form.Label>
+          <Form.Label>Equipo</Form.Label> {/* Cambiado de "Especialidad" a "Equipo" */}
           <Form.Control
             type="text"
             value={entrenador.especialidad}
@@ -103,7 +103,6 @@ const CrearEntrenador = () => {
             required
           />
         </Form.Group>
-
         {entrenador.clases.map((clase, claseIndex) => (
           <div key={claseIndex} className="mb-4">
             <h5>Clase {claseIndex + 1}</h5>
@@ -160,7 +159,6 @@ const CrearEntrenador = () => {
             </Button>
           </div>
         ))}
-
         <Button variant="primary" type="submit">
           Crear
         </Button>
@@ -170,6 +168,3 @@ const CrearEntrenador = () => {
 };
 
 export default CrearEntrenador;
-
-
-
