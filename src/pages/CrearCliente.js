@@ -1,3 +1,4 @@
+// src/pages/CrearCliente.js
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Button, Alert } from "react-bootstrap";
@@ -23,6 +24,7 @@ const CrearCliente = () => {
     nombreResponsable: "",
     equipo: "",
   });
+
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [equipos, setEquipos] = useState([]);
@@ -53,11 +55,7 @@ const CrearCliente = () => {
   }, []);
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: name === "edad" ? (value === "" ? "" : parseInt(value)) : value,
-    }));
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
@@ -65,7 +63,6 @@ const CrearCliente = () => {
     setError("");
     setSuccess("");
 
-    // Validaciones
     if (!formData.nombre.trim()) {
       setError("El nombre es obligatorio.");
       return;
@@ -94,32 +91,26 @@ const CrearCliente = () => {
       setError("La fecha de nacimiento es obligatoria.");
       return;
     }
-    if (
-      !formData.edad ||
-      isNaN(formData.edad) ||
-      parseInt(formData.edad) <= 0
-    ) {
+    if (!formData.edad || isNaN(formData.edad) || formData.edad <= 0) {
       setError("La edad debe ser un número positivo.");
       return;
     }
+    if (!formData.equipo) {
+      setError("El equipo es obligatorio.");
+      return;
+    }
+
     if (!user || !user.token) {
       setError("Debes iniciar sesión para crear un cliente.");
       return;
     }
 
-    // Preparar datos para el backend
-    const dataToSend = {
-      ...formData,
-      edad: parseInt(formData.edad), // número
-      fechaNacimiento: formData.fechaNacimiento, // string YYYY-MM-DD
-    };
-
     try {
       const config = {
         headers: { Authorization: `Bearer ${user.token}` },
       };
-      console.log("Datos enviados al backend:", dataToSend);
-      const response = await crearCliente(dataToSend, config);
+      console.log("Datos enviados:", formData);
+      const response = await crearCliente(formData, config);
       console.log("Respuesta del backend:", response.data);
       setSuccess("Cliente creado con éxito!");
       setFormData({
@@ -142,7 +133,7 @@ const CrearCliente = () => {
       });
       setTimeout(() => navigate("/clientes"), 2000);
     } catch (err) {
-      console.error("Error al crear cliente:", err.response?.data || err);
+      console.error("Error al crear cliente:", err);
       setError(
         "Error al crear el cliente: " +
           (err.response?.data?.message || "Error desconocido")
