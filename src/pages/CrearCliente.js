@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import { Form, Button, Alert } from "react-bootstrap";
-import { crearCliente, obtenerEntrenadores } from "../api/axios"; // Añadimos obtenerEntrenadores
+import { crearCliente, obtenerEntrenadores } from "../api/axios";
 import { AuthContext } from "../context/AuthContext";
 
 const CrearCliente = () => {
@@ -13,30 +13,29 @@ const CrearCliente = () => {
     direccion: "",
     estado: "activo",
     numeroIdentificacion: "",
-    fechaNacimiento: "",
-    edad: "",
+    fechaNacimiento: "", // Asegurado como obligatorio
+    edad: "", // Asegurado como obligatorio
     tipoDocumento: "C.C",
     rh: "",
     eps: "",
     tallaTrenSuperior: "",
     tallaTrenInferior: "",
     nombreResponsable: "",
-    equipo: "", // Nuevo campo para el equipo
+    equipo: "",
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [equipos, setEquipos] = useState([]); // Estado para almacenar los equipos
+  const [equipos, setEquipos] = useState([]);
   const navigate = useNavigate();
   const { user } = useContext(AuthContext);
 
   useEffect(() => {
     const fetchEquipos = async () => {
       try {
-        const response = await obtenerEntrenadores(); // Obtener todos los entrenadores
-        // Extraer las especialidades (equipos) únicas
+        const response = await obtenerEntrenadores();
         const equiposUnicos = [...new Set(response.data.flatMap(entrenador => 
           Array.isArray(entrenador.especialidad) ? entrenador.especialidad : [entrenador.especialidad]
-        ).filter(especialidad => especialidad))]; // Filtra valores vacíos o nulos
+        ).filter(especialidad => especialidad))];
         setEquipos(equiposUnicos);
       } catch (err) {
         setError("Error al cargar equipos: " + err.message);
@@ -53,6 +52,8 @@ const CrearCliente = () => {
     e.preventDefault();
     setError("");
     setSuccess("");
+
+    // Validaciones mejoradas
     if (!formData.nombre.trim()) {
       setError("El nombre es obligatorio.");
       return;
@@ -81,7 +82,7 @@ const CrearCliente = () => {
       setError("La fecha de nacimiento es obligatoria.");
       return;
     }
-    if (!formData.edad || isNaN(formData.edad) || formData.edad <= 0) {
+    if (!formData.edad || isNaN(formData.edad) || parseInt(formData.edad) <= 0) {
       setError("La edad debe ser un número positivo.");
       return;
     }
@@ -89,6 +90,7 @@ const CrearCliente = () => {
       setError("Debes iniciar sesión para crear un cliente.");
       return;
     }
+
     try {
       const config = {
         headers: { Authorization: `Bearer ${user.token}` },
