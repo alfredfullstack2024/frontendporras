@@ -16,10 +16,9 @@ const CrearPago = () => {
   });
   const [error, setError] = useState("");
   const [showTiquete, setShowTiquete] = useState(false);
-  const [showMensajeImpresion, setShowMensajeImpresion] = useState(false);
-  const [isRegisterDisabled, setIsRegisterDisabled] = useState(false);
   const navigate = useNavigate();
 
+  // Configuración del tiquete
   const tiqueteConfig = {
     nombreEstablecimiento: "Nombre del Gimnasio",
     direccion: "Carrera 123 # 45 67",
@@ -27,6 +26,7 @@ const CrearPago = () => {
     nit: "123456789",
   };
 
+  // Obtener y actualizar el contador del tiquete desde localStorage
   const [ticketNumber, setTicketNumber] = useState(() => {
     const savedTicketNumber = localStorage.getItem("lastTicketNumber");
     return savedTicketNumber ? parseInt(savedTicketNumber, 10) + 1 : 1;
@@ -78,9 +78,7 @@ const CrearPago = () => {
 
     try {
       await crearPago(formData);
-      setShowTiquete(true);
-      setShowMensajeImpresion(true);
-      setIsRegisterDisabled(true); // Deshabilitar el botón
+      setShowTiquete(true); // Mostrar tiquete tras registrar
     } catch (err) {
       setError("Error al registrar el pago: " + err.message);
       if (err.message.includes("Sesión expirada")) {
@@ -90,6 +88,7 @@ const CrearPago = () => {
   };
 
   const imprimirTiquete = () => {
+    // Incrementar y guardar el nuevo número de tiquete
     const newTicketNumber = ticketNumber;
     localStorage.setItem("lastTicketNumber", newTicketNumber);
     setTicketNumber(newTicketNumber + 1);
@@ -113,11 +112,8 @@ const CrearPago = () => {
     printWindow.document.close();
     printWindow.print();
     printWindow.close();
-
-    setShowTiquete(false);
-    setShowMensajeImpresion(false);
-    setIsRegisterDisabled(false); // Reactivar el botón
-    navigate("/pagos");
+    setShowTiquete(false); // Ocultar tras imprimir
+    navigate("/pagos"); // Redirigir después de imprimir
   };
 
   const fechaFinal = new Date(formData.fecha);
@@ -128,13 +124,6 @@ const CrearPago = () => {
       <h2>Registrar Pago</h2>
 
       {error && <Alert variant="danger">{error}</Alert>}
-
-      {showMensajeImpresion && (
-        <Alert variant="info">
-          El pago se ha registrado correctamente. <br />
-          <strong>Por favor imprima el recibo generado antes de continuar.</strong>
-        </Alert>
-      )}
 
       <Card>
         <Card.Body>
@@ -167,7 +156,8 @@ const CrearPago = () => {
                 <option value="">Seleccione un producto</option>
                 {productos.map((producto) => (
                   <option key={producto._id} value={producto._id}>
-                    {producto.nombre} - ${producto.precio} ({producto.stock} en stock)
+                    {producto.nombre} - ${producto.precio} ({producto.stock} en
+                    stock)
                   </option>
                 ))}
               </Form.Control>
@@ -214,7 +204,7 @@ const CrearPago = () => {
               </Form.Control>
             </Form.Group>
 
-            <Button variant="primary" type="submit" disabled={isRegisterDisabled}>
+            <Button variant="primary" type="submit">
               Registrar Pago
             </Button>
             <Button
@@ -227,16 +217,7 @@ const CrearPago = () => {
           </Form>
 
           {showTiquete && (
-            <div className="mt-4">
-              {/* Botón de impresión arriba */}
-              <Button
-                variant="primary"
-                className="mb-3"
-                onClick={imprimirTiquete}
-              >
-                Imprimir Tiquete
-              </Button>
-
+            <div>
               <div
                 id="tiquete"
                 style={{
@@ -244,6 +225,7 @@ const CrearPago = () => {
                   fontFamily: "Arial, sans-serif",
                   padding: "10px",
                   border: "1px solid #000",
+                  marginTop: "20px",
                 }}
               >
                 <h1 style={{ textAlign: "center" }}>
@@ -277,10 +259,16 @@ const CrearPago = () => {
                   Devolución de Dinero
                 </p>
               </div>
-
+              <Button
+                variant="primary"
+                className="mt-2"
+                onClick={imprimirTiquete}
+              >
+                Imprimir Tiquete
+              </Button>
               <Button
                 variant="secondary"
-                className="ms-2 mt-3"
+                className="ms-2 mt-2"
                 onClick={() => setShowTiquete(false)}
               >
                 Cancelar
